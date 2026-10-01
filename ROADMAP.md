@@ -7,6 +7,7 @@ compatibility remains an important target. Target versions must be selected and
 tested before they become support promises; see [COMPATIBILITY.md](COMPATIBILITY.md).
 
 The starting point is the [2026-10-01 audit](docs/compatibility-audit-2026-10-01.md).
+Prepared work is tracked in the [local PR candidate inventory](docs/pr-candidates-2026-10-01.md).
 
 ## Phase 1: Establish a verified baseline
 

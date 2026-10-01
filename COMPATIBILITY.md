@@ -14,6 +14,7 @@ See the [full audit](docs/compatibility-audit-2026-10-01.md) for evidence and li
 | --- | --- | --- |
 | PHP | `>=7.0.0` in Composer | PHP 8.4.25 parsed all 359 non-Blade PHP files; 37 implicit-nullability notices in 24 files remain |
 | Laravel | `>=5.5` in Composer | No complete Laravel/PHP runtime combination has passed the existing suite in this audit |
+| Laravel 12.69.3 / 13.34.0 + PHP 8.4.25 + SQLite | Temporary consumer with production dependencies | Install, login/dashboard/menu/user-list HTTP smoke and cache commands passed; both generator modes failed; full compatibility is not established |
 | Laravel 11–13 scaffolding | Allowed by the runtime constraint | Uses Doctrine connection methods removed in Laravel 11 |
 | Test dependencies | BrowserKit `^6.0` | Its Illuminate constraints stop at Laravel 10; cannot resolve an 11–13 test matrix unchanged |
 | Test bootstrap | Legacy Eloquent factories | Requires migration for modern Laravel |

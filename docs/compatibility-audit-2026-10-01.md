@@ -33,21 +33,23 @@ dependency, and security changes remain separate work.
 
 PHP 8.4.25 was built from the official php.net source distribution, with its
 published SHA-256 verified. Composer 2.10.3 was obtained from getcomposer.org
-and its published SHA-256 verified. This isolated CLI does not provide the full
-database/XML/image-extension environment required by the historical suite.
+and its published SHA-256 verified. The initial minimal CLI was extended with
+verified official libxml2 and SQLite builds for actual disposable-application
+checks. The historical test suite remains blocked by its dependency graph.
 
 | Check | Result | Meaning |
 | --- | --- | --- |
 | PHP 8.4.25 lint, all 359 PHP files under src/config/database/tests/resources/lang | PASS for syntax | 37 implicit-nullability deprecations in 24 files; syntax success is not clean deprecation status |
 | Composer strict manifest validation | WARNING / exit 1 | Valid schema; unbounded `laravel/framework >=5.5` constraint is warned about |
-| Composer update --dry-run, unchanged root | BLOCKED / exit 2 | Initial runtime lacked ext-dom |
+| Composer update --dry-run, unchanged root after adding XML/SQLite extensions | FAIL / exit 2 | Old Laravel candidates blocked by security advisories; BrowserKit 6 conflicts with the remaining modern candidates |
 | Composer resolution diagnostic ignoring only extension requirements | FAIL / exit 2 | Older Laravel candidates blocked by security advisories; newer candidates conflict with BrowserKit 6 |
 | Same diagnostic with Laravel 12 / 13 explicitly requested | FAIL / exit 2 for both | BrowserKit 6 Illuminate constraints conflict with the requested framework |
 | Tree regression against unmodified source | FAIL as expected | Undeclared property plus two PHP 8.2+ dynamic-property diagnostics |
 | Tree regression after public property declaration | PASS | Constructor path capture, callback access, public reassignment, instance isolation, and no runtime diagnostics |
 | Tree/test syntax checks and whitespace checks | PASS | The two existing constructor implicit-nullability notices remain explicitly identified |
+| Final non-Blade PHP syntax check | PASS, 360 files | Includes the new regression script; the same 37 baseline notices in 24 files remain |
 | composer test / full BrowserKit suite | BLOCKED / exit 127; tests not started | vendor/bin/phpunit is absent because dependencies cannot be installed unchanged |
-| Laravel/PHP end-to-end matrix | NOT RUN | No support claim based on the focused check |
+| Full Laravel/PHP end-to-end matrix | NOT RUN | Limited consumer-application checks below are not full support |
 | Browser-executed frontend exploit tests | NOT RUN | Static flows inspected; no deployed exploit verified |
 
 Run the focused regression in a fresh process:
@@ -63,9 +65,51 @@ not boot Laravel, connect to a database, or validate rendering.
 
 The extension-ignoring commands were dependency-resolution dry runs only, not
 installations or runtime passes. Composer's security-advisory blocking remained
-enabled. A later temporary consumer application can isolate runtime dependencies
+enabled. The temporary consumer applications below isolate runtime dependencies
 from this package's obsolete development/test dependencies without changing the
-package manifest; such a smoke result is still narrower than full support.
+package manifest; their smoke results are still narrower than full support.
+
+### Disposable Laravel 12 and 13 applications
+
+Fresh official Laravel skeletons were used with small consumer manifests requiring
+Laravel `^12.0` or `^13.0` and this checkout as a local path dependency:
+
+- Laravel 12 skeleton: `e90c74ca717e9082d7463a2db50814fe565a3e44`
+- Laravel 13 skeleton: `06d016a364a37430eec9cbc52209adce3d7667ce`
+- Package checkout during execution: `ecb1552c565531ac90e73674c3aa321f0e7dca54`
+  (Tree-only runtime fix plus audit documentation)
+
+This excludes the package's obsolete require-dev graph; the package's own
+composer.json was unchanged.
+
+Resolved versions: PHP 8.4.25, Laravel 12.69.3 / 13.34.0, DBAL 3.10.6,
+DomCrawler 5.4.52, and SQLite 3.53.4. Normal dependency installation and
+check-platform-reqs passed for both consumers without ignoring platform requirements. Composer audit reported no known
+advisories in these temporary PHP lockfiles; that does not cover bundled JS or
+the application-level defects below.
+
+The following results were obtained on both Laravel versions:
+
+- PASS: automatic package discovery, vendor publishing, migrations, seeding,
+  admin:install, config:cache, and route:cache
+- PASS: repeat admin:install exits 0 and reports the existing admin directory;
+  it does not reinstall the application
+- PASS: in-process HTTP-kernel checks of login page (200), unauthenticated
+  redirect (302), login submission (302 with authenticated guard), and
+  authenticated dashboard/menu/user-list responses (200)
+- FAIL as predicted: admin:make with a model calls the removed
+  SQLiteConnection::isDoctrineAvailable method; without a model it throws
+  Invalid model [] (both commands exit 1)
+- REPRODUCED: an authenticated settings request with a synthetic, disposable
+  password stores both password fields in plaintext in the operation log
+
+An initial Laravel 12 run failed because the custom CLI lacked mb_split; adding
+verified official Oniguruma/mbregex support resolved that environment issue. It
+is not counted as a package compatibility defect.
+
+These checks used APP_ENV=testing and disposable SQLite databases. They do not
+verify browser JavaScript, session-cookie/CSRF round trips, other database
+drivers, uploads, all CRUD operations, or the 73 historical integration tests.
 
 ## Prioritized findings
 
@@ -84,8 +128,10 @@ package manifest; such a smoke result is still narrower than full support.
   but leaves password and password_confirmation visible
 
 This verifies the default code path, including failed authenticated password
-submissions. Ordinary unauthenticated login attempts fail the logger's
-authenticated-user condition. No production leak was observed. Redact before
+submissions. The successful-request path was also reproduced with a synthetic
+password in both disposable Laravel 12/13 apps. Ordinary unauthenticated login
+attempts fail the logger's authenticated-user condition. No production leak
+was observed. Redact before
 persistence, add success/failure and nested-input regressions, and assess any
 existing logs separately. Do not solve this only by masking the display.
 
@@ -202,7 +248,7 @@ The suite publishes files and installs on every test. Teardown drops tables
 directly (`tests/TestCase.php:76–80`), with a default local MySQL/root configuration.
 Use disposable app/database fixtures only; do not point it at a shared database.
 
-The first PR adds only a focused PHP 8.4 regression workflow. Full application
+The prepared first patch includes a focused PHP 8.4 regression workflow. Full application
 CI remains a roadmap item; a green focused job must not be presented as full
 Laravel compatibility.
 
@@ -211,8 +257,9 @@ Laravel compatibility.
 Faker's original repository is archived, and Intervention Image v2 is EOL.
 However, the permitted Symfony 5.4 line still receives security fixes (through
 February 2029); do not label every old allowed dependency as unsupported.
-No resolved application lockfile exists, so no installed PHP dependency CVE
-inventory can be claimed from constraints alone.
+No resolved application lockfile exists in the repository, so no consuming
+production application's PHP dependency CVE inventory can be inferred from
+constraints alone. The temporary consumer lockfile audit has narrower scope.
 
 Sources: [Faker](https://github.com/fzaninotto/Faker),
 [Intervention v2](https://image.intervention.io/v2),
