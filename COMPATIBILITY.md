@@ -5,7 +5,38 @@
 - Treat Exment compatibility as an important target and verify specific releases
 - Separate dependency declarations, focused checks, and full runtime support
 
-## Current evidence (2026-10-01)
+## PHP baseline migration (2026-10-02)
+
+The package now requires **PHP `^8.2` (8.2 through 8.x)**. PHP 7.x, 8.0 and
+8.1 are no longer supported; an unverified PHP 9 major is not accepted. PHP 8.3+
+is recommended for deployments. PHP 8.2 remains security-supported only through
+2026-12-31; PHP 8.3 through 2027-12-31. Recheck the
+[upstream support table](https://www.php.net/supported-versions.php) before release.
+
+All 37 previously implicit nullable parameters in 24 source files now declare
+`?Type` explicitly. Parameter names, default values, accepted types, visibility,
+and behavior are preserved. This is an intentional PHP minimum-version change,
+not a Laravel dependency upgrade: the broad `>=5.5` Laravel constraint remains
+for downstream resolution, and does not promise support for EOL frameworks.
+
+`php tests/compatibility/php_source_lint.php` lints all 326 production PHP files
+with `E_ALL` and rejects compile-time diagnostics as well as syntax errors.
+On PHP 8.4.25 it passes without diagnostics; the pre-migration source fails with
+exactly 37 implicit-nullability notices in 24 files. All standalone regressions
+also pass locally. Both real Laravel 12.69.3 and 13.34.0 suites pass 14 tests /
+1,411 assertions each on PHP 8.4.25 without diagnostics, using the existing
+isolated dependency sets with the migration source. Reflection metadata for all
+37 parameters matches the old source (types, nullability, defaults, optionality,
+visibility and static flags). CI requests standalone/source checks on PHP 8.2, 8.3 and 8.4,
+and real integration on Laravel 12/PHP 8.2–8.4 and Laravel 13/PHP 8.3–8.4.
+PHP 8.2/8.3 CI results and PHP 8.5 runtime verification are not claimed locally.
+
+Obsolete Travis PHP 7.2–8.0 configuration has been retired. The historical root
+development dependencies and 73-test BrowserKit suite remain unchanged/blocked;
+use the isolated [integration harness](tests/integration/README.md) for modern
+framework checks. These targeted passes are not complete framework certification.
+
+## Historical baseline evidence (2026-10-01)
 
 Baseline: `819837af94e1a4170a13ac7dc85dbe40bd6e8d9b`.
 See the [full audit](docs/compatibility-audit-2026-10-01.md) for evidence and limits.
@@ -63,8 +94,8 @@ Sources: [Laravel support policy](https://laravel.com/framework/docs/releases),
 - Keep the existing `Encore\Admin` namespace and package identity unchanged in
   the initial maintenance patch; evaluate publication decisions separately
 - Do not widen constraints merely to make Composer accept an untested version
-- Do not raise the minimum PHP version incidentally: `?Type` syntax, for example,
-  requires PHP 7.1 even though the current manifest still advertises PHP 7.0
+- PHP minimum-version changes must be intentional and documented; the current
+  minimum is PHP 8.2, with PHP 8.3+ recommended
 - Record the exact framework, PHP, dependency set, commands, and result for each
   newly verified combination
 - Distinguish passed, failed, blocked, and not-run checks in PRs and release notes
@@ -77,7 +108,7 @@ SQLite migrations/seeding and persisted operation-log redaction. Its ten tests
 and 54 assertions pass locally on PHP 8.4.25 with Laravel 12.69.3 and 13.34.0.
 A negative control using the old middleware fails the three redaction tests.
 
-This consumer has its own development dependencies; the root production and
-legacy development requirements remain unchanged. The historical 73-test suite
+This consumer has its own development dependencies; the root legacy development
+requirements remain unchanged. The package PHP requirement is now `^8.2`. The historical 73-test suite
 is still blocked, and these focused passes do not establish full Laravel support.
 See the harness README for exact dependency versions and untested areas.

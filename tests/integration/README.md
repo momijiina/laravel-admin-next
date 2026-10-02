@@ -2,9 +2,9 @@
 
 This is an isolated Composer **consumer** of the repository via a local path
 repository. It uses [Orchestra Testbench](https://github.com/orchestral/testbench)
-to boot real Laravel and SQLite, while leaving the package's production and
-legacy development constraints unchanged. The PHP requirement in this directory
-applies only to this harness, not to the shipped package.
+to boot real Laravel and SQLite without changing the root legacy development
+dependencies. Both the shipped package and this harness require PHP `^8.2`;
+Laravel 13 / Testbench 11 requires PHP 8.3+.
 
 Run from this directory, using a PHP CLI with the required extensions:
 
@@ -50,12 +50,13 @@ The root PHPUnit configuration excludes this consumer directory, keeping its
 classes and vendor tree out of legacy test discovery. This suite does not replace
 or claim to pass the 73 legacy BrowserKit tests.
 Uploads, browser JavaScript, complete CRUD, non-SQLite drivers and model-based
-generator compatibility remain separate work. Known PHP 8.4 implicit-nullability
-deprecations remain in the package; this is not a zero-deprecation certification. The PHPUnit configuration enables E_ALL
-and routes Laravel/Testbench deprecation logs to stderr so those notices remain
-visible (14 implicit-nullability notices on both frameworks). The intentional
-legacy-getter reference call suppresses only its own Symfony deprecation; the
-controller regression turns that same notice into a failure. Successful focused integration tests are not a full framework support claim.
+generator compatibility remain separate work. The PHP baseline migration explicitly
+declares all 37 previously implicit nullable parameters; these integration runs
+now emit no nullable notices. The PHPUnit configuration keeps E_ALL enabled and
+routes Laravel/Testbench deprecation logs to stderr. The intentional legacy-getter
+reference call suppresses only its own Symfony deprecation; the controller
+regression turns that same notice into a failure. These focused passes do not
+certify the absence of all deprecations in untested paths or full framework support.
 
 ## Local verification (2026-10-02)
 
@@ -77,5 +78,11 @@ The value matrix stops at the real guard's `Attempting` event to compare the exa
 argument without authenticating; separate HTTP tests check cookies, tokens and
 login outcomes with the real guard.
 
-The workflow additionally requests PHP 8.2/Laravel 12 and PHP 8.3/Laravel 13.
+The workflow additionally requests PHP 8.2/8.3 with Laravel 12 and PHP 8.3 with Laravel 13.
 Those PHP runtimes were not executed locally; their results must come from CI.
+
+After the PHP baseline migration, both 14-test / 1,411-assertion suites pass again
+on PHP 8.4.25 without diagnostics. The existing resolved dependency sets were
+reused with the package PSR-4 source mapped to the migration worktree; dependency
+resolution on PHP 8.2/8.3 remains a CI check. The standalone source regression
+separately lints 326 production PHP files with no compile-time diagnostics.

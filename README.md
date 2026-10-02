@@ -28,6 +28,14 @@ The project aims to support modern PHP and Laravel while prioritizing existing A
 
 This is not an official OpenAI project and does not imply OpenAI endorsement.
 
+## Laravel Admin Next requirements
+
+- PHP `^8.2` (8.2–8.x); PHP 8.3+ is recommended. PHP 7.x, 8.0 and 8.1 are no longer supported by this fork.
+- The Laravel Composer constraint remains `>=5.5` for downstream resolution; it does not guarantee compatibility with every admitted release. See the [tested combinations and limits](COMPATIBILITY.md).
+- Fileinfo PHP extension
+
+The source for this fork is [momijiina/laravel-admin-next](https://github.com/momijiina/laravel-admin-next). The historical `composer require encore/laravel-admin` command below resolves the upstream package by default; it does not select this fork. This README does not announce a separate Packagist release for Laravel Admin Next.
+
 ## Original laravel-admin README / 元プロジェクトの README
 
 The original README is preserved below for reference. Its installation instructions, requirements, badges, and links describe the upstream project.

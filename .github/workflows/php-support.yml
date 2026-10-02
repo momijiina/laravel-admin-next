@@ -1,4 +1,4 @@
-name: Null database defaults
+name: Supported PHP source and standalone checks
 
 on:
   pull_request:
@@ -9,10 +9,11 @@ permissions:
   contents: read
 
 jobs:
-  null-defaults:
+  compatibility:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
     strategy:
+      fail-fast: false
       matrix:
         php: ['8.2', '8.3', '8.4']
     steps:
@@ -23,9 +24,11 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           coverage: none
-      - name: Lint generator and regression
+          tools: composer:v2
+      - name: Validate package metadata
+        run: composer validate --no-check-publish
+      - name: Run every standalone regression (not the full Laravel suite)
         run: |
-          php -l src/Console/ResourceGenerator.php
-          php -l tests/compatibility/null_defaults.php
-      - name: Check absent defaults and unchanged generated output (not the full Laravel suite)
-        run: php tests/compatibility/null_defaults.php
+          for test in tests/compatibility/*.php; do
+            php -d error_reporting=-1 "$test" || exit 1
+          done
