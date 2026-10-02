@@ -151,7 +151,7 @@ class ResourceGenerator
 
             $output .= sprintf($this->formats['form_field'], $fieldType, $name, $label);
 
-            if (trim($defaultValue, "'\"")) {
+            if ($defaultValue !== null && trim($defaultValue, "'\"")) {
                 $output .= "->default({$defaultValue})";
             }
 

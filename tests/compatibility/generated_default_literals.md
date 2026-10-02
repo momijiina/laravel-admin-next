@@ -17,5 +17,5 @@ discovery, the Laravel application lifecycle, or the full legacy browser suite.
 
 CI runs this regression on PHP 7.0 (the declared package minimum) and PHP 8.4.
 No PHP minimum, Laravel dependency, database mapping, or date expression behavior
-is changed by this fix. Null defaults in non-string branches may still encounter
-the separate PHP 8.1+ `trim(null)` deprecation.
+is changed by this fix. Missing defaults in non-string branches are covered
+separately by the [null-default regression](null_defaults.md).
