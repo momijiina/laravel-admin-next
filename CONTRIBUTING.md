@@ -19,6 +19,23 @@ Working on your first Pull Request? You can learn how from this *free* series, [
 
 Any code change should be submitted as a pull request. The description should explain what the code does and give steps to execute it. The pull request should also contain tests.
 
+## PHP compatibility checks
+
+Use PHP 8.2+ (PHP 8.x), preferably 8.3 or newer. Run the dependency-free focused
+checks from the repository root:
+
+```sh
+for test in tests/compatibility/*.php; do
+    php -d error_reporting=-1 "$test" || exit 1
+done
+```
+
+The source-lint regression treats all compile-time diagnostics as failures;
+run it on PHP 8.4+ to detect implicit nullable declarations. For real Laravel
+12/13 coverage, follow [the isolated integration instructions](tests/integration/README.md).
+The root legacy development dependencies are not the modern test harness and
+are not upgraded by the PHP baseline migration.
+
 ## Code review process
 
 The bigger the pull request, the longer it will take to review and merge. Try to break down large pull requests in smaller chunks that are easier to review and merge.

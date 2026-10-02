@@ -17,34 +17,15 @@ namespace Illuminate\Contracts\Support {
 namespace {
     error_reporting(E_ALL);
 
-    $baselineDeprecations = [];
     $treeFile = realpath(__DIR__.'/../../src/Tree.php');
 
-    // Class-loading warnings are an existing, separate PHP 8.4 issue.
-    // Report only these known warnings as baseline; fail on anything else.
-    set_error_handler(function ($severity, $message, $file, $line) use (&$baselineDeprecations, $treeFile) {
-        $knownNullableParameter = false;
-
-        foreach (['model', 'callback'] as $parameter) {
-            $prefix = 'Encore\\Admin\\Tree::__construct(): Implicitly marking parameter $'.$parameter.' as nullable is deprecated';
-            $knownNullableParameter = $knownNullableParameter || strpos($message, $prefix) === 0;
-        }
-
-        if ($severity === E_DEPRECATED && $file === $treeFile && $knownNullableParameter) {
-            $baselineDeprecations[] = $message;
-
-            return true;
-        }
-
+    // All class-loading diagnostics are regressions, including nullability.
+    set_error_handler(function ($severity, $message, $file, $line) {
         throw new \ErrorException($message, 0, $severity, $file, $line);
     });
 
     require $treeFile;
     restore_error_handler();
-
-    foreach ($baselineDeprecations as $message) {
-        echo 'BASELINE (not fixed here): '.$message."\n";
-    }
 
     class TreePathRequest
     {
