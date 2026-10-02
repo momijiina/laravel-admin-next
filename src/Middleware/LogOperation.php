@@ -25,7 +25,7 @@ class LogOperation
                 'path'    => substr($request->path(), 0, 255),
                 'method'  => $request->method(),
                 'ip'      => $request->getClientIp(),
-                'input'   => json_encode($request->input()),
+                'input'   => json_encode($this->redactInput($request->input())),
             ];
 
             try {
@@ -36,6 +36,42 @@ class LogOperation
         }
 
         return $next($request);
+    }
+
+    /**
+     * Redact sensitive field names at every array depth without changing input.
+     *
+     * Configured names extend the defaults, including for published configs.
+     *
+     * @param array $input
+     *
+     * @return array
+     */
+    protected function redactInput(array $input)
+    {
+        $additionalFields = config('admin.operation_log.redact_fields', []);
+        $additionalFields = is_array($additionalFields)
+            ? array_filter($additionalFields, 'is_string')
+            : [];
+
+        $fields = array_merge([
+            'password', 'password_confirmation', 'current_password',
+            'new_password', 'new_password_confirmation', '_token', 'token',
+            'access_token', 'refresh_token', 'remember_token', 'api_token',
+            'api_key', 'secret', 'client_secret', 'authorization',
+        ], $additionalFields);
+
+        $fields = array_map('strtolower', $fields);
+
+        foreach ($input as $key => $value) {
+            if (in_array(strtolower((string) $key), $fields, true)) {
+                $input[$key] = '[REDACTED]';
+            } elseif (is_array($value)) {
+                $input[$key] = $this->redactInput($value);
+            }
+        }
+
+        return $input;
     }
 
     /**

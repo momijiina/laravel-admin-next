@@ -35,8 +35,9 @@ do not silently remove or claim support for them.
   runtime compatibility changes
 - Resolve PHP implicit-nullability, CSV escape-default, PJAX entity-conversion,
   and remaining dynamic-property deprecations in small regression-tested changes
-- Prioritize sensitive-input redaction before operation-log persistence;
-  cover successful and failed password changes and rendered logs
+- Sensitive-input redaction before operation-log persistence is implemented
+  with a focused middleware regression; see [behavior and limits](docs/operation-log-redaction.md).
+  Real Laravel password-change and rendered-log coverage remains to be added
 - Review default credentials, login throttling, upload previews, and AJAX-option
   escaping; do not treat the audit as a penetration test
 - Decide the supported dependency ranges and package publication/install path
