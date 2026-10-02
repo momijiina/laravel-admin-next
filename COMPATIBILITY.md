@@ -25,6 +25,22 @@ A clean syntax check or a focused deprecation regression is not a Laravel suppor
 claim. Full support requires installation, bootstrap, database-backed tests,
 browser smoke checks, and supported dependency resolution for that combination.
 
+## Focused follow-up: legacy column cast (2026-10-02)
+
+The existing public, untyped `Grid\Column::$cast` property is now declared to
+avoid PHP 8.2+ dynamic-property deprecations. On PHP 8.4.25, the standalone
+`php tests/compatibility/grid_column_cast.php` regression failed on the preceding
+source with two dynamic-property notices and passes after the declaration.
+It checks fluent calls, public reads/writes, null resets, untyped values,
+instance isolation, and unchanged `sortable($cast)` arguments using small
+framework test doubles. CI runs this focused check on PHP 8.4.
+
+The deprecated `cast()` API still only stores its value; callers should continue
+using `sortable($cast)` to configure sorting. This patch does not change sorting
+behavior, PHP requirements, implicit-nullability warnings, or the blocked legacy
+Laravel suite. It does not establish full framework, database, or rendering
+compatibility.
+
 ## Proposed verification matrix
 
 These are candidates, not supported combinations:
