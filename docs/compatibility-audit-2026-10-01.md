@@ -176,7 +176,7 @@ Sources: [BrowserKit 6.x](https://raw.githubusercontent.com/laravel/browser-kit-
 | --- | --- | --- |
 | src/Tree.php:88 | Undeclared public path | PHP 8.2+ dynamic-property notice; addressed by the first patch |
 | src/Grid/Column.php:376 | Undeclared cast in legacy cast() | PHP 8.2+ notice when that API is used |
-| src/Middleware/Pjax.php:142–144 | mb_convert_encoding with HTML-ENTITIES | PHP 8.2+ deprecation on matching decimal entities |
+| src/Middleware/Pjax.php:142–144 | mb_convert_encoding with HTML-ENTITIES as its source | PHP 8.4.25 runtime recheck: no deprecation from this call; replacing the decoder can change output (see below) |
 | 37 parameters / 24 files | Implicit nullable typed parameters | PHP 8.4+ compile-time deprecations; bulk nullable syntax requires deciding PHP minimum |
 | src/Grid/Exporters/CsvExporter.php:176,181 | fputcsv default escape omitted | PHP 8.4+ deprecation per header/data row |
 | src/Console/ExportSeedCommand.php:36 and its seed stub | database/seeders + Database\Seeders | Does not follow the Laravel 5.5–7 default seed layout despite the broad constraint |
@@ -186,6 +186,47 @@ Preserving the current escape explicitly is a different change from adopting
 RFC-oriented empty escaping. PJAX fixes must preserve decimal/entity behavior.
 The first Tree change preserves its existing public read/write API and PHP 7
 syntax; it does not silence other deprecations globally.
+
+#### PJAX recheck (2026-10-02)
+
+The original static finding incorrectly predicted a deprecation for
+HTML-ENTITIES used as the source encoding. PJAX actually calls `mb_convert_encoding($entity, 'UTF-8',
+'HTML-ENTITIES')`. With PHP 8.4.25 and mbstring built from its official release
+source, invoking the real protected decoder through a small public test subclass
+under `E_ALL` produced no diagnostics across 21 inputs. The reverse call, using
+HTML-ENTITIES as the destination, emitted the expected deprecation as a positive
+control. In that PHP source, destination validation uses `php_mb_get_encoding`,
+which raises the warning; the source encoding list follows a separate parser.
+This corrects the claim for the tested PHP version, not all future PHP versions.
+
+A focused reproduction (requires mbstring):
+
+```sh
+php -d error_reporting=-1 -d display_errors=1 -r '
+var_dump(mb_convert_encoding("&#26085;", "UTF-8", "HTML-ENTITIES"));
+var_dump(mb_convert_encoding("日", "HTML-ENTITIES", "UTF-8"));
+'
+```
+
+The differential checks covered Japanese text, emoji, attribute/script markup,
+named and hexadecimal references, malformed references, control characters,
+surrogates, Unicode boundaries, leading zeroes, and integer overflow. Replacing
+only the decimal-match callback with `html_entity_decode` using
+`ENT_QUOTES | ENT_HTML5` and UTF-8 changes control and invalid-code-point output.
+Using `mb_decode_numericentity` with `[0, 0x10FFFF, 0, 0x1FFFFF]` and UTF-8
+preserves those outputs in this runtime but changes long leading-zero and
+some overflowing references. For example, the current decoder returns `A` for
+both `&#000000000000000000000065;` and `&#4294967361;`; that numeric decoder
+leaves both references unchanged. No production encoding change is justified by
+the original deprecation claim, and no replacement is applied here.
+
+These are decoder-level checks. DOM parsing, the full middleware request cycle,
+and browser rendering were not tested by this recheck. Existing standalone
+Tree, CSV, and operation-log checks passed on the same runtime; Tree still
+reports its previously documented class-loading nullability notices.
+
+Sources: [PHP 8.4.25 mbstring implementation](https://github.com/php/php-src/blob/php-8.4.25/ext/mbstring/mbstring.c),
+[PHP 8.4.25 entity decoder](https://github.com/php/php-src/blob/php-8.4.25/ext/mbstring/libmbfl/filters/mbfilter_htmlent.c).
 
 Sources: [PHP 8.2 deprecations](https://www.php.net/manual/en/migration82.deprecated.php),
 [PHP 8.4 deprecations](https://www.php.net/manual/en/migration84.deprecated.php),
