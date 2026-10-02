@@ -1,0 +1,28 @@
+name: PHP 8.4 Column cast regression
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  column-cast:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2
+        with:
+          php-version: '8.4'
+          coverage: none
+      - name: Check focused files
+        run: |
+          php -l src/Grid/Column.php
+          php -l tests/compatibility/grid_column_cast.php
+      - name: Run standalone regression (not the full Laravel suite)
+        run: php tests/compatibility/grid_column_cast.php

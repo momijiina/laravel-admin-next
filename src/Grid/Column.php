@@ -49,6 +49,13 @@ class Column
     protected $original;
 
     /**
+     * Value stored by the deprecated cast() API.
+     *
+     * @var mixed
+     */
+    public $cast;
+
+    /**
      * Attributes of column.
      *
      * @var array
