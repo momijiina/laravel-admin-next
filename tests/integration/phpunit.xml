@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit bootstrap="vendor/autoload.php" colors="true" cacheDirectory=".phpunit.cache" failOnWarning="true" failOnRisky="true">
+    <php>
+        <ini name="error_reporting" value="32767"/>
+        <env name="LOG_DEPRECATIONS_CHANNEL" value="stderr" force="true"/>
+        <env name="LOG_DEPRECATIONS_WHILE_TESTING" value="true" force="true"/>
+    </php>
+    <testsuites>
+        <testsuite name="real Laravel integration">
+            <file>AdminLifecycleTest.php</file>
+        </testsuite>
+    </testsuites>
+</phpunit>
