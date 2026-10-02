@@ -68,3 +68,16 @@ Sources: [Laravel support policy](https://laravel.com/framework/docs/releases),
 - Record the exact framework, PHP, dependency set, commands, and result for each
   newly verified combination
 - Distinguish passed, failed, blocked, and not-run checks in PRs and release notes
+
+## Isolated integration coverage (2026-10-02)
+
+The [real Laravel integration harness](tests/integration/README.md) boots
+Laravel with Testbench and exercises the package provider, auth HTTP lifecycle,
+SQLite migrations/seeding and persisted operation-log redaction. Its ten tests
+and 54 assertions pass locally on PHP 8.4.25 with Laravel 12.69.3 and 13.34.0.
+A negative control using the old middleware fails the three redaction tests.
+
+This consumer has its own development dependencies; the root production and
+legacy development requirements remain unchanged. The historical 73-test suite
+is still blocked, and these focused passes do not establish full Laravel support.
+See the harness README for exact dependency versions and untested areas.
