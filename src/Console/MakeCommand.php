@@ -66,13 +66,21 @@ class MakeCommand extends GeneratorCommand
             return false;
         }
 
-        $this->generator = new ResourceGenerator($this->modelName);
+        if ($this->option('output') && !$this->modelName) {
+            $this->error('The --output option requires a model.');
+
+            return 1;
+        }
+
+        if ($this->modelName) {
+            $this->generator = new ResourceGenerator($this->modelName);
+        }
 
         if ($this->option('output')) {
             return $this->output($this->modelName);
         }
 
-        if (parent::handle() !== false) {
+        if (parent::handle() !== false && $this->modelName) {
             $path = Str::plural(Str::kebab(class_basename($this->modelName)));
 
             $this->line('');
@@ -150,6 +158,10 @@ class MakeCommand extends GeneratorCommand
     protected function replaceClass($stub, $name)
     {
         $stub = parent::replaceClass($stub, $name);
+
+        if (!$this->modelName) {
+            return $stub;
+        }
 
         return str_replace(
             [
