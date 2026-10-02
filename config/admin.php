@@ -212,6 +212,14 @@ return [
         'enable' => true,
 
         /*
+         * Additional input field names to redact before saving operation logs.
+         * Matching is exact, case-insensitive, and recursive through arrays.
+         * Built-in password/token/secret fields are always redacted, even when
+         * this setting is absent or empty. This does not change request input.
+         */
+        'redact_fields' => [],
+
+        /*
          * Only logging allowed methods in the list
          */
         'allowed_methods' => ['GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'CONNECT', 'OPTIONS', 'TRACE', 'PATCH'],
