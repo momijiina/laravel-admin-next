@@ -71,7 +71,6 @@ namespace {
         public function sorterCasts()
         {
             $property = new \ReflectionProperty(\Encore\Admin\Grid\Column\Sorter::class, 'cast');
-            $property->setAccessible(true);
 
             return array_map(function ($sorter) use ($property) {
                 return $property->getValue($sorter);
