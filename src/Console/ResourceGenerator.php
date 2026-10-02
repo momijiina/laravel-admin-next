@@ -111,7 +111,7 @@ class ResourceGenerator
                             break;
                         }
                     }
-                    $defaultValue = "'{$default}'";
+                    $defaultValue = var_export((string) $default, true);
                     break;
                 case 'integer':
                 case 'bigint':
@@ -142,7 +142,7 @@ class ResourceGenerator
                     break;
                 default:
                     $fieldType = 'text';
-                    $defaultValue = "'{$default}'";
+                    $defaultValue = var_export((string) $default, true);
             }
 
             $defaultValue = $defaultValue ?: $default;
