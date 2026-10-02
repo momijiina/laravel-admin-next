@@ -45,7 +45,17 @@ class AuthController extends Controller
         $this->loginValidator($request->all())->validate();
 
         $credentials = $request->only([$this->username(), 'password']);
-        $remember = $request->get('remember', false);
+        // Preserve Request::get() precedence and values without its deprecation.
+        $remember = $request->attributes->get('remember', $request);
+        if ($remember === $request) {
+            if ($request->query->has('remember')) {
+                $remember = $request->query->all()['remember'];
+            } elseif ($request->request->has('remember')) {
+                $remember = $request->request->all()['remember'];
+            } else {
+                $remember = false;
+            }
+        }
 
         if ($this->guard()->attempt($credentials, $remember)) {
             return $this->sendLoginResponse($request);
