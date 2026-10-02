@@ -1,0 +1,55 @@
+name: DomCrawler compatibility
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  domcrawler:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { php: '8.2', testbench: '^10.0', phpunit: '^11.5', crawler: '^5.4' }
+          - { php: '8.2', testbench: '^10.0', phpunit: '^11.5', crawler: '6.4.40' }
+          - { php: '8.2', testbench: '^10.0', phpunit: '^11.5', crawler: '^6.4.40' }
+          - { php: '8.3', testbench: '^10.0', phpunit: '^11.5', crawler: '^5.4' }
+          - { php: '8.3', testbench: '^10.0', phpunit: '^11.5', crawler: '6.4.40' }
+          - { php: '8.3', testbench: '^10.0', phpunit: '^11.5', crawler: '^6.4.40' }
+          - { php: '8.4', testbench: '^10.0', phpunit: '^11.5', crawler: '^5.4' }
+          - { php: '8.4', testbench: '^10.0', phpunit: '^11.5', crawler: '6.4.40' }
+          - { php: '8.4', testbench: '^10.0', phpunit: '^11.5', crawler: '^6.4.40' }
+          - { php: '8.3', testbench: '^11.0', phpunit: '^12.0', crawler: '^5.4' }
+          - { php: '8.3', testbench: '^11.0', phpunit: '^12.0', crawler: '6.4.40' }
+          - { php: '8.3', testbench: '^11.0', phpunit: '^12.0', crawler: '^6.4.40' }
+          - { php: '8.4', testbench: '^11.0', phpunit: '^12.0', crawler: '^5.4' }
+          - { php: '8.4', testbench: '^11.0', phpunit: '^12.0', crawler: '6.4.40' }
+          - { php: '8.4', testbench: '^11.0', phpunit: '^12.0', crawler: '^6.4.40' }
+    defaults:
+      run:
+        working-directory: tests/integration
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: mbstring, dom, xml, xmlwriter, pdo_sqlite
+          coverage: none
+          tools: composer:v2
+      - name: Include supported BrowserKit only with the new Crawler range
+        if: matrix.crawler != '^5.4'
+        run: composer require --no-update 'laravel/browser-kit-testing:^7.2.8'
+      - name: Resolve isolated consumer dependencies
+        run: composer update --no-interaction --no-progress --prefer-dist --with 'orchestra/testbench:${{ matrix.testbench }}' --with 'phpunit/phpunit:${{ matrix.phpunit }}' --with 'symfony/dom-crawler:${{ matrix.crawler }}'
+      - name: Check actual runtime requirements
+        run: composer check-platform-reqs
+      - name: Run real Laravel lifecycle and production Crawler tests
+        run: composer test

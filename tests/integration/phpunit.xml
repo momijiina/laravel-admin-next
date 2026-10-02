@@ -8,6 +8,7 @@
     <testsuites>
         <testsuite name="real Laravel integration">
             <file>AdminLifecycleTest.php</file>
+            <file>DomCrawlerCompatibilityTest.php</file>
         </testsuite>
     </testsuites>
 </phpunit>
