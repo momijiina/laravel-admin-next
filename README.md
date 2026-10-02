@@ -1,3 +1,38 @@
+# Laravel Admin Next
+
+## 日本語: OpenAI Dots による定期自動更新（計画）
+
+Laravel Admin Next は、[z-song/laravel-admin](https://github.com/z-song/laravel-admin) をもとに、メンテナーが OpenAI Dots を活用して保守・改善する独立したプロジェクトです。
+
+OpenAI Dots による定期的な自動更新支援を計画しています。変更点や互換性への影響の調査、必要な修正、テスト、Pull Request の作成までを支援し、レビューとマージの判断はメンテナーが行います。定期実行のスケジュールは未設定で、自動マージや自動デプロイは行いません。
+
+最新の PHP / Laravel への対応を目指し、既存 API や Exment との互換性を重視します。対応状況は段階的に検証するため、すべてのバージョンでの動作を保証するものではありません。
+
+- [ロードマップ](ROADMAP.md)
+- [互換性方針](COMPATIBILITY.md)
+- [元プロジェクトについて](UPSTREAM.md)
+
+このプロジェクトは OpenAI の公式プロジェクトではなく、OpenAI による承認・推奨を示すものではありません。
+
+## English: Periodic automated updates with OpenAI Dots (planned)
+
+Laravel Admin Next is an independent project based on [z-song/laravel-admin](https://github.com/z-song/laravel-admin), maintained and improved by its maintainer with assistance from OpenAI Dots.
+
+We plan to use OpenAI Dots for periodic automated maintenance assistance: investigating changes and compatibility impact, making necessary fixes, running tests, and preparing pull requests. The maintainer reviews changes and decides whether to merge them. No recurring schedule is configured yet, and changes are not automatically merged or deployed.
+
+The project aims to support modern PHP and Laravel while prioritizing existing APIs and Exment compatibility. Compatibility is verified incrementally; support for every version is not guaranteed.
+
+- [Roadmap](ROADMAP.md)
+- [Compatibility policy](COMPATIBILITY.md)
+- [Upstream attribution](UPSTREAM.md)
+
+This is not an official OpenAI project and does not imply OpenAI endorsement.
+
+## Original laravel-admin README / 元プロジェクトの README
+
+The original README is preserved below for reference. Its installation instructions, requirements, badges, and links describe the upstream project.
+以下は参考のために残している元プロジェクトの README です。インストール手順、動作要件、バッジ、リンクは元プロジェクトの内容です。
+
 <p align="center">
 <a href="https://laravel-admin.org/">
 <img src="https://laravel-admin.org/images/logo002.png" alt="laravel-admin">
