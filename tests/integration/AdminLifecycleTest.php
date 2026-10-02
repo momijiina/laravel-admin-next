@@ -89,8 +89,10 @@ class AdminLifecycleTest extends TestCase
 
     public function test_login_authenticated_request_and_logout_lifecycle(): void
     {
-        $this->post('/admin/auth/login', ['username' => 'admin', 'password' => 'admin'])->assertRedirect('/admin');
+        $response = $this->post('/admin/auth/login', ['username' => 'admin', 'password' => 'admin'])->assertRedirect('/admin');
         $this->assertAuthenticatedAs(Administrator::first(), 'admin');
+        $response->assertCookieMissing(Admin::guard()->getRecallerName());
+        $this->assertEmpty(Administrator::first()->getRememberToken());
         $this->get('/admin')->assertOk()->assertJson(['username' => 'admin']);
         $this->assertGreaterThan(0, config('integration.bootstrap_calls'));
         $this->get('/admin/auth/logout')->assertRedirect('/admin');
@@ -105,6 +107,102 @@ class AdminLifecycleTest extends TestCase
         ])->assertRedirect('/admin/auth/login')->assertSessionHasErrors('username');
         $this->assertGuest('admin');
         $this->assertDatabaseCount('admin_operation_log', 0);
+    }
+
+    public function test_remember_values_match_the_legacy_getter_without_its_deprecation(): void
+    {
+        $captured = null;
+        $this->app['events']->listen(\Illuminate\Auth\Events\Attempting::class, function ($event) use (&$captured) {
+            $captured = $event->remember;
+            // Stop at the real guard boundary, before credentials or cookies change.
+            Admin::guard()->getTimebox()->returnEarly();
+            throw new RememberValueCaptured();
+        });
+        $values = [[], ['remember' => null], ['remember' => ''], ['remember' => 0],
+            ['remember' => '0'], ['remember' => false], ['remember' => true],
+            ['remember' => '1'], ['remember' => 'false'], ['remember' => []],
+            ['remember' => ['nested' => 'value']]];
+
+        foreach ($values as $attributes) {
+            foreach ($values as $query) {
+                foreach ($values as $body) {
+                    $request = new Request($query, $body + ['username' => 'admin', 'password' => 'admin'], $attributes);
+                    $request->setMethod('POST');
+                    $this->assertRememberMatchesLegacyGetter($request, $captured);
+                }
+            }
+        }
+
+        // Symfony's getter treats the request object itself as its absent sentinel.
+        $request = new Request(['remember' => 'query'], ['username' => 'admin', 'password' => 'admin']);
+        $request->setMethod('POST');
+        $request->attributes->set('remember', $request);
+        $this->assertRememberMatchesLegacyGetter($request, $captured);
+
+        $request = Request::create('/admin/auth/login', 'POST', [], [], [], ['CONTENT_TYPE' => 'application/json'],
+            json_encode(['username' => 'admin', 'password' => 'admin', 'remember' => true]));
+        $this->assertRememberMatchesLegacyGetter($request, $captured);
+
+        $request = Request::create('/admin/auth/login', 'GET', ['username' => 'admin', 'password' => 'admin', 'remember' => '0']);
+        $this->assertRememberMatchesLegacyGetter($request, $captured);
+    }
+
+    private function assertRememberMatchesLegacyGetter(Request $request, &$captured): void
+    {
+        // The reference call deliberately exercises the deprecated API on Symfony 7.4.
+        set_error_handler(function ($severity, $message) {
+            return $severity === E_USER_DEPRECATED && str_contains($message, 'Request::get() is deprecated');
+        });
+        try {
+            $expected = $request->get('remember', false);
+        } finally {
+            restore_error_handler();
+        }
+
+        set_error_handler(function ($severity, $message) {
+            if ($severity === E_USER_DEPRECATED && str_contains($message, 'Request::get() is deprecated')) {
+                throw new \RuntimeException($message);
+            }
+            return false;
+        });
+        try {
+            (new AuthController())->postLogin($request);
+            $this->fail('The real guard should dispatch an Attempting event.');
+        } catch (RememberValueCaptured $exception) {
+            $this->assertSame($expected, $captured);
+        } finally {
+            restore_error_handler();
+        }
+    }
+
+    public function test_valid_login_with_remember_sets_the_recaller_cookie(): void
+    {
+        $response = $this->post('/admin/auth/login', [
+            'username' => 'admin', 'password' => 'admin', 'remember' => '1',
+        ])->assertRedirect('/admin');
+        $this->assertAuthenticatedAs(Administrator::first(), 'admin');
+        $response->assertCookie(Admin::guard()->getRecallerName());
+        $this->assertNotEmpty(Administrator::first()->getRememberToken());
+    }
+
+    public function test_query_false_remember_overrides_true_body_without_a_recaller(): void
+    {
+        $response = $this->post('/admin/auth/login?remember=0', [
+            'username' => 'admin', 'password' => 'admin', 'remember' => '1',
+        ])->assertRedirect('/admin');
+        $this->assertAuthenticatedAs(Administrator::first(), 'admin');
+        $response->assertCookieMissing(Admin::guard()->getRecallerName());
+        $this->assertEmpty(Administrator::first()->getRememberToken());
+    }
+
+    public function test_invalid_login_with_remember_does_not_set_a_recaller(): void
+    {
+        $response = $this->from('/admin/auth/login')->post('/admin/auth/login', [
+            'username' => 'admin', 'password' => 'incorrect-test-password', 'remember' => '1',
+        ])->assertRedirect('/admin/auth/login')->assertSessionHasErrors('username');
+        $this->assertGuest('admin');
+        $response->assertCookieMissing(Admin::guard()->getRecallerName());
+        $this->assertEmpty(Administrator::first()->getRememberToken());
     }
 
     public function test_authenticated_log_is_redacted_without_mutating_controller_input(): void
@@ -190,4 +288,8 @@ class AdminLifecycleTest extends TestCase
         $this->assertSame(1, $code);
         $this->assertStringContainsString('model', Artisan::output());
     }
+}
+
+class RememberValueCaptured extends \RuntimeException
+{
 }
