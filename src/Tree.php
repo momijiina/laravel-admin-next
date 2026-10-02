@@ -20,6 +20,13 @@ class Tree implements Renderable
     protected $elementId = 'tree-';
 
     /**
+     * Request path used by tree links and actions.
+     *
+     * @var string
+     */
+    public $path;
+
+    /**
      * @var Model
      */
     protected $model;
