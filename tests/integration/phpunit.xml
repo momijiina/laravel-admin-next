@@ -13,6 +13,7 @@
             <file>TagsTest.php</file>
             <file>ListFieldTest.php</file>
             <file>ListFieldScopedNameTest.php</file>
+            <file>CollectionScriptScopingTest.php</file>
             <file>ExplicitEmptyCollectionsTest.php</file>
             <file>EmbeddedObjectOriginalTest.php</file>
             <file>ObjectDisplayTest.php</file>

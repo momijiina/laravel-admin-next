@@ -123,15 +123,30 @@ class ListField extends Field
      */
     protected function setupScript()
     {
-        $this->script = <<<SCRIPT
+        $this->script = <<<'SCRIPT'
 
-$('.{$this->column}-add').on('click', function () {
-    var tpl = $('template.{$this->column}-tpl').html();
-    $('tbody.list-{$this->column}-table').append(tpl);
-});
+$('[data-admin-collection="list"]').each(function () {
+    var root = $(this);
 
-$('tbody').on('click', '.{$this->column}-remove', function () {
-    $(this).closest('tr').remove();
+    // HasMany reruns child scripts after insertion. Replace only our handlers.
+    root.off('.adminCollection')
+        .on('click.adminCollection', '[data-collection-add]', function () {
+            if ($(this).closest('[data-admin-collection]')[0] !== root[0]) {
+                return;
+            }
+
+            var table = root.find('[data-collection-body]').filter(function () {
+                return $(this).closest('[data-admin-collection]')[0] === root[0];
+            });
+            table.append(root.children('template').html());
+        })
+        .on('click.adminCollection', '[data-collection-remove]', function () {
+            if ($(this).closest('[data-admin-collection]')[0] !== root[0]) {
+                return;
+            }
+
+            $(this).closest('tr').remove();
+        });
 });
 
 SCRIPT;
