@@ -84,14 +84,14 @@ choose random fixture counts.
 
 This is a **behavioral pass, not a deprecation-free pass**. E_ALL and Laravel's
 `LOG_DEPRECATIONS_WHILE_TESTING` remain enabled, with deprecations sent to stderr.
-The revived coverage exposes existing warnings from Faker's legacy property
-API and Symfony's deprecated `Request::get()`. The `MultipleSelect::prepare`
-null-to-`strlen()` warning exposed by this suite is now fixed, with a strict
-regression that preserves the original filtering behavior. Laravel-handled
-deprecations are logged and do
-not necessarily fail PHPUnit, even with `failOnDeprecation` enabled. These
-production/dependency cleanups belong in separate changes; no warnings are
-suppressed by this runner.
+The fixtures use Faker formatter methods and reserved `example.com` avatar
+URLs, avoiding Faker's deprecated property API and remote image provider.
+The revived coverage still exposes existing warnings from Symfony's deprecated
+`Request::get()`. The `MultipleSelect::prepare` null-to-`strlen()` warning exposed
+by this suite is now fixed, with a strict regression that preserves the original
+filtering behavior. Laravel-handled deprecations are logged and do not necessarily
+fail PHPUnit, even with `failOnDeprecation` enabled. These production/dependency
+cleanups belong in separate changes; no warnings are suppressed by this runner.
 
 PHP 8.2/8.3/8.5 jobs are configured in CI but are not claimed as locally verified
 by these PHP 8.4 runs. Neither SQLite success nor in-process HTML assertions
