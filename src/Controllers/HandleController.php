@@ -47,7 +47,7 @@ class HandleController extends Controller
 
         $formClass = $this->requestValue($request, '_form_');
 
-        if (!class_exists($formClass)) {
+        if (!class_exists($formClass ?? '')) {
             throw new Exception("Form [{$formClass}] does not exist.");
         }
 
@@ -112,7 +112,7 @@ class HandleController extends Controller
             throw new Exception('Invalid action request.');
         }
 
-        $actionClass = str_replace('_', '\\', $this->requestValue($request, '_action'));
+        $actionClass = str_replace('_', '\\', $this->requestValue($request, '_action') ?? '');
 
         if (!class_exists($actionClass)) {
             throw new Exception("Form [{$actionClass}] does not exist.");
@@ -155,7 +155,7 @@ class HandleController extends Controller
         $class = $this->requestValue($request, 'selectable');
         $args = $this->requestValue($request, 'args', []);
 
-        $class = str_replace('_', '\\', $class);
+        $class = str_replace('_', '\\', $class ?? '');
 
         if (class_exists($class)) {
             /** @var \Encore\Admin\Grid\Selectable $selectable */
@@ -177,7 +177,7 @@ class HandleController extends Controller
         $class = $this->requestValue($request, 'renderable');
         $key = $this->requestValue($request, 'key');
 
-        $class = str_replace('_', '\\', $class);
+        $class = str_replace('_', '\\', $class ?? '');
 
         if (class_exists($class)) {
             /** @var Renderable $selectable */

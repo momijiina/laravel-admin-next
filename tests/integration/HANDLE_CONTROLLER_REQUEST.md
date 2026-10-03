@@ -34,13 +34,51 @@ invoke the controller directly; they do not establish browser-cookie or CSRF
 coverage. Routing, middleware, CSRF, authorization and validation policy are not
 changed by the production patch.
 
-The reference call alone suppresses the intentional `Request::get()` deprecation.
-Production execution throws on that notice even when Symfony uses `@trigger_error`.
-Other diagnostics remain enabled. In particular, deliberately invalid null class
-selectors still emit the pre-existing native `class_exists(null)` and
-`str_replace(..., null)` deprecations in both reference and production execution.
-This change does not silently normalize invalid input or claim all diagnostics
-are gone.
+The reference call alone suppresses the intentional `Request::get()` deprecation
+and the two exact native null-argument notices from reference calls in this test
+file. Production execution throws on every native/user deprecation, including
+Symfony's `@trigger_error`. Other diagnostics remain enabled.
+
+## Null selector compatibility
+
+Only null is normalized to an empty string at the four native string call sites:
+`class_exists()` for forms and `str_replace()` for actions, selectables and
+renderables. This makes PHP's legacy null coercion explicit; the request getter,
+`has()` guards, lookup/autoload order, container resolution, method checks,
+authorization and dispatch are unchanged. Arrays still fail at the same native
+boundary. Non-stringable objects still fail, and scalar/Stringable inputs retain
+their existing behavior; the differential matrix includes these controls.
+
+These null paths are reachable. Laravel `has()` accepts present null form/action
+selectors, and HTTP empty strings become null through the normal middleware.
+Missing form/action selectors still throw `Invalid form/action request.`; present
+nulls still throw `Form [] does not exist.`. Authenticated HTTP requests keep the
+same 500 JSON `Server Error` response. Missing/null selectable/renderable values
+still return an empty string (HTTP 200). Guest requests still redirect to login.
+
+`AdminLifecycleTest` exercises these real registered routes and middleware with
+the seeded admin guard. Its diagnostics check catches deprecations even when the
+HTTP exception handler converts one to a 500 response. Testbench bypasses CSRF
+in its testing environment; this is not a browser-cookie or CSRF end-to-end test.
+No production middleware, validation, authorization or security setting changes.
+
+### Null selector verification (2026-10-03)
+
+On restored PHP 8.5.11, both existing isolated dependency sets pass the full suite:
+
+- Laravel 12.69.3 / Testbench 10.12.0: **106 tests, 36,653 assertions, two skips**
+- Laravel 13.34.0 / Testbench 11.3.0: **106 tests, 36,653 assertions, two skips**
+- No diagnostics from either full run; the two pre-existing optional MySQL/MariaDB and
+  PostgreSQL generator checks remain skipped without disposable services
+- The six differential/dispatch tests now make **17,485 assertions**, including
+  39 additional object/Stringable/float value comparisons
+- Loading the original controller from `1469704` fails both differential consumer
+  tests on native null deprecations and fails the real-route control
+- All standalone compatibility scripts pass, including strict production lint
+
+Dependencies, shared vendor mappings and PHPUnit warning settings are unchanged;
+verification uses process-local source overrides and isolated compiled-view caches.
+PHP 8.2/8.3/8.4 and historical BrowserKit were not rerun for this null-only patch.
 
 ## Local verification (2026-10-03)
 
