@@ -66,7 +66,8 @@ vendor/bin/phpunit --filter 'DateRangeInitializationTest|DateRangeCastPresentati
 The existing integration and DomCrawler workflows already install these Node
 dependencies. The new test is included in the full integration suite. Native cast
 presentation and HTTP/SQLite persistence coverage remain in
-`DateRangeCastPresentationTest`; this regression does not replace that coverage.
+[the range-cast presentation regression](DATE_RANGE_CAST_PRESENTATION.md); this
+regression does not replace that coverage.
 
 This is offline DOM/widget execution, not browser E2E, popup/layout testing, live
 PJAX, or a claim about server-side range ordering validation. No local HTTP server

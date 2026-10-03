@@ -12,7 +12,7 @@ OpenAI Dots による定期的な自動更新支援を計画しています。�
 
 - [ロードマップ](ROADMAP.md)
 - [互換性方針](COMPATIBILITY.md)
-- [最近の変更点・アップグレード時の注意事項と検証範囲](COMPATIBILITY.md#current-maintenance-summary)
+- [最近の変更点・アップグレード時の注意事項と検証範囲（PR #53 まで）](COMPATIBILITY.md#current-maintenance-summary)
 - [元プロジェクトについて](UPSTREAM.md)
 
 このプロジェクトは OpenAI の公式プロジェクトではなく、OpenAI による承認・推奨を示すものではありません。
@@ -29,7 +29,7 @@ The project aims to support modern PHP and Laravel while prioritizing existing A
 
 - [Roadmap](ROADMAP.md)
 - [Compatibility policy](COMPATIBILITY.md)
-- [Recent changes, upgrade cautions and verification limits](COMPATIBILITY.md#current-maintenance-summary)
+- [Recent changes, upgrade cautions and verification limits (through PR #53)](COMPATIBILITY.md#current-maintenance-summary)
 - [Upstream attribution](UPSTREAM.md)
 
 This is not an official OpenAI project and does not imply OpenAI endorsement.

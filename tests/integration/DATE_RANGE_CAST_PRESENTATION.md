@@ -10,7 +10,9 @@ asserts unchanged raw database and serialized model values.
 This is an HTTP-kernel plus production-Moment regression, **not a live-browser or
 full datetimepicker-widget test**. The Node helper reproduces the widget's
 fixed-format, non-strict parsing and input rewriting; it does not execute picker
-UI, change-event constraints, or `useCurrent` initialization behavior.
+UI, change-event constraints, or `useCurrent` initialization behavior. The separate
+[initial range-picker regression](DATE_RANGE_INITIALIZATION.md) executes the shipped
+widget in offline DOM; neither test is real-browser E2E.
 
 ## Failure and narrow boundary
 

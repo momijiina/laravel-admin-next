@@ -51,6 +51,8 @@ The dated results below are historical snapshots, not the current suite totals.
   [date-cast presentation scope](DATE_CAST_PRESENTATION.md) and boundaries
 - Native mutable/immutable DateRange/DatetimeRange endpoint edit/save round trips;
   [range-cast presentation scope](DATE_RANGE_CAST_PRESENTATION.md) and boundaries
+- Initial DateRange/DatetimeRange/TimeRange bounds with the shipped picker in offline DOM;
+  [initialization contract and exclusions](DATE_RANGE_INITIALIZATION.md)
 - Nullable temporal generated create/edit/save NULL preservation;
 - Canonical temporal database literal defaults in generated source and HTTP persistence;
   [generator default scope](NULLABLE_TEMPORAL_DEFAULTS.md) and existing-controller caveats
