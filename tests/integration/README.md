@@ -54,6 +54,8 @@ The dated results below are historical snapshots, not the current suite totals.
   DomCrawler compatibility and multiple-select null handling
 - Ordinary Tags hidden-input create/update/clear with exact storage parity;
   [Tags regressions](TAGS.md)
+- Native object/array casts in configured embedded forms;
+  [original-metadata regression and replacement boundary](EMBEDDED_OBJECT_ORIGINALS.md)
 - Main-file upload failure preservation and successful replacement
 - Actual HTTP-kernel middleware lifecycle, including consumer bootstrap execution
 - SQLite-persisted operation logs, recursive redaction, preserved controller input,
