@@ -6,9 +6,15 @@
 
         @include('admin::form.error')
 
+        @php
+            $selected = array_filter((array) old($column, $value), function ($item) {
+                return $item !== null;
+            });
+        @endphp
+
         <select class="form-control {{$class}}" style="width: 100%;" name="{{$name}}[]" multiple="multiple" data-placeholder="{{ $placeholder }}" {!! $attributes !!} >
             @foreach($options as $select => $option)
-                <option value="{{$select}}" {{  in_array($select, (array)old($column, $value)) ?'selected':'' }}>{{$option}}</option>
+                <option value="{{$select}}" {{  in_array($select, $selected) ?'selected':'' }}>{{$option}}</option>
             @endforeach
         </select>
         <input type="hidden" name="{{$name}}[]" />
