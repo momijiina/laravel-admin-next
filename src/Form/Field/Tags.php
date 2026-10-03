@@ -156,7 +156,9 @@ class Tags extends Field
      */
     public function prepare($value)
     {
-        $value = array_filter($value, 'strlen');
+        $value = array_filter($value, function ($item) {
+            return $item !== null && strlen($item);
+        });
 
         if ($this->keyAsValue) {
             return is_null($this->saveAction) ? $value : ($this->saveAction)($value);
