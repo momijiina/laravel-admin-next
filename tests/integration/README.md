@@ -86,3 +86,27 @@ on PHP 8.4.25 without diagnostics. The existing resolved dependency sets were
 reused with the package PSR-4 source mapped to the migration worktree; dependency
 resolution on PHP 8.2/8.3 remains a CI check. The standalone source regression
 separately lints 326 production PHP files with no compile-time diagnostics.
+
+
+### PHP 8.5 verification (2026-10-02)
+
+[PHP 8.5.11](https://www.php.net/downloads.php?source=Y) was built from the
+official source archive and checked against its published SHA-256. Fresh normal
+Composer resolutions on that runtime retained DBAL 3.10.6 and DomCrawler 5.4.52:
+
+- Laravel 12.69.3 / Testbench 10.12.0 / PHPUnit 11.5.56: **14 tests, 1,411 assertions pass**
+- Laravel 13.34.0 / Testbench 11.3.0 / PHPUnit 12.5.37: **14 tests, 1,411 assertions pass**
+- Both actual-runtime `check-platform-reqs` checks pass, and Composer reports no
+  known security advisories at verification time
+- All eight standalone scripts pass, including strict lint of 326 production PHP
+  files; the lifecycle runs emit no diagnostics with the existing E_ALL settings
+
+The standalone column test no longer calls
+[`ReflectionProperty::setAccessible()`](https://www.php.net/manual/en/reflectionproperty.setaccessible.php),
+which has no effect since PHP 8.1 and is deprecated in 8.5. This fixture-only change
+preserves the reflected sorter-value assertions under the package's PHP 8.2 floor.
+No production code, warning handling or dependency constraints changed.
+
+The source/standalone workflow now includes PHP 8.5, and the real lifecycle
+workflow includes PHP 8.5 with both framework families. These are focused results;
+the limitations above, including the unverified legacy suite, still apply.
