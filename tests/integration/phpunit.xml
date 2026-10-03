@@ -9,6 +9,7 @@
         <testsuite name="real Laravel integration">
             <file>AdminLifecycleTest.php</file>
             <file>DomCrawlerCompatibilityTest.php</file>
+            <file>MultipleSelectTest.php</file>
         </testsuite>
     </testsuites>
 </phpunit>

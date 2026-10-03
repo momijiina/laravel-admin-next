@@ -85,8 +85,10 @@ choose random fixture counts.
 This is a **behavioral pass, not a deprecation-free pass**. E_ALL and Laravel's
 `LOG_DEPRECATIONS_WHILE_TESTING` remain enabled, with deprecations sent to stderr.
 The revived coverage exposes existing warnings from Faker's legacy property
-API, Symfony's deprecated `Request::get()` and nullable values passed to
-`strlen()` in `MultipleSelect`. Laravel-handled deprecations are logged and do
+API and Symfony's deprecated `Request::get()`. The `MultipleSelect::prepare`
+null-to-`strlen()` warning exposed by this suite is now fixed, with a strict
+regression that preserves the original filtering behavior. Laravel-handled
+deprecations are logged and do
 not necessarily fail PHPUnit, even with `failOnDeprecation` enabled. These
 production/dependency cleanups belong in separate changes; no warnings are
 suppressed by this runner.
