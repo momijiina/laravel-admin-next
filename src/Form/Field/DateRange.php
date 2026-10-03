@@ -2,7 +2,10 @@
 
 namespace Encore\Admin\Form\Field;
 
+use Carbon\CarbonInterface;
+use Encore\Admin\Form;
 use Encore\Admin\Form\Field;
+use Illuminate\Support\Carbon;
 
 class DateRange extends Field
 {
@@ -48,9 +51,53 @@ class DateRange extends Field
         return $value;
     }
 
+    /**
+     * Present each default native cast endpoint in the picker's local format.
+     *
+     * Keep application-controlled serialization and parsing unchanged.
+     */
+    protected function formatDateCastValues()
+    {
+        if (!in_array(static::class, [self::class, DatetimeRange::class], true)
+            || !$this->form instanceof Form
+            || !is_array($this->value)
+            || !is_string($this->options['format'] ?? null)
+            || $this->options['format'] === ''
+            || $this->customFormat instanceof \Closure
+            || $this->callback instanceof \Closure
+            || isset($this->options['parseInputDate'])
+            || !empty($this->options['timeZone'])) {
+            return;
+        }
+
+        $model = $this->form->model();
+        $casts = $model->getCasts();
+
+        foreach ($this->column as $endpoint => $column) {
+            if (!is_string($column)
+                || strpos($column, '.') !== false
+                || !is_string($this->value[$endpoint] ?? null)
+                || !in_array($casts[$column] ?? null, ['date', 'datetime', 'immutable_date', 'immutable_datetime'], true)) {
+                continue;
+            }
+
+            $date = $model->getAttribute($column);
+
+            if ($date instanceof CarbonInterface && $this->value[$endpoint] === $date->toJSON()) {
+                // Rendering must not change either model attribute or its timezone.
+                $this->value[$endpoint] = Carbon::instance($date)
+                    ->setTimezone(config('app.timezone'))
+                    ->locale($this->options['locale'])
+                    ->isoFormat($this->options['format']);
+            }
+        }
+    }
+
     public function render()
     {
         $this->options['locale'] = array_key_exists('locale', $this->options) ? $this->options['locale'] : config('app.locale');
+
+        $this->formatDateCastValues();
 
         $startOptions = json_encode($this->options);
         $endOptions = json_encode($this->options + ['useCurrent' => false]);

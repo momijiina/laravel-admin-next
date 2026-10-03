@@ -49,6 +49,8 @@ The dated results below are historical snapshots, not the current suite totals.
   through the real HTTP kernel; [CRUD regression scope](GENERATED_CONTROLLER_CRUD.md)
 - Native mutable/immutable Date/Datetime edit/save round trips with shipped Moment;
   [date-cast presentation scope](DATE_CAST_PRESENTATION.md) and boundaries
+- Native mutable/immutable DateRange/DatetimeRange endpoint edit/save round trips;
+  [range-cast presentation scope](DATE_RANGE_CAST_PRESENTATION.md) and boundaries
 - Nullable temporal generated create/edit/save NULL preservation;
 - Canonical temporal database literal defaults in generated source and HTTP persistence;
   [generator default scope](NULLABLE_TEMPORAL_DEFAULTS.md) and existing-controller caveats

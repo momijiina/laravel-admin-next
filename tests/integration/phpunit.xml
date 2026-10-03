@@ -32,6 +32,7 @@
             <file>ResourceGeneratorTest.php</file>
             <file>GeneratedControllerCrudTest.php</file>
             <file>DateCastPresentationTest.php</file>
+            <file>DateRangeCastPresentationTest.php</file>
             <file>NullableTemporalDefaultsTest.php</file>
             <file>LiteralTemporalDefaultsTest.php</file>
         </testsuite>
