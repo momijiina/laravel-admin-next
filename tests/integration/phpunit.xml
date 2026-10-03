@@ -15,6 +15,7 @@
             <file>HandleControllerRequestTest.php</file>
             <file>FileUploadFailureTest.php</file>
             <file>ResourceGeneratorTest.php</file>
+            <file>GeneratedControllerCrudTest.php</file>
         </testsuite>
     </testsuites>
 </phpunit>

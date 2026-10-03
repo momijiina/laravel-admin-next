@@ -40,6 +40,8 @@ The dated results below are historical snapshots, not the current suite totals.
   including source precedence, null/array values, JSON and absent input; real
   remember cookies/tokens for accepted and rejected credentials
 - Real Artisan blank-controller generation and rejection of model-less `--output`
+- Generated model-backed controllers executing index/create/store/show/edit/update/delete
+  through the real HTTP kernel; [CRUD regression scope](GENERATED_CONTROLLER_CRUD.md)
 - Model-backed Artisan generation and independent DBAL metadata/output parity;
   [generator regressions](RESOURCE_GENERATOR.md) cover SQLite and opt-in services
 - Real request-input parity for grid, row/batch actions and controller dispatch;
@@ -65,7 +67,8 @@ or claim to pass the 73 legacy BrowserKit tests; use the separate
 Main-file upload failures and successful replacement are covered by the
 [upload failure regressions](FILE_UPLOAD_FAILURE.md), including their non-atomic
 filesystem/database limitations. Other upload behavior,
-complete CRUD and browser JavaScript remain outside this suite. Non-SQLite
+CRUD beyond the [generated scalar-field lifecycle](GENERATED_CONTROLLER_CRUD.md)
+and browser JavaScript remain outside this suite. Non-SQLite
 coverage is limited to the dedicated generator service matrix; the ordinary
 lifecycle suite uses SQLite. The PHP baseline migration explicitly
 declares all 37 previously implicit nullable parameters; these integration runs
