@@ -78,6 +78,15 @@ SCRIPT;
 
     public function prepare($value)
     {
+        // Only scalar empty markers represent zero rows; blank array elements are rows.
+        if (is_array($value)) {
+            foreach (['keys', 'values'] as $part) {
+                if (array_key_exists($part, $value) && ($value[$part] === null || $value[$part] === '')) {
+                    $value[$part] = [];
+                }
+            }
+        }
+
         return array_combine($value['keys'], $value['values']);
     }
 

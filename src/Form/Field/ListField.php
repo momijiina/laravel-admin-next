@@ -96,6 +96,8 @@ class ListField extends Field
             return false;
         }
 
+        Arr::set($input, $this->column, $this->normalizeEmptyValues(Arr::get($input, $this->column)));
+
         if ($fieldRules) {
             $rules["{$this->column}.values.*"] = $fieldRules;
             $attributes["{$this->column}.values.*"] = __('Value');
@@ -140,7 +142,22 @@ SCRIPT;
      */
     public function prepare($value)
     {
+        $value = $this->normalizeEmptyValues($value);
+
         return array_values($value['values']);
+    }
+
+    /**
+     * Normalize the explicit empty marker without removing actual blank rows.
+     */
+    protected function normalizeEmptyValues($value)
+    {
+        if (is_array($value) && array_key_exists('values', $value)
+            && ($value['values'] === null || $value['values'] === '')) {
+            $value['values'] = [];
+        }
+
+        return $value;
     }
 
     /**

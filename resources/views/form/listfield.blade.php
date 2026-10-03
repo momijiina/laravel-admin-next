@@ -13,11 +13,17 @@
             @endforeach
         @endif
 
+        {{-- Keep empty defaults before real rows so PHP replaces them with submitted arrays. --}}
+        <input type="hidden" name="{{ $name }}[values]" value="" />
+
         <table class="table table-hover">
 
             <tbody class="list-{{$column}}-table">
 
-            @foreach(old("{$errorKey}.values", ($value ?: [])) as $k => $v)
+            @php($rows = old("{$errorKey}.values", ($value ?: [])))
+            @php($rows = ($rows === null || $rows === '') ? [] : $rows)
+
+            @foreach($rows as $k => $v)
 
                 @php($itemErrorKey = "{$errorKey}.values.{$loop->index}")
 

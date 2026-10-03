@@ -196,8 +196,9 @@ class ListFieldScopedNameTest extends TestCase
             ->setElementName($name)->setErrorKey($key)->value(['stored']);
         $html = $field->render();
         $crawler = new Crawler($html);
-        $this->assertSame(2, $crawler->filter('input')->count());
-        foreach ($crawler->filter('input') as $input) {
+        $this->assertSame(3, $crawler->filter('input')->count());
+        $this->assertSame($name.'[values]', $crawler->filter('input[type=hidden]')->attr('name'));
+        foreach ($crawler->filter('input:not([type=hidden])') as $input) {
             $this->assertSame($name.'[values][]', $input->getAttribute('name'));
             $this->assertFalse($input->hasAttribute('items'));
         }
