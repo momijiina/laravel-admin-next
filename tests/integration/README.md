@@ -182,3 +182,6 @@ The source/standalone workflow now includes PHP 8.5, and the real lifecycle
 workflow includes PHP 8.5 with both framework families. These are focused results;
 the limitations of this focused suite above still apply; historical coverage is
 tracked by the separate BrowserKit runner.
+
+Action modal NULL/zero radio selection and emitted FormData are covered by
+[the dedicated action Radio regression](ACTION_NULLABLE_RADIO.md).
