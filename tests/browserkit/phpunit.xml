@@ -23,5 +23,8 @@
             <file>../UserSettingTest.php</file>
             <file>../UsersTest.php</file>
         </testsuite>
+        <testsuite name="Historical harness isolation">
+            <file>StaticStateIsolationTest.php</file>
+        </testsuite>
     </testsuites>
 </phpunit>
