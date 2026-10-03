@@ -147,6 +147,12 @@ class ResourceGenerator
 
             $defaultValue = $defaultValue ?: $default;
 
+            // An empty optional temporal field must not replace a stored NULL with now.
+            if (in_array($type, ['date', 'datetime', 'time'], true)
+                && $column->getNotnull() === false && $default === null) {
+                $defaultValue = null;
+            }
+
             $label = $this->formatLabel($name);
 
             $output .= sprintf($this->formats['form_field'], $fieldType, $name, $label);

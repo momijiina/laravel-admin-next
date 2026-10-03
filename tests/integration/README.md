@@ -45,6 +45,8 @@ The dated results below are historical snapshots, not the current suite totals.
   through the real HTTP kernel; [CRUD regression scope](GENERATED_CONTROLLER_CRUD.md)
 - Native mutable/immutable Date/Datetime edit/save round trips with shipped Moment;
   [date-cast presentation scope](DATE_CAST_PRESENTATION.md) and boundaries
+- Nullable temporal generated create/edit/save NULL preservation;
+  [generator default scope](NULLABLE_TEMPORAL_DEFAULTS.md) and existing-controller caveats
 - Model-backed Artisan generation and independent DBAL metadata/output parity;
   [generator regressions](RESOURCE_GENERATOR.md) cover SQLite and opt-in services
 - Real request-input parity for grid, row/batch actions and controller dispatch;

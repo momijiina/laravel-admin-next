@@ -76,19 +76,22 @@ try {
     foreach ($nativeRows as $row) {
         $type = $platform->getDoctrineTypeMapping($row['type_name']);
         if (preg_match('/\(DC2Type:([^\)]+)\)/', $row['comment'] ?? '', $m)) $type = $m[1];
-        $candidate[$row['name']] = new Column($row['name'], Type::getType($type), ['default'=>normalizeDefault($row['default'], $driver, $maria)]);
+        $candidate[$row['name']] = new Column($row['name'], Type::getType($type), ['default'=>normalizeDefault($row['default'], $driver, $maria), 'notnull'=>!$row['nullable']]);
     }
     check(array_keys($candidate) === array_keys($dbalColumns), 'native/DBAL ordered column names and prefix parity');
     $capture = [];
     foreach ($nativeRows as $row) {
         $name = $row['name']; $expected = $dbalColumns[$name]; $actual = $candidate[$name];
-        $capture[$name] = ['native'=>$row,'dbal'=>['type'=>$expected->getType()->getName(), 'default'=>$expected->getDefault()]];
+        $capture[$name] = ['native'=>$row,'dbal'=>['type'=>$expected->getType()->getName(), 'default'=>$expected->getDefault(), 'notnull'=>$expected->getNotnull()]];
         // Print observed evidence before assertions, so CI failures retain the mismatch.
         echo 'OBSERVED '.json_encode($capture[$name], JSON_UNESCAPED_SLASHES)."\n";
         if ($nativeJsonGap && $name === 'document') {
             check($row['type_name'] === 'longtext' && $actual->getType()->getName() === 'text' && $expected->getType()->getName() === 'json', 'KNOWN GAP: MariaDB native metadata omits JSON check-constraint semantics');
         } else {
             check($actual->getType()->getName() === $expected->getType()->getName(), "$name type parity");
+        }
+        if (in_array($expected->getType()->getName(), ['date', 'datetime', 'time'], true)) {
+            check($actual->getNotnull() === $expected->getNotnull(), "$name temporal nullability parity");
         }
         check($actual->getDefault() === $expected->getDefault(), "$name default parity: ".json_encode([$actual->getDefault(), $expected->getDefault()]));
     }

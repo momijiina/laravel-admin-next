@@ -18,6 +18,7 @@
             <file>ResourceGeneratorTest.php</file>
             <file>GeneratedControllerCrudTest.php</file>
             <file>DateCastPresentationTest.php</file>
+            <file>NullableTemporalDefaultsTest.php</file>
         </testsuite>
     </testsuites>
 </phpunit>
