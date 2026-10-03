@@ -51,5 +51,11 @@ jobs:
         run: composer update --no-interaction --no-progress --prefer-dist --with 'orchestra/testbench:${{ matrix.testbench }}' --with 'phpunit/phpunit:${{ matrix.phpunit }}' --with 'symfony/dom-crawler:${{ matrix.crawler }}'
       - name: Check actual runtime requirements
         run: composer check-platform-reqs
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
+        with:
+          node-version: '24'
+          package-manager-cache: false
+      - name: Install pinned collection DOM test dependencies
+        run: npm ci --ignore-scripts --prefix javascript
       - name: Run real Laravel lifecycle and production Crawler tests
         run: composer test

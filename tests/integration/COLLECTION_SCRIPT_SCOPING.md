@@ -17,9 +17,14 @@ npm ci --ignore-scripts --prefix javascript
 vendor/bin/phpunit --filter CollectionScriptScopingTest
 ```
 
-The existing Laravel integration workflow installs Node 24 and the locked npm
-dependencies before running its normal suite on both framework families. The
-lock pins jsdom 30.1.1 and jQuery 3.7.1 from the official npm registry; dependencies
+Both the Laravel integration and DomCrawler compatibility workflows install
+Node 24 and the locked npm dependencies before running the full suite. Any runner
+executing the full integration suite must do the same; Composer does not install
+these JavaScript dependencies. The model-schema workflow selects only
+`ResourceGeneratorTest`, and schema-parity runs standalone PHP probes, so neither
+executes this DOM suite or needs its npm setup.
+
+The lockfile pins jsdom 30.1.1 and jQuery 3.7.1 from the official npm registry; dependencies
 are test-only. Each scenario executes with both the shipped jQuery 2.1.4 asset and
 pinned jQuery 3.7.1. HasMany tab mode loads the shipped Bootstrap implementation.
 No package/framework or collection/HasMany handler is replaced by a stub.

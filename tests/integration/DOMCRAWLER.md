@@ -12,9 +12,13 @@ with DomCrawler 5.4 (baseline), exactly 6.4.40 (new floor), and the latest allow
 6.4. In the two modern cells it also requires `laravel/browser-kit-testing:^7.2.8`
 in this isolated consumer, proving that the original Composer conflict is gone.
 BrowserKit is installed but these tests do not claim to exercise its legacy suite.
-For example, from this directory:
+This workflow runs the full integration suite, including the collection DOM
+regressions. Node 24.15+ (24.x) and the locked test-only npm dependencies are
+required in every Crawler matrix lane, alongside the Composer dependencies.
+For example, from this directory with Node 24 available:
 
 ```sh
+npm ci --ignore-scripts --prefix javascript
 composer require --no-update 'laravel/browser-kit-testing:^7.2.8'
 composer update --with 'orchestra/testbench:^10.0' --with 'phpunit/phpunit:^11.5' --with 'symfony/dom-crawler:6.4.40'
 composer check-platform-reqs
