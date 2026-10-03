@@ -85,12 +85,20 @@ its SQLite and Artisan regressions.
   its `false` availability error. This targeted branch check is not a claim that
   every historical Laravel/DBAL dependency pairing works.
 
+The transaction, reconnect, PDO-state and persistent-PDO lifecycle checks above
+use SQLite only; the service fixtures do not establish those guarantees for
+every driver.
+
 The fixtures cover strings, embedded quotes and backslashes, empty/default-null
 values, the string `NULL`, zero strings, booleans/tiny integers, other integer
 sizes, decimal/floating values, text/blob, dates/times/timestamps and reserved
 form columns. Generated fragments and complete controllers are PHP-parser checked.
 
 ## Live service matrix
+
+The post-PR #25 [verified coverage snapshot](../../COMPATIBILITY.md#database-service-evidence-and-remaining-limits)
+records the successful hosted run, exact commit, server versions and distinction
+between the six full-framework and four component jobs.
 
 `.github/workflows/model-schema.yml` defines six **full-framework** jobs:
 
@@ -189,8 +197,9 @@ check passed. This is legitimate component coverage, separate from the rejected
 full-framework dependency pairing.
 
 Local service processes cannot be started in this environment, so MySQL,
-MariaDB and PostgreSQL results require the hosted workflow. A written matrix is
-not evidence that those jobs passed. SQL Server remains **unverified against a
+MariaDB and PostgreSQL were not run locally. Their successful hosted results
+are recorded in the linked coverage snapshot; a configured matrix alone is not
+evidence of a pass. SQL Server remains **unverified against a
 live server**; this workflow has no SQL Server service and accepts no SQL Server
 license terms. General SQL Server support, all third-party drivers, all PDO
 options, historical framework combinations and full application CRUD are not
