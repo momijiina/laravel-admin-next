@@ -63,7 +63,8 @@ parent initializer. Full ready-wrapped table-parent reinitialization, identity
 allocation, consumer handlers, and post-click HTTP/SQLite persistence are covered
 by the separate [table-parent regression](HASMANY_TABLE_REINITIALIZATION.md). The
 actual parent scripts here still create each new child and execute their captured
-nested collection initializer; default/tab parent reinitialization is outside
+nested collection initializer; default/tab parent reinitialization is covered by
+the separate [default/tab suite](HASMANY_MODES_REINITIALIZATION.md), outside
 this test's scope.
 
 Consumers overriding/publishing `listfield.blade.php` or `keyvalue.blade.php` must

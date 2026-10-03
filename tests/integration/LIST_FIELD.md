@@ -26,8 +26,10 @@ key, so an unrelated validation failure retains each submitted list separately.
 `ListFieldScopedNameTest` checks escaped names/values/errors, native PHP form
 parsing of rendered controls, embedded and two-record HasMany update round trips,
 and validation redisplay without writes. This is rendered-HTML and HTTP-kernel
-coverage, not browser JavaScript. In particular, the pre-existing column-global
-add/template selectors and nested validator aggregation are unchanged. The scoped-name fix is also used by the empty markers below.
+coverage, not browser JavaScript. Collection Add/Remove scoping is covered by the
+later [collection-script regression](COLLECTION_SCRIPT_SCOPING.md), rather than
+this scoped-name test. Nested validator aggregation is unchanged. The scoped-name
+fix is also used by the empty markers below.
 
 
 ## Explicitly empty collections
@@ -49,9 +51,10 @@ preparation semantics remain unchanged; it has no collection minimum API.
 
 `ExplicitEmptyCollectionsTest` uses real rendered controls, native PHP parsing,
 the HTTP kernel, and SQLite. DOM removal simulates removal of row controls; no
-JavaScript is executed. Column-global add/template selectors and nested validator
-aggregation remain separate pre-existing limitations, so these tests do not claim
-repeated-instance JavaScript correctness or nested list-bound validation.
+JavaScript is executed by this test. Repeated-instance JavaScript correctness is
+covered separately by the [collection-script regression](COLLECTION_SCRIPT_SCOPING.md).
+Nested validator aggregation remains unchanged; these tests do not establish
+nested list-bound validation.
 
 Collection `disable()`/`readonly()` attributes remain unsupported by these
 existing templates. Code that deliberately omits a field by disabling its
