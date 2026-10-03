@@ -3,6 +3,10 @@
     <label class="{{$viewClass['label']}} control-label">{{$label}}</label>
 
     <div class="{{$viewClass['field']}}">
+        {{-- Keep empty defaults before real rows so PHP replaces them with submitted arrays. --}}
+        <input type="hidden" name="{{ $name }}[keys]" value="" />
+        <input type="hidden" name="{{ $name }}[values]" value="" />
+
         <table class="table table-hover">
             <thead>
             <tr>
@@ -13,16 +17,19 @@
             </thead>
             <tbody class="kv-{{$column}}-table">
 
-            @foreach(old("{$column}.keys", ($value ?: [])) as $k => $v)
+            @php($rows = old("{$errorKey}.keys", ($value ?: [])))
+            @php($rows = ($rows === null || $rows === '') ? [] : $rows)
 
-                @php($keysErrorKey = "{$column}.keys.{$loop->index}")
-                @php($valsErrorKey = "{$column}.values.{$loop->index}")
+            @foreach($rows as $k => $v)
+
+                @php($keysErrorKey = "{$errorKey}.keys.{$loop->index}")
+                @php($valsErrorKey = "{$errorKey}.values.{$loop->index}")
 
                 <tr>
                     <td>
                         <div class="form-group {{ $errors->has($keysErrorKey) ? 'has-error' : '' }}">
                             <div class="col-sm-12">
-                                <input name="{{ $name }}[keys][]" value="{{ old("{$column}.keys.{$k}", $k) }}" class="form-control" required/>
+                                <input name="{{ $name }}[keys][]" value="{{ old("{$errorKey}.keys.{$k}", $k) }}" class="form-control" required/>
 
                                 @if($errors->has($keysErrorKey))
                                     @foreach($errors->get($keysErrorKey) as $message)
@@ -35,7 +42,7 @@
                     <td>
                         <div class="form-group {{ $errors->has($valsErrorKey) ? 'has-error' : '' }}">
                             <div class="col-sm-12">
-                                <input name="{{ $name }}[values][]" value="{{ old("{$column}.values.{$k}", $v) }}" class="form-control" />
+                                <input name="{{ $name }}[values][]" value="{{ old("{$errorKey}.values.{$k}", $v) }}" class="form-control" />
                                 @if($errors->has($valsErrorKey))
                                     @foreach($errors->get($valsErrorKey) as $message)
                                         <label class="control-label" for="inputError"><i class="fa fa-times-circle-o"></i> {{$message}}</label><br/>
