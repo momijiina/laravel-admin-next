@@ -197,8 +197,11 @@ class EmbeddedForm
      */
     protected function setFieldOriginalValue($key)
     {
-        if (array_key_exists($key, $this->original)) {
-            $values = $this->original[$key];
+        // Native Eloquent object casts expose original JSON attributes as stdClass.
+        $original = $this->original instanceof \stdClass ? (array) $this->original : $this->original;
+
+        if (array_key_exists($key, $original)) {
+            $values = $original[$key];
 
             $this->fields->each(function (Field $field) use ($values) {
                 $field->setOriginal($values);
