@@ -51,7 +51,15 @@ class ImageProcessor
             throw new \InvalidArgumentException('Image driver must be gd, imagick, or the corresponding Intervention v3 Driver class. See IMAGE_MIGRATION.md.');
         }
 
-        return (new ImageManager($driver, autoOrientation: false, decodeAnimation: false, blendingColor: 'ffffff', strip: false))->read($source);
+        $image = (new ImageManager($driver, autoOrientation: false, decodeAnimation: false, blendingColor: 'ffffff', strip: false))->read($source);
+        // The v2 GD file decoder copied onto transparent white. Fully transparent
+        // RGB otherwise leaks into visible edge colors during libgd rotation.
+        if ($driver === \Intervention\Image\Drivers\Gd\Driver::class) {
+            // v3's GD clone performs the same native canvas copy, retaining metadata.
+            $image = clone $image;
+        }
+
+        return $image;
     }
 
     public function encode(ImageInterface $image)

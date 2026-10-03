@@ -1,0 +1,28 @@
+[
+  {
+    "id": "bundled",
+    "manifest": "v2-oracle.json",
+    "fingerprint": {
+      "gd_version": "bundled (2.1.0 compatible)",
+      "resize_rgba_sha256": "2e3400b5f94246aa615cc4659a4dbb459bb4248f73f8d69d1c0517f237f57917",
+      "rotate_dimensions": [
+        13,
+        14
+      ],
+      "rotate_rgba_sha256": "fdd4b7b8f89ea350358e2ab4671d9c42afe9bfbcf81a81cd00299da6494eeab4"
+    }
+  },
+  {
+    "id": "external",
+    "manifest": "v2-oracle-external-gd.json",
+    "fingerprint": {
+      "gd_version": "2.3.3",
+      "resize_rgba_sha256": "95d74eb70af20686ef6b5038995428df1383840820a3fd1d57fa0fdb83a3d128",
+      "rotate_dimensions": [
+        15,
+        15
+      ],
+      "rotate_rgba_sha256": "26c158840fe1e11de68fe2e4b2b689e4cff0c46262acdb215242680ab5fbc0c3"
+    }
+  }
+]

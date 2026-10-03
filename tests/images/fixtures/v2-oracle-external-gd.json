@@ -5,7 +5,24 @@
     "php": "8.5.11",
     "driver": "GD",
     "pixel_hash": "sha256(row-major RGBA bytes: R,G,B,GD-alpha 0..127)",
-    "notes": "Synthetic images only. Actual v2 file-path ImageField baseline on bundled GD (2.1.0 compatible), PHP8.5.11. Lossless decoded-pixel oracle, not encoded-file hashes. No EXIF/animation/Imagick coverage. Backend selected using independent native-GD canary fingerprints."
+    "notes": "Measured actual v2.7.2 file-path ImageField baseline on external GD2.3.3/PHP8.5.11. Not generated from v3 and not a universal all-libgd-build oracle.",
+    "gd_info": {
+      "GD Version": "2.3.3",
+      "FreeType Support": true,
+      "FreeType Linkage": "with freetype",
+      "GIF Read Support": true,
+      "GIF Create Support": true,
+      "JPEG Support": true,
+      "PNG Support": true,
+      "WBMP Support": true,
+      "XPM Support": true,
+      "XBM Support": true,
+      "WebP Support": true,
+      "BMP Support": true,
+      "AVIF Support": true,
+      "TGA Read Support": true,
+      "JIS-mapped Japanese Font Support": false
+    }
   },
   "cases": [
     {
@@ -192,10 +209,10 @@
       "thumbnails": {},
       "expected": {
         "input.png": {
-          "width": 13,
-          "height": 14,
+          "width": 15,
+          "height": 15,
           "mime": "image/png",
-          "rgba_sha256": "fdd4b7b8f89ea350358e2ab4671d9c42afe9bfbcf81a81cd00299da6494eeab4"
+          "rgba_sha256": "ccbb5e94883f8c576113b38c45136fb929e3dffcf2957345d0d84868660cfcf3"
         }
       }
     },
@@ -510,37 +527,37 @@
           "width": 16,
           "height": 16,
           "mime": "image/png",
-          "rgba_sha256": "03df7ad174335b67809514007c734529adc47ede2bcb8828bea44507ba76ec7f"
+          "rgba_sha256": "2ea2318f0d9aad17c76d2fc7ef91935457a6549588f635bc89f48e3fcdcd8f2d"
         },
         "input-portrait.png": {
           "width": 5,
           "height": 11,
           "mime": "image/png",
-          "rgba_sha256": "7b288cafa570cf6e9000a67a38d0d538af30f84f3c045b99d16397f0c9f5e9aa"
+          "rgba_sha256": "85bb64613d4ff28a4487c9e4e25c19c37760cee4991ff70f43a63528e3b5ce80"
         },
         "input-wide.png": {
           "width": 17,
           "height": 5,
           "mime": "image/png",
-          "rgba_sha256": "dd438e4a3c8ef425f2fd638627f4a366d016f1d91bc3bb73ed4f56cc4f3448ce"
+          "rgba_sha256": "e95462d1688101c3d75bdac3659aee7102dcbcb8d6d7dbcb623bd301edfd4027"
         },
         "input-fit.png": {
           "width": 5,
           "height": 5,
           "mime": "image/png",
-          "rgba_sha256": "b140ea84e15f4df99c8c22bcc055dc48822f4630110623c4c3f8119a57bd35f3"
+          "rgba_sha256": "3dca250bfe8a085138aafce9ca6a5913d9cf223eca507f0655379803d6f43acd"
         },
         "input-width.png": {
           "width": 9,
           "height": 6,
           "mime": "image/png",
-          "rgba_sha256": "365a11f36c8a9224a18cd204eef81e03c5777b8859338de62ae96647e9009d03"
+          "rgba_sha256": "28f002f83dcdda541844cd35d1346ecfe1a88caf3575be938fc4882caacdfde4"
         },
         "input-height.png": {
           "width": 14,
           "height": 9,
           "mime": "image/png",
-          "rgba_sha256": "21d1e61f5e50a8eb6bb11667725f6c1c7a9acbe692e552542a671f58a8fcbfb5"
+          "rgba_sha256": "c78b116de2afc784fd7777c64634d2b039c9728d2853f11c532c7404b787cdba"
         }
       }
     },
@@ -565,7 +582,7 @@
           "width": 16,
           "height": 16,
           "mime": "image/png",
-          "rgba_sha256": "abe3101d7f3ac4b4dc58acf5efc7f13f4c00fd1b148627c6209f9931bc75f283"
+          "rgba_sha256": "870ced2ea64c9470b385a5cd14ea7b35ee13163599e8d08d45bb92c5478e4873"
         }
       }
     },
@@ -597,7 +614,7 @@
           "width": 16,
           "height": 16,
           "mime": "image/png",
-          "rgba_sha256": "07ee20f29faa65ee1112d5ea5f6d8c25f5fd20560c216b84142e601ee6c92856"
+          "rgba_sha256": "b52848f593f7495b47db5d292f251fb5745e75f3eee41265693800a270940d43"
         }
       }
     },
@@ -679,7 +696,7 @@
           "width": 9,
           "height": 9,
           "mime": "image/png",
-          "rgba_sha256": "d2b47be2ec5c2ea56b3be08943d7ff17b63ace4bcb0e6fc3656238de0e4b7913"
+          "rgba_sha256": "f27c8f01fc9f709bf7e7f0bc4fdae48b699bf682c11331e83c93242c14498d50"
         }
       }
     },
@@ -773,7 +790,7 @@
           "width": 9,
           "height": 8,
           "mime": "image/png",
-          "rgba_sha256": "2e3400b5f94246aa615cc4659a4dbb459bb4248f73f8d69d1c0517f237f57917"
+          "rgba_sha256": "95d74eb70af20686ef6b5038995428df1383840820a3fd1d57fa0fdb83a3d128"
         }
       }
     },
@@ -795,7 +812,7 @@
           "width": 12,
           "height": 9,
           "mime": "image/png",
-          "rgba_sha256": "c62fdcb608407159780e9306f93306cfd0e18eec369a774b4b48ec1f37054d3b"
+          "rgba_sha256": "953af55c5db1c7712ca82f8a899b653f62a204d0150702b52b850ceb60e1aa0d"
         }
       }
     },
@@ -822,7 +839,7 @@
           "width": 8,
           "height": 5,
           "mime": "image/png",
-          "rgba_sha256": "2d7a3c265fee21a5c768d07e8b3275a9e4c6f86c611ff7fbf0516909485901e8"
+          "rgba_sha256": "23e4900f74b1f0479c57de9b693fb16c413ca4dd294067da5cf1cab02fe7bfc4"
         }
       }
     },

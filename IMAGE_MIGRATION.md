@@ -281,15 +281,86 @@ composer test -- --testsuite 'Image processing output'
 php ../images/optional_dependency.php
 ```
 
-The focused GD run on **PHP 8.5.11 / Laravel 13.34.0 / Intervention 3.11.9**
-passed **17 tests / 234 assertions / 0 skips**, with EXIF enabled and zero
-diagnostics,
-including
-**49 decoded PNG output hashes from 31 archived v2 cases**. The
+The initial bundled-GD run on **PHP 8.5.11 / Laravel 13.34.0 / Intervention
+3.11.9** passed **17 tests / 234 assertions / 0 skips**, with EXIF enabled and
+zero diagnostics. This predates the GD-build-specific correction described
+below; it was not a cross-build guarantee. The corpus contains **49 PNG outputs
+from 31 archived v2 cases**. The
 [oracle fixture](tests/images/fixtures/v2-oracle.json) records provenance:
 Intervention Image 2.7.2, GD, PHP 8.5.11 and source revision
 `47d0db5e3b6edbcb8aaabdebb2532da6edf397e9`. It compares dimensions, MIME and
-row-major decoded RGBA (GD alpha 0–127), not encoded-file hashes. Cases cover
+row-major decoded RGBA (GD alpha 0–127), not encoded-file hashes.
+
+### GD-build-specific rotation and the corrected oracle
+
+The initial eight hosted GD lanes failed the archived 45-degree rotation case.
+The source is 12×8 pixels: bundled GD produces 13×14, whereas external system
+libgd 2.3.3 produces 15×15 for the same native rotation. Oblique rotation bounds
+and resampling can depend on the GD build; identical adapter behavior does not
+imply identical numerical output across those builds.
+
+Independent v2 baselines on both builds also exposed a real input difference:
+the v2 GD path decoder normalized hidden RGB in fully transparent pixels to
+white; a raw v3 decode did not. Resampling could expose that hidden RGB as a
+visible edge-color difference. The production adapter now clones the decoded
+GD image using v3's public cloning behavior, which performs the equivalent
+native canvas copy while preserving alpha, origin, EXIF and resolution. No
+per-pixel normalization loop or vendor patch is used. Imagick is unchanged.
+Native `imageProcessing()` callbacks receive this normalized GD input; operations
+inside those callbacks still use native v3 semantics.
+
+The final test runs all **31 oracle cases independently through a data provider**.
+It checks **49 fixed archived PNG outputs per characterized backend**, including
+oblique rotation, against actual Intervention v2 results. The
+[bundled-GD manifest](tests/images/fixtures/v2-oracle.json) and
+[external-libgd manifest](tests/images/fixtures/v2-oracle-external-gd.json) are
+selected using [recorded GD fingerprints](tests/images/fixtures/gd-backends.json).
+A fingerprint combines the exact GD version string with dimensions and decoded
+RGBA hashes from independent native-GD resize/rotation canaries; those canaries
+do not invoke Intervention or the adapter. An unknown fingerprint fails clearly
+and requires an independently recorded v2 baseline. This is a **test-oracle
+restriction only**: production uploads do not consult these fingerprints or
+reject other GD builds. Expectations are never
+regenerated from v3, selected by accepting a union of output hashes, weakened
+with broad tolerances, or skipped for an unknown build. All selected output
+checks compare exact dimensions, MIME and complete decoded RGBA hashes.
+
+A separate independent comparison found all **53 decoded outputs** (including
+JPEG/GIF originals and thumbnails beyond the committed PNG corpus) pixel-exact
+against v2 on both tested backends. This is scoped evidence for those fixtures,
+not a guarantee that oblique-rotation dimensions or pixels are portable between
+GD builds. Applications requiring identical output should control and test their
+GD build as well as package versions.
+
+### Corrected local runs
+
+With **PHP 8.5.11 / Intervention Image 3.11.9 / EXIF enabled**, the final focused
+suite passed **48 tests / 236 assertions** on both characterized GD builds.
+Complete BrowserKit results were:
+
+| Backend | Laravel | Tests | Assertions |
+| --- | --- | --- | --- |
+| Bundled GD | 12.69.3 | 125 | 1,236 |
+| Bundled GD | 13.34.0 | 125 | 1,232 |
+| External libgd 2.3.3 | 12.69.3 | 125 | 1,228 |
+| External libgd 2.3.3 | 13.34.0 | 125 | 1,234 |
+
+All focused and complete runs had **zero skips and zero diagnostics**. Historical
+random fixture counts explain varying assertion totals. The increase from 17 to
+48 focused tests reflects 31 independently named oracle cases replacing one
+loop-based test, plus a direct transparent-RGB normalization regression.
+
+All four framework/backend integration runs completed **106 tests / 36,653
+assertions / 2 expected database-service skips** each. The optional-dependency
+boundary and **330-file production lint** passed on both builds. Removing the
+normalizing clone fails two regressions; an unknown GD fingerprint fails the
+data provider. Independent review checked both 49-output manifests against
+actual v2 results. See [image test details](tests/images/README.md).
+These local results are separate from hosted CI and untested runtime builds.
+
+### Other coverage and initial local results
+
+Cases cover
 synthetic portrait/landscape/square/odd/tiny/alpha images, the bounded geometry
 operations, constraints, watermarks and thumbnails. Additional tests cover
 JPEG MIME/quality, callback order, invalid inputs, separate driver settings,
@@ -302,8 +373,8 @@ check passed.
 These are focused GD checks, not global v2 compatibility or production-driver
 certification. Imagick and WebP/AVIF codecs are untested. General EXIF and
 full animation parity remain outside the focused cases recorded above.
-On the same PHP 8.5.11 local environment, the complete BrowserKit runner
-(including the new output suite) completed:
+Before the data-provider correction, on the same bundled-GD PHP 8.5.11 local
+environment, the complete BrowserKit runner (including the output suite) completed:
 
 - Laravel 12.69.3: **94 tests / 1,231 assertions / 0 skips**.
 - Laravel 13.34.0: **94 tests / 1,232 assertions / 0 skips**.

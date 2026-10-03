@@ -129,7 +129,39 @@ paths. Run it alone with `composer test -- --testsuite 'Historical harness isola
 The original 73-method suite remains independently selectable as
 `Historical BrowserKit (SQLite)`; neither suite depends on test execution order.
 
-## Current v3 local evidence (2026-10-03)
+## Image-output GD-build correction (2026-10-03)
+
+The initial eight hosted GD lanes failed the fixed 45-degree rotation oracle:
+bundled GD yields 13×14 from the 12×8 fixture, while external libgd 2.3.3 yields
+15×15. Independent v2 comparisons additionally found hidden transparent-RGB
+normalization missing from the v3 input path. The adapter now uses v3's public
+GD clone/native canvas copy to preserve that legacy decode behavior; Imagick is
+unchanged. This is a production correction, not only a test expectation change.
+
+The final oracle runs 31 cases independently and checks 49 fixed PNG outputs
+against one of two actual v2 golden manifests. Exact GD-version and independent
+native resize/rotation canary fingerprints select the characterized backend;
+an unknown fingerprint fails the test provider instead of skipping or weakening
+checks. This does not restrict GD builds accepted by production uploads.
+This verifies exact adapter parity on each tested runtime, not identical output
+across different GD builds. See the
+[detailed evidence and limits](../../IMAGE_MIGRATION.md#gd-build-specific-rotation-and-the-corrected-oracle).
+
+With PHP 8.5.11 / Intervention Image 3.11.9 / EXIF enabled, the corrected focused
+suite passed 48 tests / 236 assertions on both characterized GD builds. Complete
+runs passed **125 tests** each:
+
+- Bundled GD: Laravel 12.69.3 / 1,236 assertions; Laravel 13.34.0 / 1,232 assertions.
+- External libgd 2.3.3: Laravel 12.69.3 / 1,228 assertions; Laravel 13.34.0 / 1,234 assertions.
+
+All these runs had zero skips and diagnostics. Historical random fixture counts
+make assertion totals vary. The test-count increase reflects 31 independently
+named oracle cases replacing one loop-based test, plus a direct normalization
+regression. Removing the clone fails two regressions; an unknown fingerprint
+fails the data provider. See [image test details](../images/README.md). These
+local results are distinct from hosted checks.
+
+## Initial v3 local evidence (before the GD-build correction)
 
 With Intervention Image 3.11.9 and GD on PHP 8.5.11, the full runner, including
 the new image-output suite, completed 94 tests on Laravel 12.69.3 (1,231

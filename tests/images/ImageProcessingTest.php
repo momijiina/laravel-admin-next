@@ -70,44 +70,97 @@ class ImageProcessingTest extends TestCase
         return [$c['red'], $c['green'], $c['blue'], $c['alpha']];
     }
 
-    public function testDecodedPixelsMatchArchivedV2GdOracle(): void
+    public static function archivedV2Cases(): array
     {
-        $oracle = json_decode(file_get_contents(__DIR__.'/fixtures/v2-oracle.json'), true, 512, JSON_THROW_ON_ERROR);
+        $backends = json_decode(file_get_contents(__DIR__.'/fixtures/gd-backends.json'), true, 512, JSON_THROW_ON_ERROR);
+        $fingerprint = self::gdFingerprint();
+        $manifest = null;
+        foreach ($backends as $backend) {
+            if ($backend['fingerprint'] === $fingerprint) {
+                $manifest = $backend['manifest'];
+                break;
+            }
+        }
+        if ($manifest === null) {
+            throw new \RuntimeException('Uncharacterized GD build: '.json_encode($fingerprint).'. Record an independent v2 baseline before adding this backend; never regenerate expectations from v3.');
+        }
+        $oracle = json_decode(file_get_contents(__DIR__.'/fixtures/'.$manifest), true, 512, JSON_THROW_ON_ERROR);
+        $cases = [];
         foreach ($oracle['cases'] as $case) {
-            $source = $this->root.'/oracle-source';
-            copy(__DIR__.'/fixtures/'.$case['fixture'], $source);
-            $field = (new Image('photo'))->dir($case['name'])->name('input.png')->thumbnail($case['thumbnails']);
-            foreach ($case['operations'] as [$method, $arguments]) {
-                $arguments = array_map(static function ($argument) {
-                    if (is_array($argument) && isset($argument['fixture'])) {
-                        return __DIR__.'/fixtures/'.$argument['fixture'];
-                    }
-                    if (is_array($argument) && isset($argument['constraint'])) {
-                        return static function (Constraint $constraint) use ($argument) {
-                            foreach ($argument['constraint'] as $method) {
-                                $constraint->$method();
-                            }
-                        };
-                    }
+            $cases[$case['name']] = [$case];
+        }
 
-                    return $argument;
-                }, $arguments);
-                $field->$method(...$arguments);
+        return $cases;
+    }
+
+    private static function pixelHash($image): string
+    {
+        $raw = '';
+        for ($y = 0; $y < imagesy($image); $y++) {
+            for ($x = 0; $x < imagesx($image); $x++) {
+                $color = imagecolorsforindex($image, imagecolorat($image, $x, $y));
+                $raw .= pack('C4', $color['red'], $color['green'], $color['blue'], $color['alpha']);
             }
-            $field->prepare(new UploadedFile($source, 'input.png', 'image/png', null, true));
-            foreach ($case['expected'] as $filename => $expected) {
-                $bytes = Storage::disk('image_test')->get($case['name'].'/'.$filename);
-                $image = $this->pixels($bytes);
-                self::assertSame([$expected['width'], $expected['height']], [imagesx($image), imagesy($image)], $case['name'].'/'.$filename);
-                self::assertSame($expected['mime'], getimagesizefromstring($bytes)['mime']);
-                $raw = '';
-                for ($y = 0; $y < imagesy($image); $y++) {
-                    for ($x = 0; $x < imagesx($image); $x++) {
-                        $raw .= pack('C4', ...$this->pixel($image, $x, $y));
-                    }
+        }
+
+        return hash('sha256', $raw);
+    }
+
+    private static function gdFingerprint(): array
+    {
+        // These primitives identify the build without invoking Intervention/the adapter.
+        $source = imagecreatefrompng(__DIR__.'/fixtures/quadrants.png');
+        $resized = imagecreatetruecolor(9, 8);
+        imagecopyresampled($resized, $source, 0, 0, 0, 0, 9, 8, 12, 8);
+        $source = imagecreatefrompng(__DIR__.'/fixtures/alpha.png');
+        $rotated = imagerotate($source, 45, imagecolorallocatealpha($source, 255, 255, 255, 127));
+
+        return [
+            'gd_version' => gd_info()['GD Version'],
+            'resize_rgba_sha256' => self::pixelHash($resized),
+            'rotate_dimensions' => [imagesx($rotated), imagesy($rotated)],
+            'rotate_rgba_sha256' => self::pixelHash($rotated),
+        ];
+    }
+
+    public function testGdPathDecodePreservesLegacyTransparentRgb(): void
+    {
+        $image = (new ImageProcessor())->read(__DIR__.'/fixtures/alpha.png')->core()->native();
+        self::assertSame([255, 255, 255, 127], $this->pixel($image, 0, 0));
+        self::assertSame([20, 80, 160, 64], $this->pixel($image, 1, 0));
+    }
+
+    #[\PHPUnit\Framework\Attributes\DataProvider('archivedV2Cases')]
+    public function testDecodedPixelsMatchArchivedV2GdOracle(array $case): void
+    {
+        $source = $this->root.'/oracle-source';
+        copy(__DIR__.'/fixtures/'.$case['fixture'], $source);
+        $field = (new Image('photo'))->dir($case['name'])->name('input.png')->thumbnail($case['thumbnails']);
+        foreach ($case['operations'] as [$method, $arguments]) {
+            $arguments = array_map(static function ($argument) {
+                if (is_array($argument) && isset($argument['fixture'])) {
+                    return __DIR__.'/fixtures/'.$argument['fixture'];
                 }
-                self::assertSame($expected['rgba_sha256'], hash('sha256', $raw), $case['name'].'/'.$filename);
-            }
+                if (is_array($argument) && isset($argument['constraint'])) {
+                    return static function (Constraint $constraint) use ($argument) {
+                        foreach ($argument['constraint'] as $method) {
+                            $constraint->$method();
+                        }
+                    };
+                }
+
+                return $argument;
+            }, $arguments);
+            $field->$method(...$arguments);
+        }
+        $field->prepare(new UploadedFile($source, 'input.png', 'image/png', null, true));
+        foreach ($case['expected'] as $filename => $expected) {
+            $context = $case['name'].'/'.$filename.' ('.gd_info()['GD Version'].')';
+            $bytes = Storage::disk('image_test')->get($case['name'].'/'.$filename);
+            $image = $this->pixels($bytes);
+            self::assertSame([$expected['width'], $expected['height']], [imagesx($image), imagesy($image)], $context);
+            self::assertSame($expected['mime'], getimagesizefromstring($bytes)['mime']);
+            self::assertSame($expected['rgba_sha256'], self::pixelHash($image), $context);
         }
     }
 
