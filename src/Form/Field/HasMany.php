@@ -469,6 +469,62 @@ class HasMany extends Field
     }
 
     /**
+     * Build an exact, retained-DOM allocator for default and tab children.
+     *
+     * The caller supplies its concrete parent and live body. Template contents
+     * are inert; only canonical pending names in live children seed the counter.
+     *
+     * @param string $mode
+     *
+     * @return string
+     */
+    protected function pendingIndexScript($mode)
+    {
+        $newKeyPrefix = json_encode($this->column.'[new_');
+        $indexKey = json_encode('admin-has-many-'.$mode.'-index');
+
+        return <<<EOT
+    var nextIndex = (function () {
+        var newKeyPrefix = {$newKeyPrefix};
+        var indexKey = {$indexKey};
+        var index = parent.data(indexKey) || '0';
+        body.children().find('input[name]').each(function () {
+            var name = $(this).attr('name');
+            if (name.indexOf(newKeyPrefix) !== 0) {
+                return;
+            }
+            var key = name.substring(newKeyPrefix.length).match(/^(\d+)\]/);
+            if (key) {
+                var candidate = key[1].replace(/^0+/, '') || '0';
+                if (candidate.length > index.length || (candidate.length === index.length && candidate > index)) {
+                    index = candidate;
+                }
+            }
+        });
+        parent.data(indexKey, index);
+
+        return function () {
+            // Keep deleted identities reserved, even across ready callbacks.
+            var digits = parent.data(indexKey).split('');
+            var position = digits.length - 1;
+            while (position >= 0 && digits[position] === '9') {
+                digits[position--] = '0';
+            }
+            if (position < 0) {
+                digits.unshift('1');
+            } else {
+                digits[position] = String(Number(digits[position]) + 1);
+            }
+            var value = digits.join('');
+            parent.data(indexKey, value);
+            // Existing captured field scripts expect numeric safe indices.
+            return Number(value) <= 9007199254740991 ? Number(value) : value;
+        };
+    })();
+EOT;
+    }
+
+    /**
      * Setup default template script.
      *
      * @param string $templateScript
@@ -479,33 +535,40 @@ class HasMany extends Field
     {
         $removeClass = NestedForm::REMOVE_FLAG_CLASS;
         $defaultKey = NestedForm::DEFAULT_KEY_NAME;
+        $parentId = json_encode('has-many-'.$this->column);
+        $rowClass = json_encode('has-many-'.$this->column.'-form');
+        $bodyClass = json_encode('has-many-'.$this->column.'-forms');
+        $templateClass = json_encode($this->column.'-tpl');
+        $indexScript = $this->pendingIndexScript('default');
 
-        /**
-         * When add a new sub form, replace all element key in new sub form.
-         *
-         * @example comments[new___key__][title]  => comments[new_{index}][title]
-         *
-         * {count} is increment number of current sub form count.
-         */
         $script = <<<EOT
-var index = 0;
-$('#has-many-{$this->column}').off('click', '.add').on('click', '.add', function () {
+$(document.getElementById({$parentId})).each(function () {
+    var parent = $(this);
+    var body = parent.children().filter(function () {
+        return $(this).hasClass({$bodyClass});
+    });
+    {$indexScript}
 
-    var tpl = $('template.{$this->column}-tpl');
+    parent.off('click.adminHasManyDefault', '.add').on('click.adminHasManyDefault', '.add', function () {
+        var tpl = parent.children('template').filter(function () {
+            return $(this).hasClass({$templateClass});
+        }).first();
+        var index = nextIndex();
+        var template = tpl.html().replace(/{$defaultKey}/g, index);
+        body.append(template);
+        {$templateScript}
+        return false;
+    });
 
-    index++;
-
-    var template = tpl.html().replace(/{$defaultKey}/g, index);
-    $('.has-many-{$this->column}-forms').append(template);
-    {$templateScript}
-    return false;
-});
-
-$('#has-many-{$this->column}').off('click', '.remove').on('click', '.remove', function () {
-    $(this).closest('.has-many-{$this->column}-form').find('input').removeAttr('required');
-    $(this).closest('.has-many-{$this->column}-form').hide();
-    $(this).closest('.has-many-{$this->column}-form').find('.$removeClass').val(1);
-    return false;
+    parent.off('click.adminHasManyDefault', '.remove').on('click.adminHasManyDefault', '.remove', function () {
+        var row = $(this).parents().filter(function () {
+            return $(this).hasClass({$rowClass});
+        }).first();
+        row.find('input').removeAttr('required');
+        row.hide();
+        row.find('.$removeClass').val(1);
+        return false;
+    });
 });
 
 EOT;
@@ -524,45 +587,58 @@ EOT;
     {
         $removeClass = NestedForm::REMOVE_FLAG_CLASS;
         $defaultKey = NestedForm::DEFAULT_KEY_NAME;
+        $parentId = json_encode('has-many-'.$this->column);
+        $indexScript = $this->pendingIndexScript('tab');
 
         $script = <<<EOT
+$(document.getElementById({$parentId})).each(function () {
+    var parent = $(this);
+    var body = parent.children('.tab-content');
+    var nav = parent.children('.nav');
+    {$indexScript}
 
-$('#has-many-{$this->column} > .nav').off('click', 'i.close-tab').on('click', 'i.close-tab', function(){
-    var \$navTab = $(this).siblings('a');
-    var \$pane = $(\$navTab.attr('href'));
-    if( \$pane.hasClass('new') ){
-        \$pane.remove();
-    }else{
-        \$pane.removeClass('active').find('.$removeClass').val(1);
-    }
-    if(\$navTab.closest('li').hasClass('active')){
-        \$navTab.closest('li').remove();
-        $('#has-many-{$this->column} > .nav > li:nth-child(1) > a').tab('show');
-    }else{
-        \$navTab.closest('li').remove();
-    }
-});
-
-var index = 0;
-$('#has-many-{$this->column} > .header').off('click', '.add').on('click', '.add', function(){
-    index++;
-    var navTabHtml = $('#has-many-{$this->column} > template.nav-tab-tpl').html().replace(/{$defaultKey}/g, index);
-    var paneHtml = $('#has-many-{$this->column} > template.pane-tpl').html().replace(/{$defaultKey}/g, index);
-    $('#has-many-{$this->column} > .nav').append(navTabHtml);
-    $('#has-many-{$this->column} > .tab-content').append(paneHtml);
-    $('#has-many-{$this->column} > .nav > li:last-child a').tab('show');
-    {$templateScript}
-});
-
-if ($('.has-error').length) {
-    $('.has-error').parent('.tab-pane').each(function () {
-        var tabId = '#'+$(this).attr('id');
-        $('li a[href="'+tabId+'"] i').removeClass('hide');
+    nav.off('click.adminHasManyTab', 'i.close-tab').on('click.adminHasManyTab', 'i.close-tab', function () {
+        var navTab = $(this).siblings('a');
+        var paneId = navTab.attr('href').substring(1);
+        var pane = body.children().filter(function () {
+            return this.id === paneId;
+        });
+        if (pane.hasClass('new')) {
+            pane.remove();
+        } else {
+            pane.removeClass('active').find('.$removeClass').val(1);
+        }
+        var wasActive = navTab.closest('li').hasClass('active');
+        navTab.closest('li').remove();
+        if (wasActive) {
+            nav.children('li').first().children('a').tab('show');
+        }
     });
 
-    var first = $('.has-error:first').parent().attr('id');
-    $('li a[href="#'+first+'"]').tab('show');
-}
+    parent.children('.header').off('click.adminHasManyTab', '.add').on('click.adminHasManyTab', '.add', function () {
+        var index = nextIndex();
+        var navTabHtml = parent.children('template.nav-tab-tpl').first().html().replace(/{$defaultKey}/g, index);
+        var paneHtml = parent.children('template.pane-tpl').first().html().replace(/{$defaultKey}/g, index);
+        nav.append(navTabHtml);
+        body.append(paneHtml);
+        nav.children('li').last().find('a').tab('show');
+        {$templateScript}
+    });
+
+    if (parent.find('.has-error').length) {
+        parent.find('.has-error').parent('.tab-pane').each(function () {
+            var tabId = '#'+$(this).attr('id');
+            nav.find('li a').filter(function () {
+                return $(this).attr('href') === tabId;
+            }).find('i').removeClass('hide');
+        });
+
+        var first = parent.find('.has-error:first').parent().attr('id');
+        nav.find('li a').filter(function () {
+            return $(this).attr('href') === '#'+first;
+        }).tab('show');
+    }
+});
 EOT;
 
         Admin::script($script);
