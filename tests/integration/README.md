@@ -70,6 +70,8 @@ The dated results below are historical snapshots, not the current suite totals.
   JSON/CSV saves and validation redisplay; [selection contract](CHECKBOX_ZERO.md)
 - Ordinary Tags hidden-input create/update/clear with exact storage parity;
   [Tags regressions](TAGS.md)
+- Default NULL export-driver resolution under strict PHP 8.5 diagnostics, driver
+  registry/cache compatibility, and actual unconfigured HTTP export scopes
 - Headers for empty actual CSV exports and cross-chunk header-once controls;
   [CSV schema and compatibility notes](CSV_HEADERS.md)
 - Explicit native-object grid display callbacks and actual streamed CSV round trips;

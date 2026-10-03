@@ -85,8 +85,10 @@ class CsvHeadersFixture extends TestCase
         }
         $this->app['router']->get('/admin/csv-headers', function () use ($options, $named, &$trace) {
             $grid = new Grid(new CsvHeadersRecord());
-            // Select the supported driver explicitly; the legacy null resolver is separate.
-            $grid->exporter(new Grid\Exporters\CsvExporter());
+            // Header-specific tests use an explicit driver; resolver tests opt into the default.
+            if (!($options['default_driver'] ?? false)) {
+                $grid->exporter(new Grid\Exporters\CsvExporter());
+            }
             if ($named) {
                 $grid->setName('records');
                 $grid->model()->setSortName('records_sort');
@@ -103,26 +105,28 @@ class CsvHeadersFixture extends TestCase
             $grid->paginate(2);
             $grid->filter(function ($filter) { $filter->equal('category'); });
             $grid->hideColumns($options['hidden'] ?? []);
-            $grid->export(function ($exporter) use ($grid, $options, &$trace) {
-                $trace[] = ['configure'];
-                if (array_key_exists('only', $options)) {
-                    $exporter->only($options['only']);
-                }
-                if (array_key_exists('except', $options)) {
-                    $exporter->except($options['except']);
-                }
-                $exporter->title('text', function ($title) use ($grid, $options, &$trace) {
-                    $trace[] = ['title', $title, $grid->columnNames];
-                    return $options['title'] ?? $title;
-                });
-                $exporter->column('text', function ($value, $original) use (&$trace) {
-                    if ($value !== $original) {
-                        throw new \LogicException('Display/export callback order changed');
+            if (!($options['no_callback'] ?? false)) {
+                $grid->export(function ($exporter) use ($grid, $options, &$trace) {
+                    $trace[] = ['configure'];
+                    if (array_key_exists('only', $options)) {
+                        $exporter->only($options['only']);
                     }
-                    $trace[] = ['column'];
-                    return $value;
+                    if (array_key_exists('except', $options)) {
+                        $exporter->except($options['except']);
+                    }
+                    $exporter->title('text', function ($title) use ($grid, $options, &$trace) {
+                        $trace[] = ['title', $title, $grid->columnNames];
+                        return $options['title'] ?? $title;
+                    });
+                    $exporter->column('text', function ($value, $original) use (&$trace) {
+                        if ($value !== $original) {
+                            throw new \LogicException('Display/export callback order changed');
+                        }
+                        $trace[] = ['column'];
+                        return $value;
+                    });
                 });
-            });
+            }
             return $grid->render();
         });
         $response = $this->app->make(Kernel::class)->handle(Request::create('/admin/csv-headers?'.http_build_query($query), 'GET'));
