@@ -51,7 +51,18 @@ class Sorter implements Renderable
      */
     protected function isSorted()
     {
-        $this->sort = \request()->get($this->sortName);
+        $request = \request();
+        // Preserve Request::get() precedence, literal keys and non-scalar values.
+        $this->sort = $request->attributes->get($this->sortName, $request);
+        if ($this->sort === $request) {
+            if ($request->query->has($this->sortName)) {
+                $this->sort = $request->query->all()[$this->sortName];
+            } elseif ($request->request->has($this->sortName)) {
+                $this->sort = $request->request->all()[$this->sortName];
+            } else {
+                $this->sort = null;
+            }
+        }
 
         if (empty($this->sort)) {
             return false;

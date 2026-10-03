@@ -54,7 +54,20 @@ trait HasQuickSearch
      */
     protected function applyQuickSearch()
     {
-        if (!$query = request()->get(static::$searchKey)) {
+        $request = request();
+        // Preserve Request::get() precedence, literal keys and non-scalar values.
+        $query = $request->attributes->get(static::$searchKey, $request);
+        if ($query === $request) {
+            if ($request->query->has(static::$searchKey)) {
+                $query = $request->query->all()[static::$searchKey];
+            } elseif ($request->request->has(static::$searchKey)) {
+                $query = $request->request->all()[static::$searchKey];
+            } else {
+                $query = null;
+            }
+        }
+
+        if (!$query) {
             return;
         }
 
