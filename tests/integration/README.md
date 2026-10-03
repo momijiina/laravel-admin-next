@@ -30,8 +30,10 @@ explains the framework/version mapping.
 
 ## Current evidence
 
-See [current verified coverage](../../COMPATIBILITY.md#current-verified-coverage-2026-10-03-after-pr-25)
-for the post-PR #25 local and hosted results, exact revisions and remaining limits.
+See the [current maintenance summary](../../COMPATIBILITY.md#current-maintenance-summary)
+for recent changes, upgrade cautions and scoped regression guides. The separate
+[PR #25 snapshot](../../COMPATIBILITY.md#current-verified-coverage-2026-10-03-after-pr-25)
+retains its exact local and hosted results.
 The dated results below are historical snapshots, not the current suite totals.
 
 ## What this covers
@@ -60,6 +62,8 @@ The dated results below are historical snapshots, not the current suite totals.
   [scalar/null result contract and boundaries](OBJECT_DISPLAY.md)
 - Native object/array casts in configured embedded forms;
   [original-metadata regression and replacement boundary](EMBEDDED_OBJECT_ORIGINALS.md)
+- Explicit ListField bounds, scoped input/error names, and ListField/KeyValue
+  empty-marker submission; [behavior and upgrade cautions](LIST_FIELD.md)
 - Production-rendered List/KeyValue collection scripts with shipped and modern jQuery;
   [offline DOM scope, setup, and limits](COLLECTION_SCRIPT_SCOPING.md)
 - Ready-wrapped HasMany table-parent reinitialization, unique child identities, and

@@ -6,7 +6,73 @@
   specific application/version combinations before claiming support
 - Separate dependency declarations, focused checks, and full runtime support
 
-## Image-processing dependency change (after PR #25)
+## Current maintenance summary
+
+This index describes the changes merged through
+[PR #42](https://github.com/momijiina/laravel-admin-next/pull/42), at
+[`c09e6f8`](https://github.com/momijiina/laravel-admin-next/commit/c09e6f86cd2dc928aebefd2c91ad455794eec8e9).
+Use the linked guides for upgrade steps and each regression's precise boundary.
+Historical test totals below remain evidence for their own revisions, not
+current suite totals or validation of subsequent changes.
+
+- **Image processing ([PR #35](https://github.com/momijiina/laravel-admin-next/pull/35)):**
+  optional Intervention Image `^3.11.9` replaces v2 for transformations and
+  thumbnails. Review callback types, driver/encoding settings, published
+  configuration and non-atomic storage limits in the
+  [image migration guide](IMAGE_MIGRATION.md). Ordinary uploads without
+  processing do not require it; the PHP floor remains `^8.2`.
+- **Application compatibility ([PR #36](https://github.com/momijiina/laravel-admin-next/pull/36)):**
+  integration with other Laravel applications is a goal, not a guarantee for
+  every application or every release admitted by the Composer constraints.
+- **List bounds and names ([PR #37](https://github.com/momijiina/laravel-admin-next/pull/37),
+  [PR #38](https://github.com/momijiina/laravel-admin-next/pull/38)):** explicit
+  `min()`/`max()` apply even without item rules; embedded and HasMany lists use
+  scoped input/error names. Custom validators retain precedence. See
+  [list-field behavior and limits](tests/integration/LIST_FIELD.md).
+- **Explicit clearing ([PR #39](https://github.com/momijiina/laravel-admin-next/pull/39)):**
+  removing every ListField/KeyValue row submits an empty marker; omitting the
+  field still preserves stored values. Raw-input hooks and custom validators
+  must account for that scalar marker. Controls deliberately disabled to omit
+  a field must disable its markers too; see
+  [empty-collection cautions](tests/integration/LIST_FIELD.md#explicitly-empty-collections).
+- **Collection scripts ([PR #40](https://github.com/momijiina/laravel-admin-next/pull/40)):**
+  same-column fields have root-local Add/Remove behavior and repeatable
+  initialization. Consumers with overridden/published ListField or KeyValue
+  views must carry forward the new data markers and direct-child templates;
+  see the [view/script contract](tests/integration/COLLECTION_SCRIPT_SCOPING.md#boundaries).
+- **HasMany reinitialization ([PR #41](https://github.com/momijiina/laravel-admin-next/pull/41),
+  [PR #42](https://github.com/momijiina/laravel-admin-next/pull/42)):** table,
+  default and tab modes preserve unique pending-child names and unrelated
+  consumer handlers when their ready-wrapped initialization is repeated.
+  See the [table guide](tests/integration/HASMANY_TABLE_REINITIALIZATION.md) and
+  [default/tab guide](tests/integration/HASMANY_MODES_REINITIALIZATION.md),
+  including the pending-DOM versus full validation-redirect coverage boundary.
+
+### Hosted evidence for PR #42
+
+All **61 jobs across 13 workflows** passed for the final PR #42 head,
+[`aedae96`](https://github.com/momijiina/laravel-admin-next/commit/aedae96f263e6652d816589d20da4c4e5768f235);
+see the [PR checks](https://github.com/momijiina/laravel-admin-next/pull/42/checks).
+The CI checkout was synthetic merge `4b2a838`; its tree matched that head.
+The 22 integration/DomCrawler lanes each completed **157 tests / 189,979
+assertions / 2 optional external-database service skips**. The eight BrowserKit
+lanes each completed **125 tests**, with **1,227–1,236 assertions**.
+These are hosted results for that exact pre-merge head, not local results or a
+new run against merge commit `c09e6f8` or this documentation update. Optional
+service skips do not establish ordinary lifecycle coverage on those databases.
+
+The newer collection/HasMany checks combine offline jsdom with targeted
+Testbench HTTP/SQLite checks; they are not full browser E2E, live PJAX transport,
+layout, arbitrary widget or universal downstream-application certification.
+See the [integration setup](tests/integration/README.md) for the required Node
+and locked npm dependencies, and the [BrowserKit guide](tests/browserkit/README.md)
+for separate in-process historical and image-output coverage. Local results,
+configured CI matrices and hosted results for an exact commit are distinct
+forms of evidence; none substitutes for the others.
+
+<a id="image-processing-dependency-change-after-pr-25"></a>
+
+## Image-processing dependency change (PR #35)
 
 Transformations and thumbnails now require optional Intervention Image
 `^3.11.9`; ordinary uploads without processing do not require it. The PHP floor
@@ -58,7 +124,9 @@ BrowserKit dependency; its test counts, source-file count and green hosted jobs
 must not be presented as validation of the changed v3 source. Historical
 sections intentionally retain the dependencies and results of their revisions.
 
-## Current verified coverage (2026-10-03, after PR #25)
+<a id="current-verified-coverage-2026-10-03-after-pr-25"></a>
+
+## Historical verified coverage (2026-10-03, PR #25)
 
 This snapshot records checks for the code merged in
 [PR #25](https://github.com/momijiina/laravel-admin-next/pull/25), head
@@ -126,7 +194,8 @@ dependency is reported. Prefer DBAL 3 for maintained dependencies and persistent
 ## Historical migration and regression evidence
 
 The following dated sections preserve what was verified when each patch was
-prepared. For current totals and hosted outcomes, use the snapshot above.
+prepared. For the latest maintenance scope and guide links, use the current summary above.
+The PR #25 snapshot records its own exact hosted outcomes, not current totals.
 
 ## PHP baseline migration (2026-10-02)
 

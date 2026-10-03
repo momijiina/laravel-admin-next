@@ -175,7 +175,7 @@ These are local results, separate from the older hosted checks below.
 
 ## Diagnostics and local evidence
 
-See [current verified coverage](../../COMPATIBILITY.md#current-verified-coverage-2026-10-03-after-pr-25)
+See the [historical PR #25 snapshot](../../COMPATIBILITY.md#current-verified-coverage-2026-10-03-after-pr-25)
 for the exact post-PR #25 hosted outcomes. The local results below record the
 v2-era harness-isolation patch; integration totals have increased since that
 patch. These dated results do not validate the subsequent v3 migration.

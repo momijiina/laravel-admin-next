@@ -11,7 +11,7 @@ integration checks, before they become support promises; see
 The starting point is the [2026-10-01 audit](docs/compatibility-audit-2026-10-01.md).
 The [original PR candidate inventory](docs/pr-candidates-2026-10-01.md) is a
 historical snapshot. Current completed coverage and its limits are recorded in
-[the post-PR #25 verification summary](COMPATIBILITY.md#current-verified-coverage-2026-10-03-after-pr-25).
+[the current maintenance summary](COMPATIBILITY.md#current-maintenance-summary).
 
 ## Phase 1: Establish a verified baseline
 
@@ -54,6 +54,16 @@ and application checks; do not silently remove or claim support for them.
       real SQLite/HTTP lifecycle regressions; see [behavior and limits](docs/operation-log-redaction.md)
 - [x] Preserve original main-upload files/records when replacement storage fails;
       see [non-atomic filesystem/database limits](tests/integration/FILE_UPLOAD_FAILURE.md)
+- [x] Migrate optional image processing to Intervention Image `^3.11.9` with a
+      bounded legacy adapter and GD-output regressions; review the breaking
+      changes and unverified drivers/codecs in the [migration guide](IMAGE_MIGRATION.md)
+- [x] Repair explicit list bounds, scoped names, and ListField/KeyValue clearing;
+      see [validation, marker and override cautions](tests/integration/LIST_FIELD.md)
+- [x] Scope collection scripts and repair repeated HasMany table/default/tab
+      initialization with offline DOM and targeted HTTP/SQLite persistence checks;
+      see [coverage and upgrade links](COMPATIBILITY.md#current-maintenance-summary).
+      Real-browser/PJAX and full unsaved-child validation-redirect coverage remain
+      outside these regressions
 - [ ] Add real password-change and rendered-operation-log coverage
 - [ ] Review remaining deprecations, default credentials, login throttling,
       upload previews and AJAX-option escaping; these tests are not a penetration test
