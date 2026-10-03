@@ -15,7 +15,8 @@ Prepared work is tracked in the [local PR candidate inventory](docs/pr-candidate
 - [x] Run PHP 8.4 syntax checks and record existing deprecations
 - [x] Prepare a small, separately tested PHP 8.2+ dynamic-property fix for Tree
       (subject to PR review; focused PHP 8.4 check only)
-- [ ] Rebuild the package-test harness on supported BrowserKit/PHPUnit versions
+- [x] Rebuild the package-test harness on supported BrowserKit/PHPUnit versions
+      ([isolated SQLite runner](tests/browserkit/README.md); deprecations remain visible)
 - [ ] Replace legacy Faker/factories and explicitly manage the test application
 - [ ] Add fresh-application install, login, CRUD, upload, menu, and export smoke tests
 - [ ] Add CI for explicitly selected Laravel/PHP combinations, including lowest

@@ -63,7 +63,7 @@ class UserSettingTest extends TestCase
         $this->visit('admin/auth/setting')
             ->submitForm('Submit', $data)
             ->seePageIs('admin/auth/setting')
-            ->see('The Password confirmation does not match.');
+            ->see('The Password field confirmation does not match.');
     }
 
     public function testUpdatePassword()
