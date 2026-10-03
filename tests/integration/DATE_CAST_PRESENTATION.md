@@ -27,10 +27,12 @@ custom formatter/render callbacks and explicit `parseInputDate`/nonempty
 `timeZone` picker options retain their existing behavior. Laravel old input and
 explicit input attributes still take precedence. Null values remain empty.
 
-This intentionally does not change Time/Month/Year, range fields, custom Date
-subclasses, relation/dotted fields, model-less/widget forms or their parsing
+This Date/Datetime fix intentionally does not change Time/Month/Year, range fields,
+custom Date subclasses, relation/dotted fields, model-less/widget forms or their parsing
 contracts. Applications using those custom paths remain responsible for their
-own presentation format and timezone. The existing separate generator issue
+own presentation format and timezone. Native DateRange/DatetimeRange normalization
+is covered separately by the [range regression guide](DATE_RANGE_CAST_PRESENTATION.md).
+The existing separate generator issue
 where a nullable date receives an empty default is not changed here.
 
 ## Coverage
