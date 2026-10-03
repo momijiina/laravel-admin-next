@@ -213,6 +213,12 @@ class ResourceGenerator
      */
     protected function getTableColumns()
     {
+        if (!method_exists($this->model->getConnection(), 'isDoctrineAvailable')) {
+            return DoctrineSchema::getColumns(
+                $this->model->getConnection(), $this->model->getTable(), $this->doctrineTypeMapping
+            );
+        }
+
         if (!$this->model->getConnection()->isDoctrineAvailable()) {
             throw new \Exception(
                 'You need to require doctrine/dbal: ~2.3 in your own composer.json to get database columns. '

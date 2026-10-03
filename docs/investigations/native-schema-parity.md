@@ -1,6 +1,6 @@
 # Native schema characterization before a production adapter
 
-This change is **tests and research only**. `admin:make --model` remains broken on Laravel 12/13 because `isDoctrineAvailable()` was removed. The probe asserts that baseline failure; it does not claim to fix it. No supported driver or historical Laravel path is removed.
+This document records the original **native metadata investigation**. Its proposed native normalizer is still test-only. Model-backed generation now uses a separate existing-PDO DBAL bridge on modern Laravel; see [the generator integration tests](../../tests/integration/RESOURCE_GENERATOR.md) for implementation scope and verification status. The differential probe additionally compares production output with DBAL, including MariaDB JSON. The historical Laravel Doctrine path is unchanged.
 
 ## What the differential probe measures
 
@@ -38,13 +38,13 @@ Use only a dedicated disposable `schema_parity` database. It creates `parity_rec
 
 Do not ship the prototype as production code. At minimum retain the old Doctrine branch unchanged, preserve existing generator Column semantics and custom mappings, reuse the model connection, and avoid a generic alias map. MariaDB JSON requires extra constraint metadata or a compatible DBAL bridge. Default normalization, type comments, platform version detection and expression handling need driver-specific decisions and live evidence. PostgreSQL domains and SQL Server large-value type metadata remain additional blockers to a generic adapter.
 
-A DBAL bridge around the existing connection may be smaller than reimplementing every driver's introspection, but must be proven against both supported DBAL majors without opening an unintended second application connection. A richer native adapter needs additional driver-specific queries and tests. Neither design is selected or implemented here.
+The investigation concluded that a DBAL bridge around the existing connection may be smaller than reimplementing every driver's introspection, but must be proven against both supported DBAL majors without opening an unintended second application connection. A richer native adapter needs additional driver-specific queries and tests. At that investigation checkpoint, neither design had been selected or implemented.
 
 A bounded DBAL bridge feasibility check found:
 
 - DBAL 2.13.9 documents `DriverManager`'s `pdo` option but says it is deprecated and unsupported in DBAL 3. Do not pass it blindly to DBAL 3.
 - DBAL 3.10.6 accepts a custom Driver (or Driver middleware) whose `connect()` can return a wrapper around the existing PDO. A separate SQLite in-memory proof verified native-PDO object identity and schema introspection of an existing table, so no second physical connection was created.
-- DBAL 3's `Driver\PDO\Connection` constructor is marked `@internal`. The proof is feasibility evidence, not a stable public existing-PDO import API. A maintained driver adapter would need version-specific compatibility tests, exception/platform semantics, and handling of Laravel reconnect/read-write/custom-connection behavior. No bridge is shipped in this change.
+- DBAL 3's `Driver\PDO\Connection` constructor is marked `@internal`. The proof is feasibility evidence, not a stable public existing-PDO import API. A maintained driver adapter would need version-specific compatibility tests, exception/platform semantics, and handling of Laravel reconnect/read-write/custom-connection behavior. These were investigation findings; the subsequent production bridge is covered by its own tests and documentation.
 
 ## Sources
 
