@@ -30,6 +30,7 @@
             <file>GridPaginationTest.php</file>
             <file>GridExplicitSortTest.php</file>
             <file>ActionRequestInputTest.php</file>
+            <file>ActionTextareaLeadingNewlineTest.php</file>
             <file>HandleControllerRequestTest.php</file>
             <file>FileUploadFailureTest.php</file>
             <file>ResourceGeneratorTest.php</file>

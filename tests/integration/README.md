@@ -58,6 +58,8 @@ The dated results below are historical snapshots, not the current suite totals.
   [generator default scope](NULLABLE_TEMPORAL_DEFAULTS.md) and existing-controller caveats
 - Model-backed Artisan generation and independent DBAL metadata/output parity;
   [generator regressions](RESOURCE_GENERATOR.md) cover SQLite and opt-in services
+- Action modal textarea leading blank lines through actual emitted native FormData;
+  [parser behavior and custom-view cautions](ACTION_TEXTAREA_NEWLINES.md)
 - Real request-input parity for grid, row/batch actions and controller dispatch;
   DomCrawler compatibility and multiple-select null handling
 - Named grid pagination with configured sizes, independent links and explicit
