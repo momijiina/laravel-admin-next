@@ -13,6 +13,7 @@
             <file>GridRequestInputTest.php</file>
             <file>ActionRequestInputTest.php</file>
             <file>HandleControllerRequestTest.php</file>
+            <file>FileUploadFailureTest.php</file>
         </testsuite>
     </testsuites>
 </phpunit>

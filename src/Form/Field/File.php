@@ -124,15 +124,7 @@ class File extends Field
      */
     protected function uploadAndDeleteOriginal(UploadedFile $file)
     {
-        $this->renameIfExists($file);
-
-        $path = null;
-
-        if (!is_null($this->storagePermission)) {
-            $path = $this->storage->putFileAs($this->getDirectory(), $file, $this->name, $this->storagePermission);
-        } else {
-            $path = $this->storage->putFileAs($this->getDirectory(), $file, $this->name);
-        }
+        $path = $this->upload($file);
 
         $this->destroy();
 

@@ -50,7 +50,10 @@ The root PHPUnit configuration excludes this consumer directory, keeping its
 classes and vendor tree out of legacy test discovery. This suite does not replace
 or claim to pass the 73 legacy BrowserKit tests; use the separate
 [historical BrowserKit runner](../browserkit/README.md) for that coverage.
-Uploads, browser JavaScript, complete CRUD, non-SQLite drivers and model-based
+Main-file upload failures and successful replacement are covered by the
+[upload failure regressions](FILE_UPLOAD_FAILURE.md), including their non-atomic
+filesystem/database limitations. Other upload behavior, browser JavaScript,
+complete CRUD, non-SQLite drivers and model-based
 generator compatibility remain separate work. The PHP baseline migration explicitly
 declares all 37 previously implicit nullable parameters; these integration runs
 now emit no nullable notices. The PHPUnit configuration keeps E_ALL enabled and

@@ -393,7 +393,7 @@ trait UploadField
     }
 
     /**
-     * Upload file and delete original file.
+     * Upload a file, rejecting storage failures before returning a path.
      *
      * @param UploadedFile $file
      *
@@ -404,10 +404,16 @@ trait UploadField
         $this->renameIfExists($file);
 
         if (!is_null($this->storagePermission)) {
-            return $this->storage->putFileAs($this->getDirectory(), $file, $this->name, $this->storagePermission);
+            $path = $this->storage->putFileAs($this->getDirectory(), $file, $this->name, $this->storagePermission);
+        } else {
+            $path = $this->storage->putFileAs($this->getDirectory(), $file, $this->name);
         }
 
-        return $this->storage->putFileAs($this->getDirectory(), $file, $this->name);
+        if ($path === false) {
+            throw new \RuntimeException('Failed to store uploaded file.');
+        }
+
+        return $path;
     }
 
     /**
