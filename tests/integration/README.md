@@ -56,6 +56,8 @@ The dated results below are historical snapshots, not the current suite totals.
   [generator regressions](RESOURCE_GENERATOR.md) cover SQLite and opt-in services
 - Real request-input parity for grid, row/batch actions and controller dispatch;
   DomCrawler compatibility and multiple-select null handling
+- Named grid pagination with configured sizes, independent links and explicit
+  Eloquent arguments; [pagination regression scope](GRID_PAGINATION.md)
 - Ordinary Tags hidden-input create/update/clear with exact storage parity;
   [Tags regressions](TAGS.md)
 - Explicit native-object grid display callbacks and actual streamed CSV round trips;

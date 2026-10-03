@@ -20,6 +20,7 @@
             <file>EmbeddedObjectOriginalTest.php</file>
             <file>ObjectDisplayTest.php</file>
             <file>GridRequestInputTest.php</file>
+            <file>GridPaginationTest.php</file>
             <file>ActionRequestInputTest.php</file>
             <file>HandleControllerRequestTest.php</file>
             <file>FileUploadFailureTest.php</file>

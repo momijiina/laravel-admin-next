@@ -473,25 +473,29 @@ class Model
      */
     protected function resolvePerPage($paginate)
     {
+        $arguments = $paginate['arguments'] ?? [];
+        $arguments[0] = $arguments[0] ?? $this->perPage;
+
         if ($perPage = request($this->perPageName)) {
-            if (is_array($paginate)) {
-                $paginate['arguments'][0] = (int) $perPage;
+            $arguments[0] = (int) $perPage;
 
-                return $paginate['arguments'];
+            if ($paginate === null) {
+                $this->perPage = (int) $perPage;
             }
-
-            $this->perPage = (int) $perPage;
-        }
-
-        if (isset($paginate['arguments'][0])) {
-            return $paginate['arguments'];
         }
 
         if ($name = $this->grid->getName()) {
-            return [$this->perPage, ['*'], "{$name}_page"];
+            // A configured page size must not discard the grid's page parameter.
+            // Preserve explicit Eloquent pagination arguments, including pageName.
+            if (!array_key_exists(2, $arguments)) {
+                if (!array_key_exists(1, $arguments)) {
+                    $arguments[1] = ['*'];
+                }
+                $arguments[2] = "{$name}_page";
+            }
         }
 
-        return [$this->perPage];
+        return $arguments;
     }
 
     /**
