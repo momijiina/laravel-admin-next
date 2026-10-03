@@ -12,6 +12,7 @@
             <file>MultipleSelectTest.php</file>
             <file>NullableSelectTest.php</file>
             <file>CheckboxZeroTest.php</file>
+            <file>NullableRadioTest.php</file>
             <file>TagsTest.php</file>
             <file>ListFieldTest.php</file>
             <file>ListFieldScopedNameTest.php</file>

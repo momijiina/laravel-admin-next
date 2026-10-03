@@ -6,12 +6,14 @@
 
         @include('admin::form.error')
 
+        @php($selectedValue = old($column, $value))
+
         @foreach($options as $option => $label)
 
             {!! $inline ? '<span class="icheck">' : '<div class="radio icheck">'  !!}
 
                 <label @if($inline)class="radio-inline"@endif>
-                    <input type="radio" name="{{$name}}" value="{{$option}}" class="minimal {{$class}}" {{ ($option == old($column, $value)) || ($value === null && in_array($label, $checked)) ?'checked':'' }} {!! $attributes !!} />&nbsp;{{$label}}&nbsp;&nbsp;
+                    <input type="radio" name="{{$name}}" value="{{$option}}" class="minimal {{$class}}" {{ ($selectedValue !== null && $option == $selectedValue) || ($value === null && in_array($label, $checked)) ?'checked':'' }} {!! $attributes !!} />&nbsp;{{$label}}&nbsp;&nbsp;
                 </label>
 
             {!! $inline ? '</span>' :  '</div>' !!}
