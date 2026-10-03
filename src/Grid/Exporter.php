@@ -100,6 +100,10 @@ class Exporter
             return static::$exporter;
         }
 
+        if ($driver === null) {
+            $driver = '';
+        }
+
         if (!array_key_exists($driver, static::$drivers)) {
             return static::$exporter = $this->getDefaultExporter();
         }

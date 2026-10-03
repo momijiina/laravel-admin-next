@@ -30,8 +30,13 @@ commas, quotes, embedded newlines, zero cells, and 106 rows across the 100-row
 chunk boundary. Callback and query traces verify timing and one header.
 Subprocess stderr must be empty and runtime diagnostics are promoted to failures.
 The fixture explicitly selects `new CsvExporter()` through the supported
-`Grid::exporter()` API; the legacy null-driver resolver is outside this test's
-strict diagnostic coverage. No dependency constraints are changed.
+`Grid::exporter()` API to isolate header behavior. `DefaultExporterTest.php`
+separately exercises the ordinary default driver with and without an export
+configuration callback, under the same strict diagnostics. NULL now resolves
+as the empty-string registry key without PHP 8.5's NULL-key deprecation; custom
+empty-string registrations, cached exporters and non-NULL driver behavior are
+preserved. `Exporter::extend(null, ...)` registration is unchanged; use `''`
+when registering the empty-string driver. No dependency constraints are changed.
 
 These checks do not certify live browser downloads, spreadsheet applications,
 non-SQLite databases, stale/out-of-range pages, or arbitrary consumer exporters.
