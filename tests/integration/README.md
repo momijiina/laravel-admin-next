@@ -62,6 +62,8 @@ The dated results below are historical snapshots, not the current suite totals.
   named filters and follow-up rendered links; [sort regression scope](GRID_EXPLICIT_SORT.md)
 - Ordinary nullable Select zero/NULL rendering and serialized HTTP persistence;
   [selection contract, defaults, and upgrade notes](NULLABLE_SELECT.md)
+- Checkbox zero-valued choices in flat/grouped views, native DOM successful controls,
+  JSON/CSV saves and validation redisplay; [selection contract](CHECKBOX_ZERO.md)
 - Ordinary Tags hidden-input create/update/clear with exact storage parity;
   [Tags regressions](TAGS.md)
 - Explicit native-object grid display callbacks and actual streamed CSV round trips;
