@@ -12,6 +12,7 @@
             <file>MultipleSelectTest.php</file>
             <file>GridRequestInputTest.php</file>
             <file>ActionRequestInputTest.php</file>
+            <file>HandleControllerRequestTest.php</file>
         </testsuite>
     </testsuites>
 </phpunit>
