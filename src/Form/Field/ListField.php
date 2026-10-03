@@ -86,7 +86,9 @@ class ListField extends Field
 
         $rules = $attributes = [];
 
-        if (!$fieldRules = $this->getRules()) {
+        $fieldRules = $this->getRules();
+
+        if (!$fieldRules && $this->min === 0 && is_null($this->max)) {
             return false;
         }
 
@@ -94,8 +96,10 @@ class ListField extends Field
             return false;
         }
 
-        $rules["{$this->column}.values.*"] = $fieldRules;
-        $attributes["{$this->column}.values.*"] = __('Value');
+        if ($fieldRules) {
+            $rules["{$this->column}.values.*"] = $fieldRules;
+            $attributes["{$this->column}.values.*"] = __('Value');
+        }
 
         $rules["{$this->column}.values"][] = 'array';
 
