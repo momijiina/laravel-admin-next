@@ -100,6 +100,42 @@ class AdminLifecycleTest extends TestCase
         $this->get('/admin')->assertRedirect('/admin/auth/login');
     }
 
+    public function test_empty_dispatch_selectors_keep_http_statuses_and_guest_protection(): void
+    {
+        foreach (['_handle_form_', '_handle_action_', '_handle_selectable_', '_handle_renderable_'] as $endpoint) {
+            $method = in_array($endpoint, ['_handle_form_', '_handle_action_'], true) ? 'post' : 'get';
+            $this->$method('/admin/'.$endpoint)->assertRedirect('/admin/auth/login');
+        }
+        $this->actingAs(Administrator::first(), 'admin');
+        $deprecations = [];
+        set_error_handler(function ($severity, $message, $file, $line) use (&$deprecations) {
+            if (in_array($severity, [E_DEPRECATED, E_USER_DEPRECATED], true)) {
+                $deprecations[] = $message;
+                throw new \ErrorException($message, 0, $severity, $file, $line);
+            }
+            return false;
+        });
+        try {
+            foreach (['_form_' => 'form', '_action' => 'action'] as $key => $type) {
+                $uri = '/admin/_handle_'.$type.'_';
+                $this->postJson($uri, [])->assertStatus(500)
+                    ->assertJsonPath('message', 'Server Error');
+                foreach ([null, ''] as $value) {
+                    $this->postJson($uri, [$key => $value])->assertStatus(500)
+                        ->assertJsonPath('message', 'Server Error');
+                }
+            }
+            foreach (['selectable', 'renderable'] as $selector) {
+                foreach (['', '?'.$selector.'='] as $query) {
+                    $this->get('/admin/_handle_'.$selector.'_'.$query)->assertOk()->assertContent('');
+                }
+            }
+        } finally {
+            restore_error_handler();
+        }
+        $this->assertSame([], $deprecations);
+    }
+
     public function test_invalid_credentials_do_not_authenticate_or_log_password(): void
     {
         $this->from('/admin/auth/login')->post('/admin/auth/login', [

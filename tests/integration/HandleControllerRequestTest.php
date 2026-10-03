@@ -200,6 +200,19 @@ class HandleControllerRequestTest extends TestCase
             $request->attributes->set($key, $request);
             yield $request;
         }
+        // Object selectors reach PHP unchanged; never broaden them with a string cast.
+        foreach ([new \stdClass(), new class($valid) {
+            public function __construct(private $value)
+            {
+            }
+
+            public function __toString(): string
+            {
+                return is_string($this->value) ? $this->value : 'value';
+            }
+        }, 1.5] as $value) {
+            yield new Request([], [$key => $valid], [$key => $value]);
+        }
         yield new Request(['literal' => ['key' => $valid]]);
         yield Request::create('/admin/handle', 'GET', [$key => $valid]);
         $server = ['CONTENT_TYPE' => 'application/json'];
@@ -216,7 +229,7 @@ class HandleControllerRequestTest extends TestCase
         try {
             return ['return', $callback()];
         } catch (\ErrorException $exception) {
-            // A deprecated production getter must fail, not match a reference error.
+            // Production deprecations must fail, not match a reference error.
             throw $exception;
         } catch (\Throwable $exception) {
             return ['exception', get_class($exception), $exception->getMessage()];
@@ -236,10 +249,15 @@ class HandleControllerRequestTest extends TestCase
     private function diagnostics(callable $callback, bool $strict)
     {
         set_error_handler(function ($severity, $message, $file, $line) use ($strict) {
-            if ($severity === E_USER_DEPRECATED && str_contains($message, 'Request::get() is deprecated')) {
-                if ($strict) {
-                    throw new \ErrorException($message, 0, $severity, $file, $line);
-                }
+            $legacyGetter = $severity === E_USER_DEPRECATED && str_contains($message, 'Request::get() is deprecated');
+            $legacyNull = $severity === E_DEPRECATED && $file === __FILE__ && in_array($message, [
+                'class_exists(): Passing null to parameter #1 ($class) of type string is deprecated',
+                'str_replace(): Passing null to parameter #3 ($subject) of type array|string is deprecated',
+            ], true);
+            if ($strict && in_array($severity, [E_DEPRECATED, E_USER_DEPRECATED], true)) {
+                throw new \ErrorException($message, 0, $severity, $file, $line);
+            }
+            if ($legacyGetter || $legacyNull) {
                 return true;
             }
             return false;
