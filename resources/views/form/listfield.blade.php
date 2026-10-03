@@ -1,7 +1,7 @@
 
 @php($listErrorKey = "$errorKey.values")
 
-<div class="{{$viewClass['form-group']}} {{ $errors->has($listErrorKey) ? 'has-error' : '' }}">
+<div data-admin-collection="list" class="{{$viewClass['form-group']}} {{ $errors->has($listErrorKey) ? 'has-error' : '' }}">
 
     <label class="{{$viewClass['label']}} control-label">{{$label}}</label>
 
@@ -18,7 +18,7 @@
 
         <table class="table table-hover">
 
-            <tbody class="list-{{$column}}-table">
+            <tbody data-collection-body class="list-{{$column}}-table">
 
             @php($rows = old("{$errorKey}.values", ($value ?: [])))
             @php($rows = ($rows === null || $rows === '') ? [] : $rows)
@@ -42,7 +42,7 @@
                     </td>
 
                     <td style="width: 75px;">
-                        <div class="{{$column}}-remove btn btn-warning btn-sm pull-right">
+                        <div data-collection-remove class="{{$column}}-remove btn btn-warning btn-sm pull-right">
                             <i class="fa fa-trash">&nbsp;</i>{{ __('admin.remove') }}
                         </div>
                     </td>
@@ -53,7 +53,7 @@
                 <tr>
                     <td></td>
                     <td>
-                        <div class="{{ $column }}-add btn btn-success btn-sm pull-right">
+                        <div data-collection-add class="{{ $column }}-add btn btn-success btn-sm pull-right">
                             <i class="fa fa-save"></i>&nbsp;{{ __('admin.new') }}
                         </div>
                     </td>
@@ -72,7 +72,7 @@
             </td>
 
             <td style="width: 75px;">
-                <div class="{{$column}}-remove btn btn-warning btn-sm pull-right">
+                <div data-collection-remove class="{{$column}}-remove btn btn-warning btn-sm pull-right">
                     <i class="fa fa-trash">&nbsp;</i>{{ __('admin.remove') }}
                 </div>
             </td>

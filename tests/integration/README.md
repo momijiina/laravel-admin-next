@@ -7,9 +7,11 @@ dependencies. Both the shipped package and this harness require PHP `^8.2`;
 Laravel 13 / Testbench 11 requires PHP 8.3+.
 
 Run from this directory, using a PHP CLI with the required extensions and Node.js
-(for the shipped Moment date-cast round-trip regression):
+24.15+ (24.x, for shipped Moment and collection DOM regressions):
 
 ```sh
+npm ci --ignore-scripts --prefix javascript
+
 # Laravel 12 / Testbench 10, PHP 8.2+
 composer update --with 'orchestra/testbench:^10.0' --with 'phpunit/phpunit:^11.5'
 composer check-platform-reqs
@@ -58,6 +60,8 @@ The dated results below are historical snapshots, not the current suite totals.
   [scalar/null result contract and boundaries](OBJECT_DISPLAY.md)
 - Native object/array casts in configured embedded forms;
   [original-metadata regression and replacement boundary](EMBEDDED_OBJECT_ORIGINALS.md)
+- Production-rendered List/KeyValue collection scripts with shipped and modern jQuery;
+  [offline DOM scope, setup, and limits](COLLECTION_SCRIPT_SCOPING.md)
 - Main-file upload failure preservation and successful replacement
 - Actual HTTP-kernel middleware lifecycle, including consumer bootstrap execution
 - SQLite-persisted operation logs, recursive redaction, preserved controller input,
@@ -80,7 +84,9 @@ Main-file upload failures and successful replacement are covered by the
 [upload failure regressions](FILE_UPLOAD_FAILURE.md), including their non-atomic
 filesystem/database limitations. Other upload behavior,
 CRUD beyond the [generated scalar-field lifecycle](GENERATED_CONTROLLER_CRUD.md)
-and browser JavaScript remain outside this suite. Non-SQLite
+and browser end-to-end JavaScript remain outside this suite. The collection
+regression executes real emitted scripts in jsdom; it does not cover browser
+layout, live PJAX transport, or arbitrary third-party widgets. Non-SQLite
 coverage is limited to the dedicated generator service matrix; the ordinary
 lifecycle suite uses SQLite. The PHP baseline migration explicitly
 declares all 37 previously implicit nullable parameters; these integration runs
