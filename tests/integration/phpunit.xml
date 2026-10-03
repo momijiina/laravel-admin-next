@@ -11,6 +11,7 @@
             <file>DomCrawlerCompatibilityTest.php</file>
             <file>MultipleSelectTest.php</file>
             <file>GridRequestInputTest.php</file>
+            <file>ActionRequestInputTest.php</file>
         </testsuite>
     </testsuites>
 </phpunit>

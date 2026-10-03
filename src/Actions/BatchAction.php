@@ -89,11 +89,35 @@ SCRIPT;
      */
     public function retrieveModel(Request $request)
     {
-        if (!$key = $request->get('_key')) {
+        // Preserve Request::get() precedence, including nulls and non-scalar values.
+        $key = $request->attributes->get('_key', $request);
+        if ($key === $request) {
+            if ($request->query->has('_key')) {
+                $key = $request->query->all()['_key'];
+            } elseif ($request->request->has('_key')) {
+                $key = $request->request->all()['_key'];
+            } else {
+                $key = null;
+            }
+        }
+
+        if (!$key) {
             return false;
         }
 
-        $modelClass = str_replace('_', '\\', $request->get('_model'));
+        // Preserve Request::get() precedence, including nulls and non-scalar values.
+        $modelClass = $request->attributes->get('_model', $request);
+        if ($modelClass === $request) {
+            if ($request->query->has('_model')) {
+                $modelClass = $request->query->all()['_model'];
+            } elseif ($request->request->has('_model')) {
+                $modelClass = $request->request->all()['_model'];
+            } else {
+                $modelClass = null;
+            }
+        }
+
+        $modelClass = str_replace('_', '\\', $modelClass);
 
         if (is_string($key)) {
             $key = explode(',', $key);
