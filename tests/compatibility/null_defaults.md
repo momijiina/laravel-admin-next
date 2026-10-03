@@ -6,11 +6,12 @@ Run this dependency-free regression in a fresh PHP process:
 php tests/compatibility/null_defaults.php
 ```
 
-Metadata doubles exercise the real `ResourceGenerator` with 82 cases. The test
+Metadata doubles exercise the real `ResourceGenerator` with 97 cases. The test
 promotes all diagnostics to failures, compares complete generated source, parses
 it, and evaluates fixed local fixtures. It covers missing defaults for every
 supported type plus the unknown-type fallback; empty/zero omission; ordinary
-string, numeric and textarea defaults; and unchanged date/time expressions.
+string, numeric and textarea defaults; required/defaulted date/time expressions;
+and omitted synthesized defaults for nullable temporal columns with NULL defaults.
 
 PHP 8.1+ deprecates passing null to `trim`. The generator now skips that call
 when the derived default is null, preserving its previous omission behavior.

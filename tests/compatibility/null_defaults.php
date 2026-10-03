@@ -17,11 +17,13 @@ class NullDefaultColumn
 {
     private $type;
     private $default;
+    private $notnull;
 
-    public function __construct($type, $default)
+    public function __construct($type, $default, $notnull = true)
     {
         $this->type = $type;
         $this->default = $default;
+        $this->notnull = $notnull;
     }
 
     public function getName()
@@ -37,6 +39,11 @@ class NullDefaultColumn
     public function getDefault()
     {
         return $this->default;
+    }
+
+    public function getNotnull()
+    {
+        return $this->notnull;
     }
 }
 
@@ -94,7 +101,7 @@ function __($label)
 
 $cases = [];
 // All supported metadata types must omit an absent database default, except
-// date/time fields, which intentionally retain their generated current value.
+// required date/time fields, which retain their generated current value.
 foreach ([
     'boolean' => 'switch', 'bool' => 'switch',
     'json' => 'text', 'array' => 'text', 'object' => 'text',
@@ -121,17 +128,21 @@ foreach ([
     $cases[] = $case;
 }
 foreach (['datetime' => 'Y-m-d H:i:s', 'date' => 'Y-m-d', 'time' => 'H:i:s'] as $type => $format) {
-    foreach ([null, '', '2000-01-01'] as $default) {
-        $cases[] = [$type, $default, $type, "date('".$format."')"];
+    foreach ([true, false] as $notnull) {
+        foreach ([null, '', '2000-01-01', 'CURRENT_TIMESTAMP'] as $default) {
+            $expression = !$notnull && $default === null ? null : "date('".$format."')";
+            $cases[] = [$type, $default, $type, $expression, $notnull];
+        }
     }
 }
 
 $failures = [];
 foreach ($cases as $case) {
     list($type, $default, $field, $expression) = $case;
-    $label = $type.' default '.var_export($default, true);
+    $notnull = $case[4] ?? true;
+    $label = $type.' default '.var_export($default, true).' notnull '.var_export($notnull, true);
     try {
-        $generator = new NullDefaultGenerator([new NullDefaultColumn($type, $default)]);
+        $generator = new NullDefaultGenerator([new NullDefaultColumn($type, $default, $notnull)]);
         $source = $generator->generateForm();
         $expected = '$form->'.$field."('example', __('Example'))";
         if ($expression !== null) {
