@@ -19,6 +19,7 @@
             <file>GeneratedControllerCrudTest.php</file>
             <file>DateCastPresentationTest.php</file>
             <file>NullableTemporalDefaultsTest.php</file>
+            <file>LiteralTemporalDefaultsTest.php</file>
         </testsuite>
     </testsuites>
 </phpunit>

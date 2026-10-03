@@ -6,7 +6,7 @@
 create and when editing stored NULLs. Submitting those blank inputs through
 Laravel's ordinary HTTP middleware preserves NULL in SQLite.
 
-Required temporal columns retain their current-date/time scaffolding. Explicit
+Required temporal columns without canonical literal defaults retain their current-date/time scaffolding. Explicit
 application `Field::default(...)` behavior is unchanged, including its fallback
 when an existing model attribute is NULL. This patch changes no Date presentation,
 cast formatting, or global Field fallback behavior.
@@ -18,10 +18,10 @@ After review, remove unwanted synthesized `->default(date(...))` calls from thei
 optional fields, or regenerate a controller without overwriting application
 customizations. Intentionally configured application defaults may remain.
 
-Non-NULL database temporal literals and expressions (such as `CURRENT_TIMESTAMP`)
-still receive the generator's existing current-date/time expression rather than
-faithful database-default interpretation. Tests characterize that unchanged
-limitation; this patch does not parse SQL expressions or fix those defaults.
+Canonical temporal literal defaults now preserve their DBAL values; see
+[LITERAL_TEMPORAL_DEFAULTS.md](LITERAL_TEMPORAL_DEFAULTS.md) for the exact boundary.
+Unrecognized defaults and expressions such as `CURRENT_TIMESTAMP` retain their
+existing current-date/time scaffolding and are not SQL-expression interpretation.
 
 ## Regression coverage
 
@@ -34,7 +34,7 @@ The tests boot real Laravel and generate fresh controllers using both
 - Rendered input values and exact raw database persistence after HTTP submission
 - Required date/datetime/time scaffold expressions and persistence
 - Explicit application defaults on create and on stored NULL, with clearing
-- Unchanged non-NULL database literal/current-timestamp generated expressions
+- Preserved canonical database literals and unchanged current-timestamp scaffolding
 
 The standalone `tests/compatibility/null_defaults.php` additionally checks exact
 source for nullable/required temporal columns with NULL, empty, literal and
@@ -42,7 +42,7 @@ expression metadata defaults. The schema characterization reconstructs native
 column nullability and checks temporal nullability against the independent DBAL
 connection, since nullability now intentionally affects form output.
 
-## Local evidence (2026-10-03)
+## Original nullable-NULL patch evidence (2026-10-03)
 
 Restored PHP 8.5.11, SQLite 3.46.1, DBAL 3.10.6; installed Laravel 12.69.3 /
 Testbench 10.12.0 / PHPUnit 11.5.56 and Laravel 13.34.0 / Testbench 11.3.0 /

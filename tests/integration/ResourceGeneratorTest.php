@@ -68,6 +68,7 @@ class ResourceGeneratorTest extends TestCase
         $model = new SchemaGeneratorRecord();
         $columns = $this->schema($reference)->listTableColumns('generator_records');
         $this->assertParity($model, $columns);
+        $this->assertTemporalLiteralDefaults($model, $columns);
         $this->assertServiceArtisanGeneration('records', $columns);
 
         $form = (new ResourceGenerator($model))->generateForm();
@@ -330,6 +331,7 @@ class ResourceGeneratorTest extends TestCase
                 'document json', 'document_binary jsonb', 'identifier uuid',
                 'domain_value '.$schemaName.'.rating DEFAULT 5',
                 'published_at timestamp DEFAULT CURRENT_TIMESTAMP', 'birth_date date', 'alarm_time time',
+                ...$this->temporalLiteralDefinitions('timestamp'),
                 'generated_value integer GENERATED ALWAYS AS (small_value + 1) STORED',
                 'expression_value integer DEFAULT (1 + 2)', 'hint text',
                 'created_at timestamp', 'updated_at timestamp', 'deleted_at timestamp',
@@ -340,6 +342,7 @@ class ResourceGeneratorTest extends TestCase
             $this->assertParity($model, $columns);
             $this->assertSame('json', $columns['hint']->getType()->getName());
             $this->assertSame('integer', $columns['domain_value']->getType()->getName());
+            $this->assertTemporalLiteralDefaults($model, $columns);
             $this->assertServiceArtisanGeneration($model->getTable(), $columns);
             $this->assertStringContainsString("\$form->text('document_binary'", (new ResourceGenerator($model))->generateForm());
             // Make a different search_path active on the existing session. A second
@@ -401,6 +404,40 @@ class ResourceGeneratorTest extends TestCase
         }
     }
 
+    private function temporalLiteralDefinitions($datetimeType = 'datetime'): array
+    {
+        $definitions = [];
+        foreach (['date' => '2024-02-29', 'time' => '12:34:56', 'datetime' => '2024-02-29 12:34:56'] as $type => $literal) {
+            foreach (['required' => 'NOT NULL', 'nullable' => 'NULL'] as $suffix => $nullability) {
+                $databaseType = $type === 'datetime' ? $datetimeType : $type;
+                $definitions[] = 'literal_'.$type.'_'.$suffix.' '.$databaseType.' '.$nullability." DEFAULT '".$literal."'";
+            }
+        }
+        return $definitions;
+    }
+
+    private function assertTemporalLiteralDefaults(Model $model, array $columns): void
+    {
+        $form = (new ResourceGenerator($model))->generateForm();
+        foreach (['date' => '2024-02-29', 'time' => '12:34:56', 'datetime' => '2024-02-29 12:34:56'] as $type => $literal) {
+            foreach (['required' => true, 'nullable' => false] as $suffix => $notnull) {
+                $name = 'literal_'.$type.'_'.$suffix;
+                $this->assertSame($type, $columns[$name]->getType()->getName(), $name.' DBAL type');
+                // PostgreSQL casts and MariaDB/SQLite SQL quotes are normalized by
+                // DBAL before generation. Assert that boundary independently of parity.
+                $this->assertSame($literal, $columns[$name]->getDefault(), $name.' canonical DBAL literal');
+                $this->assertSame($notnull, $columns[$name]->getNotnull(), $name.' DBAL nullability');
+                $label = ucfirst(str_replace('_', ' ', $name));
+                $this->assertStringContainsString(
+                    '$form->'.$type."('".$name."', __('".$label."'))->default(".var_export($literal, true).");\r\n",
+                    $form,
+                    $name.' exact literal default source'
+                );
+            }
+        }
+        token_get_all('<?php '.$form, TOKEN_PARSE);
+    }
+
     private function sqliteFixture(bool $persistent = false): array
     {
         $file = tempnam(sys_get_temp_dir(), 'admin-schema-fixture-');
@@ -415,6 +452,7 @@ class ResourceGeneratorTest extends TestCase
             'amount decimal(10,2) DEFAULT 12.50', 'score double DEFAULT 1.25', 'details text', 'image blob',
             'published_at timestamp DEFAULT CURRENT_TIMESTAMP', 'appointment datetime', 'birth_date date',
             'alarm_time time', 'created_at datetime', 'updated_at datetime', 'deleted_at datetime',
+            ...$this->temporalLiteralDefinitions(),
         ]).')');
         return [$connection, $this->reference(['driver' => 'pdo_sqlite', 'path' => $file])];
     }
@@ -516,6 +554,7 @@ class ResourceGeneratorTest extends TestCase
                 'enabled tinyint DEFAULT 1', 'small_value smallint DEFAULT 2', 'big_value bigint DEFAULT 3',
                 'amount decimal(10,2) DEFAULT 12.50', 'score double DEFAULT 1.25', 'details text', 'image blob',
                 'published_at timestamp DEFAULT CURRENT_TIMESTAMP', 'appointment datetime', 'birth_date date', 'alarm_time time',
+                ...$this->temporalLiteralDefinitions(),
                 "choice enum('a','b') DEFAULT 'a'", 'document json', 'position point',
                 'tiny_text tinytext', 'medium_text mediumtext', 'long_text longtext',
                 'tiny_blob tinyblob', 'medium_blob mediumblob', 'long_blob longblob', "hint text COMMENT '(DC2Type:json)'",
@@ -526,6 +565,7 @@ class ResourceGeneratorTest extends TestCase
             $columns = $this->schema($reference)->listTableColumns($table, $config['database']);
             $model = (new SchemaGeneratorRecord())->setTable(substr($table, strlen('generator_')));
             $this->assertParity($model, $columns);
+            $this->assertTemporalLiteralDefaults($model, $columns);
             $qualified = $config['database'].'.'.$model->getTable();
             $this->assertParity((clone $model)->setTable($qualified), $columns);
             $this->assertServiceArtisanGeneration($qualified, $columns);

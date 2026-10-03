@@ -61,6 +61,16 @@ $nativeJsonGap = $maria && interface_exists(Doctrine\DBAL\Driver\API\ExceptionCo
 $definitions = [
     'id integer primary key', "email varchar(255) DEFAULT 'test@example.test'", "title varchar(255) DEFAULT 'Hello'", "quoted varchar(255) DEFAULT 'O''Reilly'", "empty_string varchar(30) DEFAULT ''", "literal_null varchar(30) DEFAULT 'NULL'", "zero_string varchar(30) DEFAULT '0'", 'null_value varchar(30) DEFAULT NULL', 'enabled tinyint DEFAULT 1', 'small_value smallint DEFAULT 2', 'big_value bigint DEFAULT 3', 'amount decimal(10,2) DEFAULT 12.50', 'score double DEFAULT 1.25', 'details text', 'image blob', 'published_at timestamp DEFAULT CURRENT_TIMESTAMP', 'appointment datetime', 'birth_date date', 'alarm_time time', 'created_at datetime', 'updated_at datetime', 'deleted_at datetime',
 ];
+// Canonical literals must survive DBAL normalization and source generation for
+// both nullabilities. These assertions do not depend on renderer parity alone.
+$temporalLiterals = [];
+foreach (['date' => '2024-02-29', 'time' => '12:34:56', 'datetime' => '2024-02-29 12:34:56'] as $type => $literal) {
+    foreach (['required' => true, 'nullable' => false] as $suffix => $notnull) {
+        $name = 'literal_'.$type.'_'.$suffix;
+        $definitions[] = $name.' '.$type.($notnull ? ' NOT NULL' : ' NULL')." DEFAULT '".$literal."'";
+        $temporalLiterals[$name] = [$type, $literal, $notnull];
+    }
+}
 if ($driver !== 'sqlite') {
     $definitions = array_merge($definitions, ["slashes varchar(80) DEFAULT 'C:\\\\tmp\\\\sample'", "choice enum('a','b') DEFAULT 'a'", 'document json', 'position point', 'tiny_text tinytext', 'medium_text mediumtext', 'long_text longtext', 'tiny_blob tinyblob', 'medium_blob mediumblob', 'long_blob longblob', "hint text COMMENT '(DC2Type:json)'", 'generated_value integer GENERATED ALWAYS AS (small_value + 1) STORED', 'expression_value integer DEFAULT (1 + 2)']);
 }
@@ -101,6 +111,16 @@ try {
     foreach (['generateForm','generateGrid','generateShow'] as $method) {
         check($production->$method() === $legacy->$method(), "$method production bridge preserves same-version DBAL output");
         token_get_all('<?php '.$production->$method(), TOKEN_PARSE);
+    }
+
+    $form = $production->generateForm();
+    foreach ($temporalLiterals as $name => [$type, $literal, $notnull]) {
+        check($dbalColumns[$name]->getType()->getName() === $type, "$name canonical DBAL type");
+        check($dbalColumns[$name]->getDefault() === $literal, "$name canonical DBAL literal");
+        check($dbalColumns[$name]->getNotnull() === $notnull, "$name canonical DBAL nullability");
+        $label = ucfirst(str_replace('_', ' ', $name));
+        $expected = '$form->'.$type."('".$name."', __('".$label."'))->default(".var_export($literal, true).");\r\n";
+        check(str_contains($form, $expected), "$name exact literal default source");
     }
 
     if ($nativeJsonGap) {
