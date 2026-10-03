@@ -6,7 +6,8 @@ to boot real Laravel and SQLite without changing the root legacy development
 dependencies. Both the shipped package and this harness require PHP `^8.2`;
 Laravel 13 / Testbench 11 requires PHP 8.3+.
 
-Run from this directory, using a PHP CLI with the required extensions:
+Run from this directory, using a PHP CLI with the required extensions and Node.js
+(for the shipped Moment date-cast round-trip regression):
 
 ```sh
 # Laravel 12 / Testbench 10, PHP 8.2+
@@ -42,6 +43,8 @@ The dated results below are historical snapshots, not the current suite totals.
 - Real Artisan blank-controller generation and rejection of model-less `--output`
 - Generated model-backed controllers executing index/create/store/show/edit/update/delete
   through the real HTTP kernel; [CRUD regression scope](GENERATED_CONTROLLER_CRUD.md)
+- Native mutable/immutable Date/Datetime edit/save round trips with shipped Moment;
+  [date-cast presentation scope](DATE_CAST_PRESENTATION.md) and boundaries
 - Model-backed Artisan generation and independent DBAL metadata/output parity;
   [generator regressions](RESOURCE_GENERATOR.md) cover SQLite and opt-in services
 - Real request-input parity for grid, row/batch actions and controller dispatch;

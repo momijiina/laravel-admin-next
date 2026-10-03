@@ -16,6 +16,7 @@
             <file>FileUploadFailureTest.php</file>
             <file>ResourceGeneratorTest.php</file>
             <file>GeneratedControllerCrudTest.php</file>
+            <file>DateCastPresentationTest.php</file>
         </testsuite>
     </testsuites>
 </phpunit>
