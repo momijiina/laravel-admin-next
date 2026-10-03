@@ -1,0 +1,68 @@
+name: Schema metadata characterization
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  parity:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        testbench: ['^10.0', '^11.0']
+        database:
+          - image: mysql:8.4
+            family: mysql
+          - image: mariadb:10.11
+            family: mariadb
+    services:
+      database:
+        image: ${{ matrix.database.image }}
+        env:
+          MYSQL_DATABASE: schema_parity
+          MYSQL_ROOT_PASSWORD: disposable-parity-only
+        ports:
+          - 127.0.0.1:3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost -pdisposable-parity-only || mariadb-admin ping -h localhost -pdisposable-parity-only"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=12
+    defaults:
+      run:
+        working-directory: tests/integration
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2
+        with:
+          php-version: '8.4'
+          extensions: mbstring, dom, xml, xmlwriter, pdo_sqlite, pdo_mysql
+          coverage: none
+          tools: composer:v2
+      - name: Resolve isolated consumer dependencies
+        run: composer update --no-interaction --no-progress --prefer-dist --with 'orchestra/testbench:${{ matrix.testbench }}'
+      - name: Check actual runtime requirements
+        run: composer check-platform-reqs
+      - name: Characterize SQLite and database metadata
+        env:
+          PARITY_DISPOSABLE: '1'
+          PARITY_HOST: 127.0.0.1
+          PARITY_PORT: '3306'
+          PARITY_DATABASE: schema_parity
+          PARITY_USER: root
+          PARITY_PASSWORD: disposable-parity-only
+          DATABASE_FAMILY: ${{ matrix.database.family }}
+        run: |
+          php ../prototypes/schema_parity.php vendor/autoload.php sqlite
+          php ../prototypes/schema_parity.php vendor/autoload.php mysql
+          if [ "$DATABASE_FAMILY" = mariadb ]; then
+            php ../prototypes/schema_parity.php vendor/autoload.php mariadb
+          fi
