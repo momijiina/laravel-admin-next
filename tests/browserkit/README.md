@@ -125,6 +125,10 @@ The original 73-method suite remains independently selectable as
 
 ## Diagnostics and local evidence
 
+See [current verified coverage](../../COMPATIBILITY.md#current-verified-coverage-2026-10-03-after-pr-25)
+for the exact post-PR #25 hosted outcomes. The local results here record the
+harness-isolation patch; integration totals have increased since that patch.
+
 With the state boundary enabled, the combined 77-test suite passes on PHP 8.4.25
 with Laravel 12 and 13, both in default order and randomized seeds 7301, 9843 and
 18057. The separate real-Laravel integration suite also passes (39 tests).
@@ -141,8 +145,10 @@ This is a **behavioral pass, not a deprecation-free pass**. E_ALL and Laravel's
 `LOG_DEPRECATIONS_WHILE_TESTING` remain enabled, with deprecations sent to stderr.
 The fixtures use Faker formatter methods and reserved `example.com` avatar
 URLs, avoiding Faker's deprecated property API and remote image provider.
-The revived coverage still exposes existing warnings from Symfony's deprecated
-`Request::get()`. The `MultipleSelect::prepare` null-to-`strlen()` warning exposed
+The grid, row/batch action and controller request-getter regressions have since
+removed the notices exercised in those paths. Unrelated Intervention Image 2
+dependency deprecations remain; untested paths may still emit diagnostics.
+The `MultipleSelect::prepare` null-to-`strlen()` warning exposed
 by this suite is now fixed, with a strict regression that preserves the original
 filtering behavior. Laravel-handled deprecations are logged and do not necessarily
 fail PHPUnit, even with `failOnDeprecation` enabled. These production/dependency

@@ -5,6 +5,76 @@
 - Treat Exment compatibility as an important target and verify specific releases
 - Separate dependency declarations, focused checks, and full runtime support
 
+## Current verified coverage (2026-10-03, after PR #25)
+
+This snapshot records checks for the code merged in
+[PR #25](https://github.com/momijiina/laravel-admin-next/pull/25), head
+[`5c161f51`](https://github.com/momijiina/laravel-admin-next/commit/5c161f51c5d144c4045099877737660fd1e8a0c1),
+merged as `d2ee8f4`. Historical evidence below and in individual regression notes
+records the suite sizes at those earlier revisions; it is not the current total.
+
+- **Declared requirements:** PHP `^8.2`, Laravel `>=5.5`, Doctrine DBAL
+  `^2.13.9 || ^3.10.6`. These declarations do not certify every admitted
+  combination. Full modern Laravel consumers resolve DBAL 3; Symfony
+  HttpFoundation conflicts prevent normal full-Laravel 12/13 resolution with
+  DBAL 2. Independently resolved Illuminate components exercise DBAL 2 instead.
+- **Source checks:** the strict source-lint runner now covers **328 production
+  PHP files** without diagnostics on PHP 8.4.25 and 8.5.11, with all 37
+  formerly implicit nullable parameters explicit.
+- **Local integration:** PHP 8.4.25, Laravel 12.69.3 / Testbench 10.12.0 /
+  PHPUnit 11.5.56 and Laravel 13.34.0 / Testbench 11.3.0 / PHPUnit 12.5.37,
+  DBAL 3.10.6: **56 tests, 35,302 assertions, 2 service skips** per framework.
+  PHP 8.5.11 was checked locally for the focused generator suite only at this
+  revision: **10 tests, 254 assertions, 2 service skips** per framework. Earlier
+  PHP 8.5 full-suite results describe smaller, earlier suites. These passes
+  retain existing invalid-input deprecations described in the
+  [controller regression](tests/integration/HANDLE_CONTROLLER_REQUEST.md).
+- **Historical BrowserKit:** **77 tests** comprise 73 historical methods and
+  four harness-isolation regressions. Local PHP 8.4.25 runs pass on Laravel 12/13
+  in default and randomized order. These are in-process SQLite HTTP tests with
+  real GD image processing, not JavaScript browser tests or a deprecation-free
+  certification. See the [runner and diagnostic limits](tests/browserkit/README.md).
+- **Hosted evidence:** all **60 jobs across 13 workflows** passed for the exact
+  PR #25 head above, including integration and BrowserKit on Laravel 12 with
+  PHP 8.2–8.5 and Laravel 13 with PHP 8.3–8.5. See
+  [the PR checks](https://github.com/momijiina/laravel-admin-next/pull/25/checks).
+  These results are separate from the local results and from future CI runs.
+
+### Database-service evidence and remaining limits
+
+The [model-generation run](https://github.com/momijiina/laravel-admin-next/actions/runs/37093063540)
+passed all ten jobs at that exact head:
+
+- Six full-framework DBAL **3.10.6** cells: Laravel 12 / PHP 8.2 and
+  Laravel 13 / PHP 8.3, each against **MySQL 8.4.11, MariaDB 10.11.19 and
+  PostgreSQL 16.15**. These exercise production schema metadata/output parity
+  against an independent same-version DBAL oracle and actual model-backed
+  Artisan generation, including qualified tables and PostgreSQL search paths.
+- Four DBAL **2.13.9** component cells: Illuminate Database/Events 12/13 on
+  PHP 8.4, each against MySQL/MariaDB. They check real metadata/output parity,
+  but do **not** boot a full modern Laravel application or run Artisan.
+  PostgreSQL/DBAL 2 is not covered by this matrix.
+
+Both MariaDB matrices exercise Laravel's `mysql` and `mariadb` connection
+classes. PDO transaction, reconnect, connection-state and persistent-connection
+lifecycle regressions use **SQLite only**. DBAL 3 supports persistent PDO in
+those tests; DBAL 2 rejects it before mutating connection state. These lifecycle
+results must not be generalized to every service driver. SQL Server has
+structural checks only and remains unverified against a live server.
+
+See the [integration harness](tests/integration/README.md) and
+[generator details](tests/integration/RESOURCE_GENERATOR.md) for reproducible
+commands, dependency-resolution boundaries and test scope. Full JavaScript
+browser flows, every PDO option/third-party driver, universal downstream support
+and specific Exment releases remain unverified. Normal Composer security and
+platform checks remain enabled; DBAL 2's abandoned `doctrine/cache` dependency
+is reported. Prefer DBAL 3 for maintained dependencies and persistent PDO.
+
+## Historical migration and regression evidence
+
+The following dated sections preserve what was verified when each patch was
+prepared. For current totals and hosted outcomes, use the snapshot above.
+
 ## PHP baseline migration (2026-10-02)
 
 The package now requires **PHP `^8.2` (8.2 through 8.x)**. PHP 7.x, 8.0 and
@@ -73,9 +143,10 @@ behavior, PHP requirements, implicit-nullability warnings, or the blocked legacy
 Laravel suite. It does not establish full framework, database, or rendering
 compatibility.
 
-## Proposed verification matrix
+## Verification matrix policy
 
-These are candidates, not supported combinations:
+The modern combinations below now have the targeted coverage recorded above,
+not complete application or downstream certification:
 
 - Laravel 12 with PHP 8.2, 8.3, 8.4, and 8.5
 - Laravel 13 with PHP 8.3, 8.4, and 8.5
@@ -101,7 +172,7 @@ Sources: [Laravel support policy](https://laravel.com/framework/docs/releases),
   newly verified combination
 - Distinguish passed, failed, blocked, and not-run checks in PRs and release notes
 
-## Isolated integration coverage (2026-10-02)
+## Historical isolated integration coverage (2026-10-02)
 
 The [real Laravel integration harness](tests/integration/README.md) boots
 Laravel with Testbench and exercises the package provider, auth HTTP lifecycle,

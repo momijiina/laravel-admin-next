@@ -59,9 +59,11 @@ and persistence test doubles. It verifies default/custom keys, nested arrays,
 case-insensitive matching, empty/non-sensitive values, log metadata, unchanged
 request input, skipped logging, a database exception and a downstream failure.
 The unmodified middleware fails the password assertion; the fix passes on
-PHP 8.4.25. The focused workflow also targets PHP 7.0, retaining the package's
-current syntax minimum; a configured CI target is not a local test result.
+PHP 8.4.25. The package now requires PHP `^8.2`; the focused workflow targets
+PHP 8.2, 8.3 and 8.4. A configured target alone is not a local test result.
 
-This is not full Laravel, database, browser/rendered-log or legacy-suite
-coverage. The legacy dependency/factory blockers remain documented in
-[the compatibility audit](compatibility-audit-2026-10-01.md).
+This standalone check is not full Laravel, database, browser/rendered-log or
+legacy-suite coverage. The separate [integration harness](../tests/integration/README.md)
+now covers SQLite-persisted redaction through the real HTTP middleware lifecycle.
+See [current coverage and limits](../COMPATIBILITY.md#current-verified-coverage-2026-10-03-after-pr-25);
+the [original audit](compatibility-audit-2026-10-01.md) preserves the earlier blockers.
