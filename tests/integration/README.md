@@ -70,6 +70,8 @@ The dated results below are historical snapshots, not the current suite totals.
   [defaults, validation and clearing boundaries](NULLABLE_RADIO.md)
 - Checkbox zero-valued choices in flat/grouped views, native DOM successful controls,
   JSON/CSV saves and validation redisplay; [selection contract](CHECKBOX_ZERO.md)
+- Ordinary Textarea leading-LF preservation through native HTML parsing and HTTP saves;
+  [textarea rendering contract and normalization boundaries](TEXTAREA_NEWLINES.md)
 - Ordinary Tags hidden-input create/update/clear with exact storage parity;
   [Tags regressions](TAGS.md)
 - Default NULL export-driver resolution under strict PHP 8.5 diagnostics, driver
