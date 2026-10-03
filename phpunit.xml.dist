@@ -14,6 +14,7 @@
         <testsuite name="all">
             <directory>tests/</directory>
             <exclude>tests/integration</exclude>
+            <exclude>tests/schema-components</exclude>
         </testsuite>
     </testsuites>
 </phpunit>

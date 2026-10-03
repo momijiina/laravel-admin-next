@@ -14,6 +14,7 @@
             <file>ActionRequestInputTest.php</file>
             <file>HandleControllerRequestTest.php</file>
             <file>FileUploadFailureTest.php</file>
+            <file>ResourceGeneratorTest.php</file>
         </testsuite>
     </testsuites>
 </phpunit>

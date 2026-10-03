@@ -1,0 +1,146 @@
+name: Model-based schema generation
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  schema-generation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        framework:
+          - { php: '8.2', testbench: '^10.0', phpunit: '^11.5' }
+          - { php: '8.3', testbench: '^11.0', phpunit: '^12.0' }
+        dbal: ['3.10.6']
+        database:
+          - image: mysql:8.4
+            family: mysql
+            port: 3306
+            user: root
+            health: mysqladmin ping -h localhost -pdisposable-schema-only
+          - image: mariadb:10.11
+            family: mariadb
+            port: 3306
+            user: root
+            health: mariadb-admin ping -h localhost -pdisposable-schema-only
+          - image: postgres:16
+            family: pgsql
+            port: 5432
+            user: postgres
+            health: pg_isready -U postgres -d schema_generator
+    services:
+      database:
+        image: ${{ matrix.database.image }}
+        env:
+          MYSQL_DATABASE: schema_generator
+          MYSQL_ROOT_PASSWORD: disposable-schema-only
+          POSTGRES_DB: schema_generator
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: disposable-schema-only
+        ports:
+          - 127.0.0.1:${{ matrix.database.port }}:${{ matrix.database.port }}
+        options: >-
+          --health-cmd="${{ matrix.database.health }}"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=12
+    defaults:
+      run:
+        working-directory: tests/integration
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2
+        with:
+          php-version: ${{ matrix.framework.php }}
+          extensions: mbstring, dom, xml, xmlwriter, pdo_sqlite, pdo_mysql, pdo_pgsql
+          coverage: none
+          tools: composer:v2
+      - name: Resolve exact supported DBAL floor with the selected framework
+        run: composer update --no-interaction --no-progress --prefer-dist --with 'orchestra/testbench:${{ matrix.framework.testbench }}' --with 'phpunit/phpunit:${{ matrix.framework.phpunit }}' --with 'doctrine/dbal:${{ matrix.dbal }}'
+      - name: Check actual runtime requirements
+        run: composer check-platform-reqs
+      - name: Audit resolved dependencies
+        run: composer audit --locked --abandoned=report
+      - name: Test real Artisan generation and independent DBAL metadata parity
+        env:
+          MODEL_SCHEMA_DISPOSABLE: '1'
+          MODEL_SCHEMA_DATABASE: ${{ matrix.database.family }}
+          MODEL_SCHEMA_HOST: 127.0.0.1
+          MODEL_SCHEMA_PORT: ${{ matrix.database.port }}
+          MODEL_SCHEMA_DB_NAME: schema_generator
+          MODEL_SCHEMA_USER: ${{ matrix.database.user }}
+          MODEL_SCHEMA_PASSWORD: disposable-schema-only
+        run: vendor/bin/phpunit --filter ResourceGeneratorTest
+
+  dbal2-components:
+    # Current Symfony HttpFoundation conflicts with DBAL 2. This is a valid
+    # Illuminate component consumer, not a full Laravel/Artisan application.
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        illuminate: ['^12.0', '^13.0']
+        database:
+          - image: mysql:8.4
+            family: mysql
+            health: mysqladmin ping -h localhost -pdisposable-parity-only
+          - image: mariadb:10.11
+            family: mariadb
+            health: mariadb-admin ping -h localhost -pdisposable-parity-only
+    services:
+      database:
+        image: ${{ matrix.database.image }}
+        env:
+          MYSQL_DATABASE: schema_parity
+          MYSQL_ROOT_PASSWORD: disposable-parity-only
+        ports:
+          - 127.0.0.1:3306:3306
+        options: >-
+          --health-cmd="${{ matrix.database.health }}"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=12
+    defaults:
+      run:
+        working-directory: tests/schema-components
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2
+        with:
+          php-version: '8.4'
+          extensions: mbstring, pdo_sqlite, pdo_mysql
+          coverage: none
+          tools: composer:v2
+      - name: Resolve DBAL 2 with real Illuminate components
+        run: composer update --no-interaction --no-progress --prefer-dist --with 'illuminate/database:${{ matrix.illuminate }}' --with 'illuminate/events:${{ matrix.illuminate }}'
+      - name: Check actual runtime requirements
+        run: composer check-platform-reqs
+      - name: Audit resolved dependencies and report abandoned cache package
+        run: composer audit --locked --abandoned=report
+      - name: Check production bridge against the independent DBAL 2 oracle
+        env:
+          PARITY_DISPOSABLE: '1'
+          PARITY_HOST: 127.0.0.1
+          PARITY_PORT: '3306'
+          PARITY_DATABASE: schema_parity
+          PARITY_USER: root
+          PARITY_PASSWORD: disposable-parity-only
+          DATABASE_FAMILY: ${{ matrix.database.family }}
+        run: |
+          php ../prototypes/schema_parity.php vendor/autoload.php sqlite
+          php ../prototypes/schema_parity.php vendor/autoload.php mysql
+          if [ "$DATABASE_FAMILY" = mariadb ]; then
+            php ../prototypes/schema_parity.php vendor/autoload.php mariadb
+          fi

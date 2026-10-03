@@ -1,5 +1,5 @@
 <?php
-// Investigation-only differential test. No production adapter is installed.
+// Native metadata characterization plus production bridge parity.
 require $argv[1];
 require_once __DIR__.'/../../src/Console/ResourceGenerator.php';
 
@@ -56,6 +56,8 @@ $reference = DriverManager::getConnection($params);
 $platform = $reference->getDatabasePlatform();
 foreach (['enum','geometry','geometrycollection','linestring','polygon','multilinestring','multipoint','multipolygon','point'] as $type) $platform->registerDoctrineTypeMapping($type, 'string');
 $maria = $driver !== 'sqlite' && $conn->isMaria();
+// DBAL 2 retains MariaDB JSON as text; only DBAL 3 recovers its check constraint.
+$nativeJsonGap = $maria && interface_exists(Doctrine\DBAL\Driver\API\ExceptionConverter::class);
 $definitions = [
     'id integer primary key', "email varchar(255) DEFAULT 'test@example.test'", "title varchar(255) DEFAULT 'Hello'", "quoted varchar(255) DEFAULT 'O''Reilly'", "empty_string varchar(30) DEFAULT ''", "literal_null varchar(30) DEFAULT 'NULL'", "zero_string varchar(30) DEFAULT '0'", 'null_value varchar(30) DEFAULT NULL', 'enabled tinyint DEFAULT 1', 'small_value smallint DEFAULT 2', 'big_value bigint DEFAULT 3', 'amount decimal(10,2) DEFAULT 12.50', 'score double DEFAULT 1.25', 'details text', 'image blob', 'published_at timestamp DEFAULT CURRENT_TIMESTAMP', 'appointment datetime', 'birth_date date', 'alarm_time time', 'created_at datetime', 'updated_at datetime', 'deleted_at datetime',
 ];
@@ -67,10 +69,9 @@ try {
     $conn->statement('CREATE TABLE parity_records ('.implode(', ', $definitions).')');
     $created = true;
     $model = new ParityModel();
-    try { (new ResourceGenerator($model))->generateForm(); throw new RuntimeException('Expected baseline failure'); }
-    catch (BadMethodCallException $e) { check(str_contains($e->getMessage(), 'isDoctrineAvailable'), 'baseline reproduces removed Doctrine API'); }
     $nativeRows = $conn->getSchemaBuilder()->getColumns($model->getTable());
-    $dbalColumns = $reference->createSchemaManager()->listTableColumns('parity_records');
+    $schema = method_exists($reference, 'createSchemaManager') ? $reference->createSchemaManager() : $reference->getSchemaManager();
+    $dbalColumns = $schema->listTableColumns('parity_records');
     $candidate = [];
     foreach ($nativeRows as $row) {
         $type = $platform->getDoctrineTypeMapping($row['type_name']);
@@ -84,7 +85,7 @@ try {
         $capture[$name] = ['native'=>$row,'dbal'=>['type'=>$expected->getType()->getName(), 'default'=>$expected->getDefault()]];
         // Print observed evidence before assertions, so CI failures retain the mismatch.
         echo 'OBSERVED '.json_encode($capture[$name], JSON_UNESCAPED_SLASHES)."\n";
-        if ($maria && $name === 'document') {
+        if ($nativeJsonGap && $name === 'document') {
             check($row['type_name'] === 'longtext' && $actual->getType()->getName() === 'text' && $expected->getType()->getName() === 'json', 'KNOWN GAP: MariaDB native metadata omits JSON check-constraint semantics');
         } else {
             check($actual->getType()->getName() === $expected->getType()->getName(), "$name type parity");
@@ -93,20 +94,26 @@ try {
     }
     $native = new ParityRenderer($model); $native->columns = $candidate;
     $legacy = new ParityRenderer($model); $legacy->columns = $dbalColumns;
-    if ($maria) {
+    $production = new ResourceGenerator($model);
+    foreach (['generateForm','generateGrid','generateShow'] as $method) {
+        check($production->$method() === $legacy->$method(), "$method production bridge preserves same-version DBAL output");
+        token_get_all('<?php '.$production->$method(), TOKEN_PARSE);
+    }
+
+    if ($nativeJsonGap) {
         check(str_contains($native->generateForm(), "\$form->textarea('document'") && str_contains($legacy->generateForm(), "\$form->text('document'"), 'KNOWN GAP: native-only MariaDB JSON changes form widget');
         // Deliberately exclude only the separately asserted known gap from remaining parity.
         unset($native->columns['document'], $legacy->columns['document']);
     }
     foreach (['generateForm','generateGrid','generateShow'] as $method) {
-        check($native->$method() === $legacy->$method(), "$method byte parity".($maria ? " (excluding characterized JSON gap)" : ""));
+        check($native->$method() === $legacy->$method(), "$method byte parity".($nativeJsonGap ? " (excluding characterized JSON gap)" : ""));
         token_get_all('<?php '.$native->$method(), TOKEN_PARSE);
     }
     check(str_contains($native->generateForm(), "\$form->switch('enabled'"), 'tinyint remains boolean');
     check(!str_contains($native->generateForm(), "'created_at'"), 'reserved form fields omitted');
     check($conn->getSchemaBuilder()->getColumns('missing_records') === [], 'native missing table returns empty metadata');
     if ($driver !== 'sqlite') check($conn->getSchemaBuilder()->getColumns($config['database'].'.records') === $nativeRows, 'qualified-table prefix applied once');
-    $capture = ['framework'=>Illuminate\Foundation\Application::VERSION, 'php'=>PHP_VERSION, 'driver'=>$driver, 'server'=>$driver === 'sqlite' ? $conn->selectOne('select sqlite_version() as v')->v : $conn->selectOne('select version() as v')->v, 'platform'=>get_class($platform), 'columns'=>$capture];
+    $capture = ['framework'=>class_exists(Illuminate\Foundation\Application::class) ? Illuminate\Foundation\Application::VERSION : 'illuminate/database '.Composer\InstalledVersions::getPrettyVersion('illuminate/database'), 'php'=>PHP_VERSION, 'driver'=>$driver, 'server'=>$driver === 'sqlite' ? $conn->selectOne('select sqlite_version() as v')->v : $conn->selectOne('select version() as v')->v, 'platform'=>get_class($platform), 'columns'=>$capture];
     if (getenv('PARITY_CAPTURE')) file_put_contents(getenv('PARITY_CAPTURE'), json_encode($capture, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)."\n");
     echo json_encode(array_diff_key($capture, ['columns'=>true]))."\n";
 } finally {

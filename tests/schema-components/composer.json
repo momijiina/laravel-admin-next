@@ -1,0 +1,19 @@
+{
+    "name": "laravel-admin-next/schema-component-tests",
+    "description": "DBAL 2 schema bridge tests using real Illuminate Database components, not a full Laravel application",
+    "license": "MIT",
+    "require": {
+        "php": "^8.2",
+        "illuminate/database": "^12.0 || ^13.0",
+        "illuminate/events": "^12.0 || ^13.0",
+        "doctrine/dbal": "2.13.9"
+    },
+    "autoload": {
+        "psr-4": {
+            "Encore\\Admin\\": "../../src/"
+        }
+    },
+    "config": {
+        "allow-plugins": false
+    }
+}
