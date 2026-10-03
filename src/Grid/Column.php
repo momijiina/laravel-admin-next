@@ -562,6 +562,24 @@ class Column
         foreach ($data as $key => &$row) {
             $this->original = $value = Arr::get($row, $this->name);
 
+            // A direct native object needs an explicit transformation before rendering.
+            if ($value instanceof \stdClass && !($value instanceof \Stringable)
+                && ($this->hasDisplayCallbacks() || $this->isDefinedColumn())) {
+                if ($this->isDefinedColumn()) {
+                    $this->useDefinedColumn();
+                }
+
+                $value = $this->callDisplayCallbacks($this->original, $key);
+
+                if ($value !== null && !is_scalar($value)) {
+                    throw new \UnexpectedValueException("Display callback for object-valued column [{$this->name}] must return a scalar or null.");
+                }
+
+                Arr::set($row, $this->name, $value);
+
+                continue;
+            }
+
             $value = $this->htmlEntityEncode($value);
 
             Arr::set($row, $this->name, $value);

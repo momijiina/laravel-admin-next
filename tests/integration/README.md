@@ -54,6 +54,8 @@ The dated results below are historical snapshots, not the current suite totals.
   DomCrawler compatibility and multiple-select null handling
 - Ordinary Tags hidden-input create/update/clear with exact storage parity;
   [Tags regressions](TAGS.md)
+- Explicit native-object grid display callbacks and actual streamed CSV round trips;
+  [scalar/null result contract and boundaries](OBJECT_DISPLAY.md)
 - Native object/array casts in configured embedded forms;
   [original-metadata regression and replacement boundary](EMBEDDED_OBJECT_ORIGINALS.md)
 - Main-file upload failure preservation and successful replacement

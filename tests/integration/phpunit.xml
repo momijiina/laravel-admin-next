@@ -12,6 +12,7 @@
             <file>MultipleSelectTest.php</file>
             <file>TagsTest.php</file>
             <file>EmbeddedObjectOriginalTest.php</file>
+            <file>ObjectDisplayTest.php</file>
             <file>GridRequestInputTest.php</file>
             <file>ActionRequestInputTest.php</file>
             <file>HandleControllerRequestTest.php</file>
