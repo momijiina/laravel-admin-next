@@ -10,7 +10,7 @@
         "laravel/browser-kit-testing": "^7.2.8",
         "laravel/legacy-factories": "^1.4.2",
         "fakerphp/faker": "^1.24",
-        "intervention/image": "^2.7",
+        "intervention/image": "^3.11.9",
         "ext-gd": "*",
         "ext-pdo_sqlite": "*"
     },

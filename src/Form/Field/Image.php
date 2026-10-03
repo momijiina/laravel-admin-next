@@ -27,6 +27,7 @@ class Image extends File
      */
     public function prepare($image)
     {
+        $this->storedImagePaths = [];
         if ($this->picker) {
             return parent::prepare($image);
         }
@@ -39,9 +40,15 @@ class Image extends File
 
         $this->callInterventionMethods($image->getRealPath());
 
-        $path = $this->uploadAndDeleteOriginal($image);
+        $path = $this->upload($image);
+        $this->storedImagePaths[] = $path;
 
         $this->uploadAndDeleteOriginalThumbnail($image);
+
+        // Keep old originals until every prepared thumbnail has been stored.
+        if (!in_array($this->original, $this->storedImagePaths, true)) {
+            $this->destroy();
+        }
 
         return $path;
     }

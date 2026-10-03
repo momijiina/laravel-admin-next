@@ -8,6 +8,8 @@ OpenAI Dots による定期的な自動更新支援を計画しています。�
 
 最新の PHP / Laravel への対応を目指し、既存 API や他の Laravel アプリケーションとの互換性・連携を重視します。対応状況は段階的に検証するため、すべてのバージョンやアプリケーションでの動作を保証するものではありません。
 
+**画像処理の破壊的変更:** 画像変換・サムネイルは任意依存の Intervention Image `^3.11.9` に移行しました。v2 の全 API との互換性はありません。型付きコールバックや既存設定を [画像処理の移行ガイド](IMAGE_MIGRATION.md) で確認してください。画像処理を行わない通常のアップロードには不要です。PHP の最低要件は 8.2 です。
+
 - [ロードマップ](ROADMAP.md)
 - [互換性方針](COMPATIBILITY.md)
 - [検証済みの範囲と制限](COMPATIBILITY.md#current-verified-coverage-2026-10-03-after-pr-25)
@@ -22,6 +24,8 @@ Laravel Admin Next is an independent project based on [z-song/laravel-admin](htt
 We plan to use OpenAI Dots for periodic automated maintenance assistance: investigating changes and compatibility impact, making necessary fixes, running tests, and preparing pull requests. The maintainer reviews changes and decides whether to merge them. No recurring schedule is configured yet, and changes are not automatically merged or deployed.
 
 The project aims to support modern PHP and Laravel while prioritizing existing APIs, compatibility, and integration with other Laravel applications. Compatibility is verified incrementally; support for every version or application is not guaranteed.
+
+**Breaking image-processing change:** transformations and thumbnails now use optional Intervention Image `^3.11.9`, with a bounded legacy API rather than full v2 compatibility. Review callbacks and settings in the [image migration guide](IMAGE_MIGRATION.md). Ordinary uploads without processing do not need it. The PHP floor remains 8.2.
 
 - [Roadmap](ROADMAP.md)
 - [Compatibility policy](COMPATIBILITY.md)

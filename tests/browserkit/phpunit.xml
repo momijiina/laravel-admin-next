@@ -26,5 +26,8 @@
         <testsuite name="Historical harness isolation">
             <file>StaticStateIsolationTest.php</file>
         </testsuite>
+        <testsuite name="Image processing output">
+            <file>../images/ImageProcessingTest.php</file>
+        </testsuite>
     </testsuites>
 </phpunit>

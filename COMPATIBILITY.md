@@ -6,6 +6,58 @@
   specific application/version combinations before claiming support
 - Separate dependency declarations, focused checks, and full runtime support
 
+## Image-processing dependency change (after PR #25)
+
+Transformations and thumbnails now require optional Intervention Image
+`^3.11.9`; ordinary uploads without processing do not require it. The PHP floor
+remains `^8.2`. This is a **breaking change** with ten supported legacy field
+operations and a native v3 callback escape hatch, not a complete v2 shim.
+See [IMAGE_MIGRATION.md](IMAGE_MIGRATION.md) for callback changes, separate
+transform/thumbnail driver defaults, encoding, thumbnail behavior and
+non-atomic storage failure boundaries.
+
+Initial local v3 verification, before the GD-build test correction, on
+PHP 8.5.11 / Intervention 3.11.9 / bundled GD: the focused
+image suite passed 17 tests / 234 assertions / zero skips with EXIF enabled
+and zero diagnostics. Complete BrowserKit runs completed 94 tests on Laravel
+12.69.3 (1,231 assertions) and 13.34.0 (1,232 assertions), each without skips.
+Separate integration runs completed 106 tests / 36,653 assertions / two expected
+MySQL/PostgreSQL service skips per framework. All 330 production PHP files
+passed lint; the optional-dependency check, Composer platform checks and audits
+passed. These local results are separate from PR #25's hosted evidence below;
+see the [detailed boundaries](IMAGE_MIGRATION.md#focused-verification).
+
+The initial eight hosted GD lanes exposed a build-dependent 45-degree rotation
+oracle failure: bundled GD produces 13×14, external libgd 2.3.3 produces 15×15
+for the 12×8 fixture. Independent v2 comparison also found missing hidden-RGB
+normalization in the v3 GD decode path. The adapter now uses v3's public clone
+(native canvas copy) to preserve legacy transparent-RGB normalization; Imagick
+is unchanged. The final test runs 31 independent cases against two actual v2
+manifests, each containing 49 fixed PNG outputs. Exact GD-version/native-canary
+fingerprints select the test oracle; unknown builds fail the test provider,
+not production uploads. These checks do
+not promise identical dimensions or pixels across different GD builds.
+See the [correction and oracle scope](IMAGE_MIGRATION.md#gd-build-specific-rotation-and-the-corrected-oracle).
+
+Corrected PHP 8.5.11 / Intervention 3.11.9 / EXIF-enabled focused runs passed
+48 tests / 236 assertions on both characterized builds. Complete BrowserKit runs
+passed 125 tests each: bundled GD with Laravel 12.69.3 / 1,236 assertions and
+13.34.0 / 1,232 assertions; external libgd 2.3.3 with Laravel 12.69.3 / 1,228
+assertions and 13.34.0 / 1,234 assertions. All had zero skips and diagnostics;
+historical random fixture counts vary. The count increase reflects independent
+oracle cases and a direct normalization regression. All four integration runs
+completed 106 tests / 36,653 assertions / two expected database-service skips;
+the optional-dependency boundary and 330-file lint passed on both builds.
+Independent comparison found 53/53 decoded outputs exact against v2 on each
+backend. These local results are separate from hosted CI and other GD builds.
+
+Imagick and WebP/AVIF codecs remain unverified; see the migration guide for
+focused EXIF/animation test scope and remaining parity limits. The
+PR #25 snapshot below predates this migration, including its Image v2
+BrowserKit dependency; its test counts, source-file count and green hosted jobs
+must not be presented as validation of the changed v3 source. Historical
+sections intentionally retain the dependencies and results of their revisions.
+
 ## Current verified coverage (2026-10-03, after PR #25)
 
 This snapshot records checks for the code merged in

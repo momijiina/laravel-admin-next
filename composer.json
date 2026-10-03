@@ -20,7 +20,7 @@
     "require-dev": {
         "laravel/laravel": ">=5.5",
         "fzaninotto/faker": "~1.4",
-        "intervention/image": "~2.3",
+        "intervention/image": "^3.11.9",
         "laravel/browser-kit-testing": "^6.0",
         "spatie/phpunit-watcher": "^1.22.0"
     },
@@ -45,7 +45,7 @@
         "test": "./vendor/bin/phpunit"
     },
     "suggest": {
-        "intervention/image": "Required to handling and manipulation upload images (~2.3).",
+        "intervention/image": "Required for image transformations and thumbnails (^3.11.9); ordinary uploads do not need it.",
         "spatie/eloquent-sortable": "Required to built orderable gird."
     },
     "extra": {
