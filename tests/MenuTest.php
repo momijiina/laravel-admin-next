@@ -14,14 +14,17 @@ class MenuTest extends TestCase
 
     public function testMenuIndex()
     {
+        // Check rendered menu labels, not matching text in the sidebar or scripts.
         $this->visit('admin/auth/menu')
-            ->see('Menu')
-            ->see('Index')
-            ->see('Auth')
-            ->see('Users')
-            ->see('Roles')
-            ->see('Permission')
-            ->see('Menu');
+            ->seeInElement('.content-header h1', 'Menu')
+            ->seeInElement('.breadcrumb', 'Auth')
+            ->seeInElement('.dd-item[data-id="1"] > .dd-handle > strong', 'Dashboard')
+            ->seeInElement('.dd-item[data-id="2"] > .dd-handle > strong', 'Admin')
+            ->seeInElement('.dd-item[data-id="3"] > .dd-handle > strong', 'Users')
+            ->seeInElement('.dd-item[data-id="4"] > .dd-handle > strong', 'Roles')
+            ->seeInElement('.dd-item[data-id="5"] > .dd-handle > strong', 'Permission')
+            ->seeInElement('.dd-item[data-id="6"] > .dd-handle > strong', 'Menu')
+            ->seeInElement('.dd-item[data-id="7"] > .dd-handle > strong', 'Operation log');
     }
 
     public function testAddMenu()

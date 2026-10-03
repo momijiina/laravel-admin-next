@@ -52,7 +52,7 @@ It is useful for testing several framework versions without replacing vendors.
 
 ## Necessary assertion corrections
 
-No methods or assertions are removed. Four historical test files are updated:
+No methods or assertions are removed. Five historical test files are updated:
 
 1. `UserGridTest`: postcode, address, color and date values belong to the
    `profile` relation. Reading them from `User` returned null, making the old
@@ -71,6 +71,14 @@ No methods or assertions are removed. Four historical test files are updated:
    extension guess (`jpg` on current versions), not a hardcoded `jpeg` suffix.
    The test now checks both the stored database path and the actual file.
 
+5. `MenuTest`: the seeded home menu is `Dashboard`, not `Index`. Check each
+   seeded label in its own tree node, plus the page heading and breadcrumb.
+   Whole-response matching previously passed accidentally when an earlier file
+   upload test left `IndexTest.php` in the process-wide `Admin::$script` buffer.
+   Tree-scoped assertions cannot be satisfied by these scripts or sidebar labels.
+   This corrects the menu test's coverage; it does not reset all package static
+   state or claim general request isolation for the historical harness.
+
 The original `tests/TestCase.php` and root PHPUnit configuration are left as
 historical references. Run this suite through its own configuration; recursively
 collecting the entire `tests/` tree mixes incompatible harnesses.
@@ -79,7 +87,7 @@ collecting the entire `tests/` tree mixes incompatible harnesses.
 
 All 73 methods pass locally on PHP 8.4.25 with both Laravel 12 and 13, including
 real GD-backed rotation/flip requests. The suite also passes in randomized order
-(seed 7301). Assertion totals vary because some historical tests intentionally
+(seeds 7301, 9843 and 18057). Assertion totals vary because some historical tests intentionally
 choose random fixture counts.
 
 This is a **behavioral pass, not a deprecation-free pass**. E_ALL and Laravel's
