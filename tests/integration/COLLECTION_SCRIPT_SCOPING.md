@@ -59,9 +59,12 @@ nesting tests defensive ownership guards, not a newly supported field API.
 
 Repeat-initialization assertions rerun the actual collection-only scripts captured
 from real top-level fields. They deliberately do not rerun the whole HasMany
-parent initializer: table mode's duplicate parent handlers on a retained-DOM
-rerun are a preexisting, separate concern. The actual parent scripts still create
-each new child and execute their captured nested collection initializer.
+parent initializer. Full ready-wrapped table-parent reinitialization, identity
+allocation, consumer handlers, and post-click HTTP/SQLite persistence are covered
+by the separate [table-parent regression](HASMANY_TABLE_REINITIALIZATION.md). The
+actual parent scripts here still create each new child and execute their captured
+nested collection initializer; default/tab parent reinitialization is outside
+this test's scope.
 
 Consumers overriding/publishing `listfield.blade.php` or `keyvalue.blade.php` must
 carry forward the new `data-admin-collection`, `data-collection-body`,

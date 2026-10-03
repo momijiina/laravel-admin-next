@@ -569,7 +569,7 @@ EOT;
     }
 
     /**
-     * Setup default template script.
+     * Setup table template script.
      *
      * @param string $templateScript
      *
@@ -580,37 +580,79 @@ EOT;
         $removeClass = NestedForm::REMOVE_FLAG_CLASS;
         $defaultKey = NestedForm::DEFAULT_KEY_NAME;
 
-        /**
-         * When add a new sub form, replace all element key in new sub form.
-         *
-         * @example comments[new___key__][title]  => comments[new_{index}][title]
-         *
-         * {count} is increment number of current sub form count.
-         */
+        $parentId = json_encode('has-many-'.$this->column);
+        $rowClass = json_encode('has-many-'.$this->column.'-form');
+        $bodyClass = json_encode('has-many-'.$this->column.'-forms');
+        $templateClass = json_encode($this->column.'-tpl');
+        $newKeyPrefix = json_encode($this->column.'[new_');
+
+        // Keep the high-water mark on retained DOM, not inside a ready callback.
+        // Pending rows seed fresh DOM; deleted keys are never reused.
         $script = <<<EOT
-var index = 0;
-$('#has-many-{$this->column}').on('click', '.add', function () {
+$(document.getElementById({$parentId})).each(function () {
+    var parent = $(this);
+    var body = parent.children('table').children('tbody').filter(function () {
+        return $(this).hasClass({$bodyClass});
+    });
+    var newKeyPrefix = {$newKeyPrefix};
+    var indexKey = 'admin-has-many-table-index';
+    var index = parent.data(indexKey) || '0';
+    body.children('tr').find('input[name]').each(function () {
+        var name = $(this).attr('name');
+        if (name.indexOf(newKeyPrefix) !== 0) {
+            return;
+        }
+        var key = name.substring(newKeyPrefix.length).match(/^(\d+)\]/);
+        if (key) {
+            var candidate = key[1].replace(/^0+/, '') || '0';
+            if (candidate.length > index.length || (candidate.length === index.length && candidate > index)) {
+                index = candidate;
+            }
+        }
+    });
+    parent.data(indexKey, index);
 
-    var tpl = $('template.{$this->column}-tpl');
+    parent.off('click.adminHasManyTable', '.add').on('click.adminHasManyTable', '.add', function () {
+        var tpl = parent.children('template').filter(function () {
+            return $(this).hasClass({$templateClass});
+        }).first();
+        // Increment decimal strings so even large pending keys stay distinct.
+        var digits = parent.data(indexKey).split('');
+        var position = digits.length - 1;
+        while (position >= 0 && digits[position] === '9') {
+            digits[position--] = '0';
+        }
+        if (position < 0) {
+            digits.unshift('1');
+        } else {
+            digits[position] = String(Number(digits[position]) + 1);
+        }
+        var nextIndex = digits.join('');
+        parent.data(indexKey, nextIndex);
+        // Preserve numeric indices for existing consumer scripts when exact.
+        var index = Number(nextIndex) <= 9007199254740991 ? Number(nextIndex) : nextIndex;
 
-    index++;
+        var template = tpl.html().replace(/{$defaultKey}/g, index);
+        body.append(template);
+        {$templateScript}
+        return false;
+    });
 
-    var template = tpl.html().replace(/{$defaultKey}/g, index);
-    $('.has-many-{$this->column}-forms').append(template);
-    {$templateScript}
-    return false;
-});
-
-$('#has-many-{$this->column}').on('click', '.remove', function () {
-    var first_input_name = $(this).closest('.has-many-{$this->column}-form').find('input[name]:first').attr('name');
-    if (first_input_name.match('{$this->column}\\\[new_')) {
-        $(this).closest('.has-many-{$this->column}-form').remove();
-    } else {
-        $(this).closest('.has-many-{$this->column}-form').hide();
-        $(this).closest('.has-many-{$this->column}-form').find('.$removeClass').val(1);
-        $(this).closest('.has-many-{$this->column}-form').find('input').removeAttr('required');
-    }
-    return false;
+    parent.off('click.adminHasManyTable', '.remove').on('click.adminHasManyTable', '.remove', function () {
+        var row = $(this).parents('tr').filter(function () {
+            return $(this).hasClass({$rowClass});
+        }).first();
+        var removeInput = row.find('input.$removeClass').first();
+        var name = removeInput.attr('name') || '';
+        if (name.indexOf(newKeyPrefix) === 0) {
+            row.remove();
+        } else {
+            row.hide();
+            row.find('.$removeClass').val(1);
+            row.find('input').removeAttr('required');
+        }
+        return false;
+    });
 });
 
 EOT;
