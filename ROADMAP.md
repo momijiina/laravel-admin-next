@@ -2,9 +2,11 @@
 
 ## Goal
 
-Modernize laravel-admin while preserving existing APIs where practical. Exment
-compatibility remains an important target. Target versions must be selected and
-tested before they become support promises; see [COMPATIBILITY.md](COMPATIBILITY.md).
+Modernize laravel-admin while preserving existing APIs where practical.
+Compatibility and integration with other Laravel applications remain important
+goals. Target versions must be selected and tested, including application-specific
+integration checks, before they become support promises; see
+[COMPATIBILITY.md](COMPATIBILITY.md).
 
 The starting point is the [2026-10-01 audit](docs/compatibility-audit-2026-10-01.md).
 The [original PR candidate inventory](docs/pr-candidates-2026-10-01.md) is a
@@ -34,8 +36,8 @@ historical snapshot. Current completed coverage and its limits are recorded in
       exact DBAL/DomCrawler floors are targeted checks, not every dependency minimum
 
 Laravel 12/13 have the targeted runtime coverage linked above. Older Laravel and
-Exment requirements still need an explicit version inventory and application
-checks; do not silently remove or claim support for them.
+downstream application requirements still need an explicit version inventory
+and application checks; do not silently remove or claim support for them.
 
 ## Phase 2: Compatibility and security repairs, one concern per PR
 
