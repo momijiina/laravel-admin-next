@@ -45,7 +45,7 @@ class HandleController extends Controller
             throw new Exception('Invalid form request.');
         }
 
-        $formClass = $request->get('_form_');
+        $formClass = $this->requestValue($request, '_form_');
 
         if (!class_exists($formClass)) {
             throw new Exception("Form [{$formClass}] does not exist.");
@@ -112,7 +112,7 @@ class HandleController extends Controller
             throw new Exception('Invalid action request.');
         }
 
-        $actionClass = str_replace('_', '\\', $request->get('_action'));
+        $actionClass = str_replace('_', '\\', $this->requestValue($request, '_action'));
 
         if (!class_exists($actionClass)) {
             throw new Exception("Form [{$actionClass}] does not exist.");
@@ -152,8 +152,8 @@ class HandleController extends Controller
      */
     public function handleSelectable(Request $request)
     {
-        $class = $request->get('selectable');
-        $args = $request->get('args', []);
+        $class = $this->requestValue($request, 'selectable');
+        $args = $this->requestValue($request, 'args', []);
 
         $class = str_replace('_', '\\', $class);
 
@@ -174,8 +174,8 @@ class HandleController extends Controller
      */
     public function handleRenderable(Request $request)
     {
-        $class = $request->get('renderable');
-        $key = $request->get('key');
+        $class = $this->requestValue($request, 'renderable');
+        $key = $this->requestValue($request, 'key');
 
         $class = str_replace('_', '\\', $class);
 
@@ -187,5 +187,32 @@ class HandleController extends Controller
         }
 
         return $class;
+    }
+
+    /**
+     * Read a literal key with the legacy Request::get() source precedence.
+     *
+     * @param Request $request
+     * @param string  $key
+     * @param mixed   $default
+     *
+     * @return mixed
+     */
+    private function requestValue(Request $request, string $key, $default = null)
+    {
+        $value = $request->attributes->get($key, $request);
+        if ($value !== $request) {
+            return $value;
+        }
+
+        if ($request->query->has($key)) {
+            return $request->query->all()[$key];
+        }
+
+        if ($request->request->has($key)) {
+            return $request->request->all()[$key];
+        }
+
+        return $default;
     }
 }
