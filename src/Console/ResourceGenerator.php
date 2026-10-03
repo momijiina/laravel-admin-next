@@ -153,6 +153,10 @@ class ResourceGenerator
                 $defaultValue = null;
             }
 
+            if ($this->isCanonicalTemporalDefault($type, $default)) {
+                $defaultValue = var_export($default, true);
+            }
+
             $label = $this->formatLabel($name);
 
             $output .= sprintf($this->formats['form_field'], $fieldType, $name, $label);
@@ -165,6 +169,31 @@ class ResourceGenerator
         }
 
         return $output;
+    }
+
+    /**
+     * Recognize DBAL-normalized literals only, never SQL expressions or casts.
+     */
+    protected function isCanonicalTemporalDefault($type, $default)
+    {
+        if (!is_string($default)) {
+            return false;
+        }
+
+        if ($type === 'time') {
+            return preg_match('/\A(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]\z/', $default) === 1;
+        }
+
+        if ($type !== 'date' && $type !== 'datetime') {
+            return false;
+        }
+
+        $time = $type === 'datetime' ? ' (?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]' : '';
+        if (preg_match('/\A([0-9]{4})-([0-9]{2})-([0-9]{2})'.$time.'\z/', $default, $parts) !== 1) {
+            return false;
+        }
+
+        return checkdate((int) $parts[2], (int) $parts[3], (int) $parts[1]);
     }
 
     public function generateShow()

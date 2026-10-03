@@ -178,19 +178,19 @@ class NullableTemporalDefaultsTest extends TestCase
                 $source = str_replace($field.';', $field."->default('{$defaults[$column]}');", $source);
             }
         }
-        // Explicit database defaults retain existing synthesis; SQL-expression interpretation
-        // and honoring temporal database literals are separate generator limitations.
+        // SQL expressions retain existing current-date/time scaffolding.
         foreach ([
             'required_day' => ['date', 'Y-m-d'],
             'required_instant' => ['datetime', 'Y-m-d H:i:s'],
             'required_clock' => ['time', 'H:i:s'],
-            'literal_day' => ['date', 'Y-m-d'],
-            'literal_instant' => ['datetime', 'Y-m-d H:i:s'],
-            'literal_clock' => ['time', 'H:i:s'],
             'current_instant' => ['datetime', 'Y-m-d H:i:s'],
         ] as $column => [$type, $format]) {
             $label = ucfirst(str_replace('_', ' ', $column));
             $this->assertStringContainsString('$form->'.$type."('{$column}', __('{$label}'))->default(date('{$format}'));", $source);
+        }
+        foreach (['literal_day' => ['date', '2001-02-03'], 'literal_instant' => ['datetime', '2001-02-03 04:05:06'], 'literal_clock' => ['time', '04:05:06']] as $column => [$type, $default]) {
+            $label = ucfirst(str_replace('_', ' ', $column));
+            $this->assertStringContainsString('$form->'.$type."('{$column}', __('{$label}'))->default(".var_export($default, true).");", $source);
         }
         if ($explicitDefaults) {
             file_put_contents($path, $source);

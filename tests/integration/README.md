@@ -46,6 +46,7 @@ The dated results below are historical snapshots, not the current suite totals.
 - Native mutable/immutable Date/Datetime edit/save round trips with shipped Moment;
   [date-cast presentation scope](DATE_CAST_PRESENTATION.md) and boundaries
 - Nullable temporal generated create/edit/save NULL preservation;
+- Canonical temporal database literal defaults in generated source and HTTP persistence;
   [generator default scope](NULLABLE_TEMPORAL_DEFAULTS.md) and existing-controller caveats
 - Model-backed Artisan generation and independent DBAL metadata/output parity;
   [generator regressions](RESOURCE_GENERATOR.md) cover SQLite and opt-in services
