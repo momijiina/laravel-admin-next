@@ -16,7 +16,8 @@ GETs, per-page overrides, both naming orders, selected columns, explicit page
 names/pages, and numeric/callback totals. Links retain the other grid's page,
 filter values and sort query. The default shared `_sort` behavior is unchanged;
 callers can use the existing `Grid::model()->setSortName()` API where independent
-sort parameters are desired.
+sort parameters are desired. Configure that key before creating sortable columns;
+see the separate [explicit sorting and applied-filter regressions](GRID_EXPLICIT_SORT.md).
 
 This is HTTP-kernel/paginator coverage, not live-browser or PJAX transport
 coverage. Filter query retention is tested; this fixture does not apply filters.
