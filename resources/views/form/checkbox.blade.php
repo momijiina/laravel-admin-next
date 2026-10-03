@@ -15,6 +15,12 @@
 
         @include('admin::form.error')
 
+        @php
+            $selected = array_filter(old($column, $value ?? []), function ($item) {
+                return $item === 0 || $item === '0' || (bool) $item;
+            });
+        @endphp
+
         @if($groups)
 
         @foreach($groups as $group => $options)
@@ -26,7 +32,7 @@
             <div class="checkbox icheck">
 
                 <label>
-                    <input type="checkbox" name="{{$name}}[]" value="{{$option}}" class="{{$class}}" {{ false !== array_search($option, array_filter(old($column, $value ?? []))) || ($value === null && in_array($option, $checked)) ?'checked':'' }} {!! $attributes !!} />&nbsp;{{$label}}&nbsp;&nbsp;
+                    <input type="checkbox" name="{{$name}}[]" value="{{$option}}" class="{{$class}}" {{ false !== array_search($option, $selected) || ($value === null && in_array($option, $checked)) ?'checked':'' }} {!! $attributes !!} />&nbsp;{{$label}}&nbsp;&nbsp;
                 </label>
 
             </div>
@@ -42,7 +48,7 @@
             {!! $inline ? '<span class="icheck">' : '<div class="checkbox icheck">' !!}
 
                 <label @if($inline)class="checkbox-inline"@endif>
-                    <input type="checkbox" name="{{$name}}[]" value="{{$option}}" class="{{$class}}" {{ false !== array_search($option, array_filter(old($column, $value ?? []))) || ($value === null && in_array($option, $checked)) ?'checked':'' }} {!! $attributes !!} />&nbsp;{{$label}}&nbsp;&nbsp;
+                    <input type="checkbox" name="{{$name}}[]" value="{{$option}}" class="{{$class}}" {{ false !== array_search($option, $selected) || ($value === null && in_array($option, $checked)) ?'checked':'' }} {!! $attributes !!} />&nbsp;{{$label}}&nbsp;&nbsp;
                 </label>
 
             {!! $inline ? '</span>' :  '</div>' !!}
