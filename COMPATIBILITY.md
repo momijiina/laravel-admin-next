@@ -35,6 +35,11 @@ current suite totals or validation of subsequent changes.
   must account for that scalar marker. Controls deliberately disabled to omit
   a field must disable its markers too; see
   [empty-collection cautions](tests/integration/LIST_FIELD.md#explicitly-empty-collections).
+- **Collection readonly UI:** ListField and KeyValue now honor the previously
+  ineffective inherited `readonly()` method. Keys/values remain submitted, while
+  collection Add/Remove is locked. Disabled collections remain unsupported. This
+  does not add server authorization or concurrency protection; update overridden
+  views and review the [behavior cautions](tests/integration/LIST_FIELD.md#readonly-collections).
 - **Collection scripts ([PR #40](https://github.com/momijiina/laravel-admin-next/pull/40)):**
   same-column fields have root-local Add/Remove behavior and repeatable
   initialization. Consumers with overridden/published ListField or KeyValue
