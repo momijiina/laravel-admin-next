@@ -105,14 +105,46 @@ class DateRange extends Field
         $class = $this->getElementClassSelector();
 
         $this->script = <<<EOT
-            $('{$class['start']}').datetimepicker($startOptions);
-            $('{$class['end']}').datetimepicker($endOptions);
-            $("{$class['start']}").on("dp.change", function (e) {
-                $('{$class['end']}').data("DateTimePicker").minDate(e.date);
-            });
-            $("{$class['end']}").on("dp.change", function (e) {
-                $('{$class['start']}').data("DateTimePicker").maxDate(e.date);
-            });
+            (function () {
+                var start = $('{$class['start']}'), end = $('{$class['end']}');
+                var fresh = !start.data('DateTimePicker') && !end.data('DateTimePicker');
+                $('{$class['start']}').datetimepicker($startOptions);
+                $('{$class['end']}').datetimepicker($endOptions);
+
+                // Only synchronize an unambiguous pair, using the widget's parsed dates.
+                if (fresh && start.length === 1 && end.length === 1) {
+                    var startPicker = start.data('DateTimePicker'), endPicker = end.data('DateTimePicker');
+                    var startDate = startPicker.date(), endDate = endPicker.date();
+                    var startConfig = startPicker.options(), endConfig = endPicker.options();
+                    // Custom parsers/timezones retain their existing initialization contract.
+                    if (!startConfig.parseInputDate && !endConfig.parseInputDate &&
+                        startConfig.timeZone === 'Etc/UTC' && endConfig.timeZone === 'Etc/UTC' &&
+                        !(startDate && endDate && startDate.isAfter(endDate))) {
+                        var synchronize = function (picker, method, date) {
+                            if (!date || !date.isValid()) return;
+                            var minimum = picker.minDate(), maximum = picker.maxDate();
+                            if ((minimum && date.isBefore(minimum)) || (maximum && date.isAfter(maximum))) return;
+                            // Bound setters can fill an empty input when useCurrent is enabled.
+                            var useCurrent = picker.useCurrent();
+                            try {
+                                picker.useCurrent(false);
+                                picker[method](date);
+                            } finally {
+                                picker.useCurrent(useCurrent);
+                            }
+                        };
+                        synchronize(endPicker, 'minDate', startDate);
+                        synchronize(startPicker, 'maxDate', endDate);
+                    }
+                }
+
+                start.off('dp.change.adminDateRange').on('dp.change.adminDateRange', function (e) {
+                    end.data('DateTimePicker').minDate(e.date);
+                });
+                end.off('dp.change.adminDateRange').on('dp.change.adminDateRange', function (e) {
+                    start.data('DateTimePicker').maxDate(e.date);
+                });
+            })();
 EOT;
 
         return parent::render();
