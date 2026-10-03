@@ -6,7 +6,9 @@
 
         @include('admin::form.error')
 
-        <textarea name="{{$name}}" class="form-control {{$class}}" rows="{{ $rows }}" placeholder="{{ $placeholder }}" {!! $attributes !!} >{{ old($column, $value) }}</textarea>
+        {{-- HTML consumes the first LF after <textarea>; keep this newline before the value. --}}
+        <textarea name="{{$name}}" class="form-control {{$class}}" rows="{{ $rows }}" placeholder="{{ $placeholder }}" {!! $attributes !!} >
+{{ old($column, $value) }}</textarea>
 
         {!! $append !!}
 
