@@ -62,6 +62,8 @@ The dated results below are historical snapshots, not the current suite totals.
   [original-metadata regression and replacement boundary](EMBEDDED_OBJECT_ORIGINALS.md)
 - Production-rendered List/KeyValue collection scripts with shipped and modern jQuery;
   [offline DOM scope, setup, and limits](COLLECTION_SCRIPT_SCOPING.md)
+- Ready-wrapped HasMany table-parent reinitialization, unique child identities, and
+  actual serialized HTTP/SQLite saves; [regression scope](HASMANY_TABLE_REINITIALIZATION.md)
 - Main-file upload failure preservation and successful replacement
 - Actual HTTP-kernel middleware lifecycle, including consumer bootstrap execution
 - SQLite-persisted operation logs, recursive redaction, preserved controller input,
