@@ -70,6 +70,8 @@ The dated results below are historical snapshots, not the current suite totals.
   JSON/CSV saves and validation redisplay; [selection contract](CHECKBOX_ZERO.md)
 - Ordinary Tags hidden-input create/update/clear with exact storage parity;
   [Tags regressions](TAGS.md)
+- Headers for empty actual CSV exports and cross-chunk header-once controls;
+  [CSV schema and compatibility notes](CSV_HEADERS.md)
 - Explicit native-object grid display callbacks and actual streamed CSV round trips;
   [scalar/null result contract and boundaries](OBJECT_DISPLAY.md)
 - Native object/array casts in configured embedded forms;

@@ -159,9 +159,9 @@ class CsvExporter extends AbstractExporter
 
         $response = function () {
             $handle = fopen('php://output', 'w');
-            $titles = [];
+            $headerWritten = false;
             fwrite($handle, chr(0xEF).chr(0xBB).chr(0xBF)); //导出的CSV文件是无BOM编码UTF-8，而我们通常使用UTF-8编码格式都是有BOM的。所以添加BOM于CSV中
-            $this->chunk(function ($collection) use ($handle, &$titles) {
+            $this->chunk(function ($collection) use ($handle, &$headerWritten) {
                 Column::setOriginalGridModels($collection);
 
                 $original = $current = $collection->toArray();
@@ -172,8 +172,9 @@ class CsvExporter extends AbstractExporter
                 });
 
                 // Write title
-                if (empty($titles)) {
-                    fputcsv($handle, $titles = $this->getVisiableTitles(), ',', '"', '\\');
+                if (!$headerWritten) {
+                    fputcsv($handle, $this->getVisiableTitles(), ',', '"', '\\');
+                    $headerWritten = true;
                 }
 
                 // Write rows
@@ -181,6 +182,14 @@ class CsvExporter extends AbstractExporter
                     fputcsv($handle, $this->getVisiableFields($record, $original[$index]), ',', '"', '\\');
                 }
             });
+            // Empty queries never invoke the chunk callback; titles still describe the export.
+            if (!$headerWritten) {
+                $this->grid->getColumns()->map(function (Column $column) {
+                    $this->grid->columnNames[] = $column->getName();
+                });
+
+                fputcsv($handle, $this->getVisiableTitles(), ',', '"', '\\');
+            }
             fclose($handle);
         };
 

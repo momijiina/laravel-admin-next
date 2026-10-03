@@ -152,8 +152,14 @@ value",日本語☕,,
 CSV
     ."\"\r\n\",é,,\n";
 
+    $header = "\xEF\xBB\xBF".<<<'CSV'
+plain,"comma,title","quote""title","slash\"title","line
+title",日本語,empty,null
+CSV
+    ."\n";
+
     $failed = false;
-    foreach (['populated' => $expected, 'empty' => "\xEF\xBB\xBF"] as $scenario => $expectedCsv) {
+    foreach (['populated' => $expected, 'empty' => $header] as $scenario => $expectedCsv) {
         $command = escapeshellarg(PHP_BINARY).' '.escapeshellarg(__FILE__).' --export '.escapeshellarg($scenario);
         $process = proc_open($command, [0 => ['pipe', 'r'], 1 => ['pipe', 'w'], 2 => ['pipe', 'w']], $pipes);
         if (!is_resource($process)) {

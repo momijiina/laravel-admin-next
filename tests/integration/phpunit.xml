@@ -23,6 +23,7 @@
             <file>ExplicitEmptyCollectionsTest.php</file>
             <file>EmbeddedObjectOriginalTest.php</file>
             <file>ObjectDisplayTest.php</file>
+            <file>CsvHeadersTest.php</file>
             <file>GridRequestInputTest.php</file>
             <file>GridPaginationTest.php</file>
             <file>GridExplicitSortTest.php</file>
