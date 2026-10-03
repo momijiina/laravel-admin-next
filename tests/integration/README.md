@@ -64,6 +64,9 @@ The dated results below are historical snapshots, not the current suite totals.
   [offline DOM scope, setup, and limits](COLLECTION_SCRIPT_SCOPING.md)
 - Ready-wrapped HasMany table-parent reinitialization, unique child identities, and
   actual serialized HTTP/SQLite saves; [regression scope](HASMANY_TABLE_REINITIALIZATION.md)
+- Ready-wrapped HasMany default/tab reinitialization, consumer handlers, safe child
+  identities, real Bootstrap tab behavior and HTTP/SQLite saves;
+  [regression scope](HASMANY_MODES_REINITIALIZATION.md)
 - Main-file upload failure preservation and successful replacement
 - Actual HTTP-kernel middleware lifecycle, including consumer bootstrap execution
 - SQLite-persisted operation logs, recursive redaction, preserved controller input,

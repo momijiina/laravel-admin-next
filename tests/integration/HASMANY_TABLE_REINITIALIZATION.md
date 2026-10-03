@@ -82,7 +82,7 @@ Customized nested collection names test parent allocation, removal, collection
 initialization, and native PHP serialization only. They do not claim a newly
 supported nested HasMany persistence API.
 
-This patch and regression are table-only. Default/tab retained-DOM allocation and
-consumer-listener behavior are not changed or certified here. The separate
+This regression is table-only. Default/tab retained-DOM allocation and consumer
+listeners are covered by the separate [default/tab suite](HASMANY_MODES_REINITIALIZATION.md). The separate
 [collection scoping regression](COLLECTION_SCRIPT_SCOPING.md) continues to cover
 unchanged collection-only reinitialization in all three HasMany modes.
