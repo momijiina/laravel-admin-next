@@ -8,9 +8,9 @@
 
 ## Current maintenance summary
 
-This index describes the changes merged through
-[PR #42](https://github.com/momijiina/laravel-admin-next/pull/42), at
-[`c09e6f8`](https://github.com/momijiina/laravel-admin-next/commit/c09e6f86cd2dc928aebefd2c91ad455794eec8e9).
+Updated 2026-10-03. This index describes the changes merged through
+[PR #53](https://github.com/momijiina/laravel-admin-next/pull/53), at
+[`f51972f`](https://github.com/momijiina/laravel-admin-next/commit/f51972f90effe90a3792bbb3ff29935173392f7b).
 Use the linked guides for upgrade steps and each regression's precise boundary.
 Historical test totals below remain evidence for their own revisions, not
 current suite totals or validation of subsequent changes.
@@ -35,8 +35,8 @@ current suite totals or validation of subsequent changes.
   must account for that scalar marker. Controls deliberately disabled to omit
   a field must disable its markers too; see
   [empty-collection cautions](tests/integration/LIST_FIELD.md#explicitly-empty-collections).
-- **Collection readonly UI:** ListField and KeyValue now honor the previously
-  ineffective inherited `readonly()` method. Keys/values remain submitted, while
+- **Collection readonly UI ([PR #46](https://github.com/momijiina/laravel-admin-next/pull/46)):**
+  ListField and KeyValue now honor the previously ineffective inherited `readonly()` method. Keys/values remain submitted, while
   collection Add/Remove is locked. Disabled collections remain unsupported. This
   does not add server authorization or concurrency protection; update overridden
   views and review the [behavior cautions](tests/integration/LIST_FIELD.md#readonly-collections).
@@ -52,6 +52,66 @@ current suite totals or validation of subsequent changes.
   See the [table guide](tests/integration/HASMANY_TABLE_REINITIALIZATION.md) and
   [default/tab guide](tests/integration/HASMANY_MODES_REINITIALIZATION.md),
   including the pending-DOM versus full validation-redirect coverage boundary.
+- **Named-grid pagination ([PR #44](https://github.com/momijiina/laravel-admin-next/pull/44)):**
+  configured page sizes now retain the grid-specific page parameter; explicit
+  Eloquent page names remain authoritative. Naming a grid does not isolate its
+  default shared `_sort` key. [PR #45](https://github.com/momijiina/laravel-admin-next/pull/45)
+  adds tests only: configure `setSortName()` before creating sortable columns.
+  See [pagination](tests/integration/GRID_PAGINATION.md) and
+  [explicit sorting/filter coverage](tests/integration/GRID_EXPLICIT_SORT.md).
+- **NULL and zero choices ([PR #47](https://github.com/momijiina/laravel-admin-next/pull/47),
+  [PR #48](https://github.com/momijiina/laravel-admin-next/pull/48),
+  [PR #49](https://github.com/momijiina/laravel-admin-next/pull/49)):** ordinary
+  Select/Radio no longer select zero for NULL; Checkbox retains integer/string
+  zero choices. Other legacy loose comparisons and explicit defaults remain.
+  Update published/overridden views. Radio omission preserves stored values and
+  is not a clearing API; enforce server-side presence rules in the application.
+  See the distinct [Select](tests/integration/NULLABLE_SELECT.md),
+  [Checkbox](tests/integration/CHECKBOX_ZERO.md), and
+  [Radio](tests/integration/NULLABLE_RADIO.md) contracts.
+- **Range cast presentation ([PR #50](https://github.com/momijiina/laravel-admin-next/pull/50)):**
+  eligible native DateRange/DatetimeRange endpoints display in the application
+  timezone to avoid unchanged edit/save drift. This is a narrow presentation fix,
+  not a change to storage or arbitrary custom casts/parsers; TimeRange is excluded.
+  See [eligibility and round-trip limits](tests/integration/DATE_RANGE_CAST_PRESENTATION.md).
+- **CSV and default export ([PR #51](https://github.com/momijiina/laravel-admin-next/pull/51),
+  [PR #52](https://github.com/momijiina/laravel-admin-next/pull/52)):** empty results
+  now contain a header after the BOM, so check for zero data records instead of
+  BOM-only output. Title callbacks also run for empty results under the existing
+  visibility/order rules. Ordinary default-export resolution avoids PHP 8.5's
+  NULL-key deprecation. `Exporter::extend(null, ...)` registration is unchanged;
+  use `''` for the empty-string driver. See
+  [CSV schema, callbacks and exporter boundaries](tests/integration/CSV_HEADERS.md).
+- **Initial range bounds ([PR #53](https://github.com/momijiina/laravel-admin-next/pull/53)):**
+  fresh DateRange/DatetimeRange/TimeRange widget pairs seed reciprocal bounds from
+  parsed endpoints without changing endpoint values during seeding. Null endpoints
+  add no bound; inverted pairs, conflicting bounds, existing widget instances,
+  custom parsers and non-default timezone options retain conservative exclusions. Existing
+  change behavior and server validation are unchanged. See the
+  [widget initialization contract](tests/integration/DATE_RANGE_INITIALIZATION.md).
+
+Disabled-collection support and changes to Embeds replacement semantics remain
+separate design work, not shipped fixes. Readonly does not imply either; see the
+[collection cautions](tests/integration/LIST_FIELD.md#readonly-collections) and
+[Embeds replacement boundary](tests/integration/EMBEDDED_OBJECT_ORIGINALS.md#boundary).
+
+### Hosted evidence for PR #53
+
+All **61 jobs across 13 workflows** passed for the final PR #53 head,
+[`c024061`](https://github.com/momijiina/laravel-admin-next/commit/c0240610adebba05b12ef9025514a6256be34345);
+see the [PR checks](https://github.com/momijiina/laravel-admin-next/pull/53/checks).
+The hosted checkout was synthetic merge `a701103` of that head into `74d5749`.
+The 22 full integration/DomCrawler lanes each completed **265 tests / 234,866
+assertions / 2 optional external-database service skips**. The eight BrowserKit
+lanes each completed **125 tests**; assertion counts vary with random fixtures.
+The range-initialization regression is included in the full suite and exercises
+39 offline widget fixtures; these results do not establish real-browser E2E.
+These are hosted results for that exact pre-merge revision, not local reruns or
+CI results for merge commit `f51972f` or this documentation update. The database
+skips do not establish ordinary lifecycle coverage on external database services.
+
+The earlier PR #42 and PR #25 evidence below is retained for its original
+revisions and must not be read as the current test totals.
 
 ### Hosted evidence for PR #42
 
