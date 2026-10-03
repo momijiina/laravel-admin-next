@@ -155,6 +155,13 @@ return [
         // Disk in `config/filesystem.php`.
         'disk' => 'admin',
 
+        // Optional Intervention Image v3 processing. See IMAGE_MIGRATION.md.
+        'image_processing' => [
+            'transform_driver' => 'gd',
+            // null preserves config('image.driver', 'gd') for thumbnails only.
+            'thumbnail_driver' => null,
+        ],
+
         // Image and file upload path under the disk above.
         'directory' => [
             'image' => 'images',

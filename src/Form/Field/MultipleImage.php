@@ -20,6 +20,14 @@ class MultipleImage extends MultipleFile
      */
     protected $rules = 'image';
 
+    public function prepare($files)
+    {
+        // Keep successfully written paths protected throughout the whole batch.
+        $this->storedImagePaths = [];
+
+        return parent::prepare($files);
+    }
+
     /**
      * Prepare for each file.
      *
@@ -41,6 +49,7 @@ class MultipleImage extends MultipleFile
         value is same as before, but now thumbnails are saved to the disk as well. */
 
         $path = $this->upload($image);
+        $this->storedImagePaths[] = $path;
         $this->uploadAndDeleteOriginalThumbnail($image);
         $this->name = null;
 

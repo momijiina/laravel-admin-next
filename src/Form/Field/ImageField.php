@@ -3,9 +3,7 @@
 namespace Encore\Admin\Form\Field;
 
 use Illuminate\Support\Str;
-use Intervention\Image\Constraint;
-use Intervention\Image\Facades\Image as InterventionImage;
-use Intervention\Image\ImageManagerStatic;
+use Intervention\Image\Interfaces\ImageInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 trait ImageField
@@ -23,6 +21,10 @@ trait ImageField
      * @var array
      */
     protected $thumbnails = [];
+
+    protected $preparedThumbnails = [];
+
+    protected $storedImagePaths = [];
 
     /**
      * Default directory for file to upload.
@@ -43,15 +45,30 @@ trait ImageField
      */
     public function callInterventionMethods($target)
     {
+        $processor = new ImageProcessor();
+        $this->preparedThumbnails = [];
         if (!empty($this->interventionCalls)) {
-            $image = ImageManagerStatic::make($target);
-
+            $image = $processor->read($target);
             foreach ($this->interventionCalls as $call) {
-                call_user_func_array(
-                    [$image, $call['method']],
-                    $call['arguments']
-                )->save($target);
+                if ($call['method'] === '__native') {
+                    try {
+                        $result = ($call['arguments'][0])($image);
+                    } catch (\Throwable $exception) {
+                        throw new \RuntimeException('Intervention v3 imageProcessing() callback failed: '.$exception->getMessage().' See IMAGE_MIGRATION.md.', 0, $exception);
+                    }
+                    if ($result !== null && !$result instanceof ImageInterface) {
+                        throw new \UnexpectedValueException('imageProcessing() must return an Intervention v3 ImageInterface or null. See IMAGE_MIGRATION.md.');
+                    }
+                    $image = $result ?? $image;
+                } else {
+                    $image = $processor->apply($image, $call['method'], $call['arguments']);
+                }
+                $processor->encode($image)->save($target);
             }
+        }
+        // Decode/transform failures must happen before upload deletes any originals.
+        foreach ($this->thumbnails as $name => $size) {
+            $this->preparedThumbnails[$name] = $processor->thumbnail($target, $size);
         }
 
         return $target;
@@ -73,14 +90,22 @@ trait ImageField
             return $this;
         }
 
-        if (!class_exists(ImageManagerStatic::class)) {
-            throw new \Exception('To use image handling and manipulation, please install [intervention/image] first.');
-        }
+        ImageProcessor::requireDependency();
+        ImageProcessor::validate($method, $arguments);
 
         $this->interventionCalls[] = [
             'method'    => $method,
             'arguments' => $arguments,
         ];
+
+        return $this;
+    }
+
+    /** Queue a native Intervention Image v3 callback at this point in the chain. */
+    public function imageProcessing(callable $callback)
+    {
+        ImageProcessor::requireDependency();
+        $this->interventionCalls[] = ['method' => '__native', 'arguments' => [$callback]];
 
         return $this;
     }
@@ -156,7 +181,10 @@ trait ImageField
      */
     public function destroyThumbnailFile($original, $name)
     {
-        $ext = @pathinfo($original, PATHINFO_EXTENSION);
+        if (!is_string($original) || $original === '') {
+            return;
+        }
+        $ext = pathinfo($original, PATHINFO_EXTENSION);
 
         // We remove extension from file name so we can append thumbnail type
         $path = @Str::replaceLast('.'.$ext, '', $original);
@@ -164,7 +192,7 @@ trait ImageField
         // We merge original name + thumbnail name + extension
         $path = $path.'-'.$name.'.'.$ext;
 
-        if ($this->storage->exists($path)) {
+        if (!in_array($path, $this->storedImagePaths, true) && $this->storage->exists($path)) {
             $this->storage->delete($path);
         }
     }
@@ -188,23 +216,18 @@ trait ImageField
             // We merge original name + thumbnail name + extension
             $path = $path.'-'.$name.'.'.$ext;
 
-            /** @var \Intervention\Image\Image $image */
-            $image = InterventionImage::make($file);
-
-            $action = $size[2] ?? 'resize';
-            // Resize image with aspect ratio
-            $image->$action($size[0], $size[1], function (Constraint $constraint) {
-                $constraint->aspectRatio();
-            })->resizeCanvas($size[0], $size[1], 'center', false, '#ffffff');
-
-            if (!is_null($this->storagePermission)) {
-                $this->storage->put("{$this->getDirectory()}/{$path}", $image->encode(), $this->storagePermission);
-            } else {
-                $this->storage->put("{$this->getDirectory()}/{$path}", $image->encode());
+            $bytes = $this->preparedThumbnails[$name] ?? (new ImageProcessor())->thumbnail($file->getRealPath(), $size);
+            $stored = !is_null($this->storagePermission)
+                ? $this->storage->put("{$this->getDirectory()}/{$path}", $bytes, $this->storagePermission)
+                : $this->storage->put("{$this->getDirectory()}/{$path}", $bytes);
+            if ($stored === false) {
+                throw new \RuntimeException("Unable to store image thumbnail [{$path}].");
             }
+            $this->storedImagePaths[] = "{$this->getDirectory()}/{$path}";
         }
 
         $this->destroyThumbnail();
+        $this->preparedThumbnails = [];
 
         return $this;
     }

@@ -1,0 +1,885 @@
+{
+  "provenance": {
+    "package_commit": "47d0db5e3b6edbcb8aaabdebb2532da6edf397e9",
+    "intervention_image": "2.7.2",
+    "php": "8.5.11",
+    "driver": "GD",
+    "pixel_hash": "sha256(row-major RGBA bytes: R,G,B,GD-alpha 0..127)",
+    "notes": "Synthetic images only. Lossless decoded-pixel oracle; not encoded-file hashes. No EXIF/animation/Imagick coverage. Callback descriptors must be converted to closures; fixture descriptors to absolute paths. Tiny-upscale captures known legacy two-pass rounding."
+  },
+  "cases": [
+    {
+      "name": "original",
+      "fixture": "quadrants.png",
+      "operations": [],
+      "thumbnails": {},
+      "expected": {
+        "input.png": {
+          "width": 12,
+          "height": 8,
+          "mime": "image/png",
+          "rgba_sha256": "6b1825393d24632830676c677bfbd21fac9d5c38e195bd8addf91dc40dc9c722"
+        }
+      }
+    },
+    {
+      "name": "rotate90",
+      "fixture": "quadrants.png",
+      "operations": [
+        [
+          "rotate",
+          [
+            90
+          ]
+        ]
+      ],
+      "thumbnails": {},
+      "expected": {
+        "input.png": {
+          "width": 8,
+          "height": 12,
+          "mime": "image/png",
+          "rgba_sha256": "8c203b6377ee27374145933ca62406a2a486fdb45c80b0207b2d950c148adbcc"
+        }
+      }
+    },
+    {
+      "name": "flip-v",
+      "fixture": "quadrants.png",
+      "operations": [
+        [
+          "flip",
+          [
+            "v"
+          ]
+        ]
+      ],
+      "thumbnails": {},
+      "expected": {
+        "input.png": {
+          "width": 12,
+          "height": 8,
+          "mime": "image/png",
+          "rgba_sha256": "27f35374aaac7afdd9d2448f76dc49c9ac849052ec1ae1ee6fc3f9975f5ad85b"
+        }
+      }
+    },
+    {
+      "name": "flip-h",
+      "fixture": "quadrants.png",
+      "operations": [
+        [
+          "flip",
+          [
+            "h"
+          ]
+        ]
+      ],
+      "thumbnails": {},
+      "expected": {
+        "input.png": {
+          "width": 12,
+          "height": 8,
+          "mime": "image/png",
+          "rgba_sha256": "3140c73e3ffbea1808ac12c7ae423862230b60bc7f8234613c3a58458a6ac392"
+        }
+      }
+    },
+    {
+      "name": "crop-offset",
+      "fixture": "quadrants.png",
+      "operations": [
+        [
+          "crop",
+          [
+            5,
+            3,
+            1,
+            2
+          ]
+        ]
+      ],
+      "thumbnails": {},
+      "expected": {
+        "input.png": {
+          "width": 5,
+          "height": 3,
+          "mime": "image/png",
+          "rgba_sha256": "1addbdf81a27dbe529249895eeea0b85b42e5ae1ce0171a2e05663f618950a2a"
+        }
+      }
+    },
+    {
+      "name": "crop-default",
+      "fixture": "quadrants.png",
+      "operations": [
+        [
+          "crop",
+          [
+            5,
+            3
+          ]
+        ]
+      ],
+      "thumbnails": {},
+      "expected": {
+        "input.png": {
+          "width": 5,
+          "height": 3,
+          "mime": "image/png",
+          "rgba_sha256": "dfd5e702a4374f43e716b98e0c94f701a17198f313e12e0ac91e614eb74a8122"
+        }
+      }
+    },
+    {
+      "name": "crop-x-only",
+      "fixture": "quadrants.png",
+      "operations": [
+        [
+          "crop",
+          [
+            5,
+            3,
+            1
+          ]
+        ]
+      ],
+      "thumbnails": {},
+      "expected": {
+        "input.png": {
+          "width": 5,
+          "height": 3,
+          "mime": "image/png",
+          "rgba_sha256": "e14f098596d05186f1bfa64cace12332213ea8fedcd23aae3004b87dd68567a2"
+        }
+      }
+    },
+    {
+      "name": "crop-y-only",
+      "fixture": "quadrants.png",
+      "operations": [
+        [
+          "crop",
+          [
+            5,
+            3,
+            null,
+            2
+          ]
+        ]
+      ],
+      "thumbnails": {},
+      "expected": {
+        "input.png": {
+          "width": 5,
+          "height": 3,
+          "mime": "image/png",
+          "rgba_sha256": "1addbdf81a27dbe529249895eeea0b85b42e5ae1ce0171a2e05663f618950a2a"
+        }
+      }
+    },
+    {
+      "name": "rotate45",
+      "fixture": "alpha.png",
+      "operations": [
+        [
+          "rotate",
+          [
+            45
+          ]
+        ]
+      ],
+      "thumbnails": {},
+      "expected": {
+        "input.png": {
+          "width": 13,
+          "height": 14,
+          "mime": "image/png",
+          "rgba_sha256": "fdd4b7b8f89ea350358e2ab4671d9c42afe9bfbcf81a81cd00299da6494eeab4"
+        }
+      }
+    },
+    {
+      "name": "canvas-default",
+      "fixture": "alpha.png",
+      "operations": [
+        [
+          "resizeCanvas",
+          [
+            16,
+            16
+          ]
+        ]
+      ],
+      "thumbnails": {},
+      "expected": {
+        "input.png": {
+          "width": 16,
+          "height": 16,
+          "mime": "image/png",
+          "rgba_sha256": "8281cc5494e6a6d72a031ddc1cc544b9ca7b19c88ed24aba75719fe4af5657d9"
+        }
+      }
+    },
+    {
+      "name": "insert",
+      "fixture": "quadrants.png",
+      "operations": [
+        [
+          "insert",
+          [
+            {
+              "fixture": "watermark.png"
+            },
+            "center"
+          ]
+        ]
+      ],
+      "thumbnails": {},
+      "expected": {
+        "input.png": {
+          "width": 12,
+          "height": 8,
+          "mime": "image/png",
+          "rgba_sha256": "d352c6d0b1c1e116d9d18a00f173f8f9e320ccb6853c8df60326e72ff06a7652"
+        }
+      }
+    },
+    {
+      "name": "insert-top-offset",
+      "fixture": "odd.png",
+      "operations": [
+        [
+          "insert",
+          [
+            {
+              "fixture": "watermark3.png"
+            },
+            "top",
+            1,
+            2
+          ]
+        ]
+      ],
+      "thumbnails": {},
+      "expected": {
+        "input.png": {
+          "width": 13,
+          "height": 9,
+          "mime": "image/png",
+          "rgba_sha256": "ef39ce0786978f676b5067ddfe00687efa8cfbb399c9dd614a63f419198acb10"
+        }
+      }
+    },
+    {
+      "name": "insert-left-offset",
+      "fixture": "odd.png",
+      "operations": [
+        [
+          "insert",
+          [
+            {
+              "fixture": "watermark3.png"
+            },
+            "left",
+            1,
+            2
+          ]
+        ]
+      ],
+      "thumbnails": {},
+      "expected": {
+        "input.png": {
+          "width": 13,
+          "height": 9,
+          "mime": "image/png",
+          "rgba_sha256": "9ee71cec8009ff34cf8131403bfb1680783e55b47112891bbd7091b759eee700"
+        }
+      }
+    },
+    {
+      "name": "insert-center-offset",
+      "fixture": "odd.png",
+      "operations": [
+        [
+          "insert",
+          [
+            {
+              "fixture": "watermark3.png"
+            },
+            "center",
+            1,
+            2
+          ]
+        ]
+      ],
+      "thumbnails": {},
+      "expected": {
+        "input.png": {
+          "width": 13,
+          "height": 9,
+          "mime": "image/png",
+          "rgba_sha256": "5fdcf82110afb0cebd1093ba9b205cc604900bd97e0421df74c064ac14277eed"
+        }
+      }
+    },
+    {
+      "name": "insert-oddmark",
+      "fixture": "quadrants.png",
+      "operations": [
+        [
+          "insert",
+          [
+            {
+              "fixture": "watermark3.png"
+            },
+            "center"
+          ]
+        ]
+      ],
+      "thumbnails": {},
+      "expected": {
+        "input.png": {
+          "width": 12,
+          "height": 8,
+          "mime": "image/png",
+          "rgba_sha256": "79b32c9fc983d0ef7461d28a475309fbbb6567f71ff85173d29225afda2c1ddc"
+        }
+      }
+    },
+    {
+      "name": "insert-odd",
+      "fixture": "odd.png",
+      "operations": [
+        [
+          "insert",
+          [
+            {
+              "fixture": "watermark.png"
+            },
+            "center"
+          ]
+        ]
+      ],
+      "thumbnails": {},
+      "expected": {
+        "input.png": {
+          "width": 13,
+          "height": 9,
+          "mime": "image/png",
+          "rgba_sha256": "1c197728819c69937e7d87e6c028bb0994a6dba40bad7a56deb8a3949df7f3f1"
+        }
+      }
+    },
+    {
+      "name": "insert-square",
+      "fixture": "square.png",
+      "operations": [
+        [
+          "insert",
+          [
+            {
+              "fixture": "watermark.png"
+            },
+            "center"
+          ]
+        ]
+      ],
+      "thumbnails": {},
+      "expected": {
+        "input.png": {
+          "width": 7,
+          "height": 7,
+          "mime": "image/png",
+          "rgba_sha256": "d9b6870bdb5809f740ac8aa9825d7d78ce1b290ef7c80174f851155362ef38ff"
+        }
+      }
+    },
+    {
+      "name": "insert-bottom-right",
+      "fixture": "odd.png",
+      "operations": [
+        [
+          "insert",
+          [
+            {
+              "fixture": "watermark.png"
+            },
+            "bottom-right",
+            1,
+            2
+          ]
+        ]
+      ],
+      "thumbnails": {},
+      "expected": {
+        "input.png": {
+          "width": 13,
+          "height": 9,
+          "mime": "image/png",
+          "rgba_sha256": "c5ad9c0c294cc2817162ffad0878f26a70cf5b290d33fbae1ace59819170c217"
+        }
+      }
+    },
+    {
+      "name": "chain",
+      "fixture": "quadrants.png",
+      "operations": [
+        [
+          "rotate",
+          [
+            90
+          ]
+        ],
+        [
+          "flip",
+          [
+            "v"
+          ]
+        ],
+        [
+          "crop",
+          [
+            4,
+            6,
+            1,
+            2
+          ]
+        ]
+      ],
+      "thumbnails": {
+        "small": [
+          8,
+          8
+        ]
+      },
+      "expected": {
+        "input.png": {
+          "width": 4,
+          "height": 6,
+          "mime": "image/png",
+          "rgba_sha256": "085ddec67961729eaf3925734c06d63ba30773072a80026dbe422b439118ca48"
+        },
+        "input-small.png": {
+          "width": 8,
+          "height": 8,
+          "mime": "image/png",
+          "rgba_sha256": "f99f585956b9d721ed64cb9034009e32e1cc53056185db01c5084a87b9aa2cbe"
+        }
+      }
+    },
+    {
+      "name": "variants",
+      "fixture": "quadrants.png",
+      "operations": [],
+      "thumbnails": {
+        "square": [
+          16,
+          16
+        ],
+        "portrait": [
+          5,
+          11
+        ],
+        "wide": [
+          17,
+          5
+        ],
+        "fit": [
+          5,
+          5,
+          "fit"
+        ],
+        "width": [
+          9,
+          null
+        ],
+        "height": [
+          null,
+          9
+        ]
+      },
+      "expected": {
+        "input.png": {
+          "width": 12,
+          "height": 8,
+          "mime": "image/png",
+          "rgba_sha256": "6b1825393d24632830676c677bfbd21fac9d5c38e195bd8addf91dc40dc9c722"
+        },
+        "input-square.png": {
+          "width": 16,
+          "height": 16,
+          "mime": "image/png",
+          "rgba_sha256": "03df7ad174335b67809514007c734529adc47ede2bcb8828bea44507ba76ec7f"
+        },
+        "input-portrait.png": {
+          "width": 5,
+          "height": 11,
+          "mime": "image/png",
+          "rgba_sha256": "7b288cafa570cf6e9000a67a38d0d538af30f84f3c045b99d16397f0c9f5e9aa"
+        },
+        "input-wide.png": {
+          "width": 17,
+          "height": 5,
+          "mime": "image/png",
+          "rgba_sha256": "dd438e4a3c8ef425f2fd638627f4a366d016f1d91bc3bb73ed4f56cc4f3448ce"
+        },
+        "input-fit.png": {
+          "width": 5,
+          "height": 5,
+          "mime": "image/png",
+          "rgba_sha256": "b140ea84e15f4df99c8c22bcc055dc48822f4630110623c4c3f8119a57bd35f3"
+        },
+        "input-width.png": {
+          "width": 9,
+          "height": 6,
+          "mime": "image/png",
+          "rgba_sha256": "365a11f36c8a9224a18cd204eef81e03c5777b8859338de62ae96647e9009d03"
+        },
+        "input-height.png": {
+          "width": 14,
+          "height": 9,
+          "mime": "image/png",
+          "rgba_sha256": "21d1e61f5e50a8eb6bb11667725f6c1c7a9acbe692e552542a671f58a8fcbfb5"
+        }
+      }
+    },
+    {
+      "name": "alpha",
+      "fixture": "alpha.png",
+      "operations": [],
+      "thumbnails": {
+        "square": [
+          16,
+          16
+        ]
+      },
+      "expected": {
+        "input.png": {
+          "width": 12,
+          "height": 8,
+          "mime": "image/png",
+          "rgba_sha256": "e71484d259e6a2d9366654e360f8918df25c4e4fb6e0bcec31fe54adb0a55103"
+        },
+        "input-square.png": {
+          "width": 16,
+          "height": 16,
+          "mime": "image/png",
+          "rgba_sha256": "abe3101d7f3ac4b4dc58acf5efc7f13f4c00fd1b148627c6209f9931bc75f283"
+        }
+      }
+    },
+    {
+      "name": "alpha-rotate",
+      "fixture": "alpha.png",
+      "operations": [
+        [
+          "rotate",
+          [
+            90
+          ]
+        ]
+      ],
+      "thumbnails": {
+        "square": [
+          16,
+          16
+        ]
+      },
+      "expected": {
+        "input.png": {
+          "width": 8,
+          "height": 12,
+          "mime": "image/png",
+          "rgba_sha256": "8d9774004dcb2d1ef62baa64ff3d0fedbe6b0111b0380c2a13676d67631a29f6"
+        },
+        "input-square.png": {
+          "width": 16,
+          "height": 16,
+          "mime": "image/png",
+          "rgba_sha256": "07ee20f29faa65ee1112d5ea5f6d8c25f5fd20560c216b84142e601ee6c92856"
+        }
+      }
+    },
+    {
+      "name": "odd-variants",
+      "fixture": "odd.png",
+      "operations": [],
+      "thumbnails": {
+        "fit": [
+          7,
+          4,
+          "fit"
+        ],
+        "square": [
+          6,
+          6
+        ],
+        "wide": [
+          8,
+          3
+        ]
+      },
+      "expected": {
+        "input.png": {
+          "width": 13,
+          "height": 9,
+          "mime": "image/png",
+          "rgba_sha256": "7121c13934cf3c821995b18cc0e5c69db1179649f0ef9839bf4a8614b103a1e9"
+        },
+        "input-fit.png": {
+          "width": 7,
+          "height": 4,
+          "mime": "image/png",
+          "rgba_sha256": "be7747da8cc1395302775e0e2a3cfc5c23d584103e26763215846e203e05bfaf"
+        },
+        "input-square.png": {
+          "width": 6,
+          "height": 6,
+          "mime": "image/png",
+          "rgba_sha256": "9512cd384c69994bfc40f30f7f3041dc20a9880b4394cb89eecb40e429d933cc"
+        },
+        "input-wide.png": {
+          "width": 8,
+          "height": 3,
+          "mime": "image/png",
+          "rgba_sha256": "0ef478236a40e33c224956aa52a22ef988621bce50d7fb31c65805bd7919dd59"
+        }
+      }
+    },
+    {
+      "name": "portrait-variants",
+      "fixture": "portrait.png",
+      "operations": [],
+      "thumbnails": {
+        "fit": [
+          7,
+          4,
+          "fit"
+        ],
+        "square": [
+          9,
+          9
+        ]
+      },
+      "expected": {
+        "input.png": {
+          "width": 8,
+          "height": 12,
+          "mime": "image/png",
+          "rgba_sha256": "b731ee383ff3d6357860033477b3062ca67b1703013bc7e297d7944be3a8db2c"
+        },
+        "input-fit.png": {
+          "width": 7,
+          "height": 4,
+          "mime": "image/png",
+          "rgba_sha256": "b9019c60f0b21655d02ea33793c1f0da168a95b66488d2805e372281eea6626d"
+        },
+        "input-square.png": {
+          "width": 9,
+          "height": 9,
+          "mime": "image/png",
+          "rgba_sha256": "d2b47be2ec5c2ea56b3be08943d7ff17b63ace4bcb0e6fc3656238de0e4b7913"
+        }
+      }
+    },
+    {
+      "name": "square-variants",
+      "fixture": "square.png",
+      "operations": [],
+      "thumbnails": {
+        "fit": [
+          8,
+          3,
+          "fit"
+        ],
+        "wide": [
+          8,
+          3
+        ]
+      },
+      "expected": {
+        "input.png": {
+          "width": 7,
+          "height": 7,
+          "mime": "image/png",
+          "rgba_sha256": "ae45f885c522b776ff2a2576b19aba6d953f87523e5b77386ba81c90eae2991b"
+        },
+        "input-fit.png": {
+          "width": 8,
+          "height": 3,
+          "mime": "image/png",
+          "rgba_sha256": "2558136c280e6ce1fd546810f1bb03404f30adc0d10696429f6badc6054dae1f"
+        },
+        "input-wide.png": {
+          "width": 8,
+          "height": 3,
+          "mime": "image/png",
+          "rgba_sha256": "db323c6c2e4d3f6f5c6d8a728634221d90021cf4e416f50c2334f25272b36789"
+        }
+      }
+    },
+    {
+      "name": "tiny-upscale",
+      "fixture": "tiny.png",
+      "operations": [],
+      "thumbnails": {
+        "fit": [
+          13,
+          9,
+          "fit"
+        ],
+        "square": [
+          13,
+          13
+        ]
+      },
+      "expected": {
+        "input.png": {
+          "width": 3,
+          "height": 2,
+          "mime": "image/png",
+          "rgba_sha256": "a16a3623184f5e72e57b567d39246a6d2664f44ca4421c9144f5ab98b84837a4"
+        },
+        "input-fit.png": {
+          "width": 13,
+          "height": 9,
+          "mime": "image/png",
+          "rgba_sha256": "73968c23705d46324fe278c5383db657d925b166c59a74468515b9213b7ba0b4"
+        },
+        "input-square.png": {
+          "width": 13,
+          "height": 13,
+          "mime": "image/png",
+          "rgba_sha256": "d826739bc735e2e2f0bb6b1931cc193698f7ce203cb5ef039d1d3e9345d517b8"
+        }
+      }
+    },
+    {
+      "name": "resize-null-width",
+      "fixture": "quadrants.png",
+      "operations": [
+        [
+          "resize",
+          [
+            9,
+            null
+          ]
+        ]
+      ],
+      "thumbnails": {},
+      "expected": {
+        "input.png": {
+          "width": 9,
+          "height": 8,
+          "mime": "image/png",
+          "rgba_sha256": "2e3400b5f94246aa615cc4659a4dbb459bb4248f73f8d69d1c0517f237f57917"
+        }
+      }
+    },
+    {
+      "name": "resize-null-height",
+      "fixture": "quadrants.png",
+      "operations": [
+        [
+          "resize",
+          [
+            null,
+            9
+          ]
+        ]
+      ],
+      "thumbnails": {},
+      "expected": {
+        "input.png": {
+          "width": 12,
+          "height": 9,
+          "mime": "image/png",
+          "rgba_sha256": "c62fdcb608407159780e9306f93306cfd0e18eec369a774b4b48ec1f37054d3b"
+        }
+      }
+    },
+    {
+      "name": "resize-proportional",
+      "fixture": "quadrants.png",
+      "operations": [
+        [
+          "resize",
+          [
+            17,
+            5,
+            {
+              "constraint": [
+                "aspectRatio"
+              ]
+            }
+          ]
+        ]
+      ],
+      "thumbnails": {},
+      "expected": {
+        "input.png": {
+          "width": 8,
+          "height": 5,
+          "mime": "image/png",
+          "rgba_sha256": "2d7a3c265fee21a5c768d07e8b3275a9e4c6f86c611ff7fbf0516909485901e8"
+        }
+      }
+    },
+    {
+      "name": "resize-no-upscale",
+      "fixture": "quadrants.png",
+      "operations": [
+        [
+          "resize",
+          [
+            24,
+            16,
+            {
+              "constraint": [
+                "aspectRatio",
+                "upsize"
+              ]
+            }
+          ]
+        ]
+      ],
+      "thumbnails": {},
+      "expected": {
+        "input.png": {
+          "width": 12,
+          "height": 8,
+          "mime": "image/png",
+          "rgba_sha256": "6b1825393d24632830676c677bfbd21fac9d5c38e195bd8addf91dc40dc9c722"
+        }
+      }
+    },
+    {
+      "name": "fit-no-upscale",
+      "fixture": "quadrants.png",
+      "operations": [
+        [
+          "fit",
+          [
+            24,
+            16,
+            {
+              "constraint": [
+                "upsize"
+              ]
+            }
+          ]
+        ]
+      ],
+      "thumbnails": {},
+      "expected": {
+        "input.png": {
+          "width": 12,
+          "height": 8,
+          "mime": "image/png",
+          "rgba_sha256": "6b1825393d24632830676c677bfbd21fac9d5c38e195bd8addf91dc40dc9c722"
+        }
+      }
+    }
+  ]
+}
