@@ -46,6 +46,8 @@ The dated results below are historical snapshots, not the current suite totals.
   [generator regressions](RESOURCE_GENERATOR.md) cover SQLite and opt-in services
 - Real request-input parity for grid, row/batch actions and controller dispatch;
   DomCrawler compatibility and multiple-select null handling
+- Ordinary Tags hidden-input create/update/clear with exact storage parity;
+  [Tags regressions](TAGS.md)
 - Main-file upload failure preservation and successful replacement
 - Actual HTTP-kernel middleware lifecycle, including consumer bootstrap execution
 - SQLite-persisted operation logs, recursive redaction, preserved controller input,
