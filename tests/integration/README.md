@@ -68,6 +68,8 @@ The dated results below are historical snapshots, not the current suite totals.
   [original-metadata regression and replacement boundary](EMBEDDED_OBJECT_ORIGINALS.md)
 - Explicit ListField bounds, scoped input/error names, and ListField/KeyValue
   empty-marker submission; [behavior and upgrade cautions](LIST_FIELD.md)
+- Readonly collection controls and unchanged submission;
+  [UI behavior and cautions](LIST_FIELD.md#readonly-collections)
 - Production-rendered List/KeyValue collection scripts with shipped and modern jQuery;
   [offline DOM scope, setup, and limits](COLLECTION_SCRIPT_SCOPING.md)
 - Ready-wrapped HasMany table-parent reinitialization, unique child identities, and

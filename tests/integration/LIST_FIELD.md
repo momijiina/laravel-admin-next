@@ -56,8 +56,45 @@ covered separately by the [collection-script regression](COLLECTION_SCRIPT_SCOPI
 Nested validator aggregation remains unchanged; these tests do not establish
 nested list-bound validation.
 
-Collection `disable()`/`readonly()` attributes remain unsupported by these
-existing templates. Code that deliberately omits a field by disabling its
-controls must disable the hidden markers too (for example, via a disabled
-ancestor fieldset). The package's hidden-cascade submission handler already
-disables all `:input` controls in the hidden group, including the markers.
+## Readonly collections
+
+ListField and KeyValue now honor inherited `readonly()` (also callable as
+`readOnly()`). This locks collection Add/Remove and applies the native readonly
+state to all visible keys/values and row-template inputs. Values remain submitted,
+including zero/blank values and the explicit empty markers. Existing Laravel
+request middleware can still normalize blank strings to null. Normal editable
+collections retain Add/Remove and explicit-clearing behavior.
+
+Only `readonly` is newly supported; arbitrary field attributes are not propagated
+across repeated inputs. As with HTML boolean attributes, presence is what matters:
+`attribute('readonly', false)` still makes the collection readonly. Use
+`removeAttribute('readonly')` before rendering to remove that state.
+
+This is an opt-in UI enhancement, not a regression fix: applications previously
+calling this method while relying on its ineffective behavior will now see locked
+controls. Published/overridden collection views must carry forward the
+`collectionReadonly` view variable, native readonly input attributes and root
+`data-collection-locked` marker.
+
+Readonly prevents accidental edits in the normal collection UI; it is not
+server-side access control. Validation, preparation and omission handling are
+unchanged. Submitted readonly values can overwrite concurrent changes when a
+stale form is saved; applications must enforce authorization and concurrency
+rules themselves. It does not lock an enclosing HasMany relation's Add/Remove
+controls.
+
+`disable()` remains unsupported by these collection templates. Custom scripts
+that disable controls directly must disable the hidden empty markers too (for
+example, via a disabled ancestor fieldset), or a submission can clear stored
+values. The hidden-cascade handler already disables all `:input` controls in the
+hidden group. Omission is not a recursive merge contract: embedded objects retain
+their existing [replacement semantics](EMBEDDED_OBJECT_ORIGINALS.md), so submitting
+sibling keys can remove an omitted child.
+
+`CollectionFieldStatesTest` renders production Blade and executes emitted scripts
+with both shipped jQuery 2.1.4 and modern jQuery 3.7.1 in offline jsdom, then parses
+actual serialized controls and submits to the Laravel HTTP kernel with SQLite.
+It covers readonly presence/removal, empty/populated fields, marker ordering,
+readonly submission, normal clearing and nested child controls. This does not
+establish live browser layout, PJAX transport or third-party widget compatibility;
+nested validation/HasMany identity contracts are unchanged.

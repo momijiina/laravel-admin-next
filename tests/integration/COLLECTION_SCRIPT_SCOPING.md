@@ -73,3 +73,7 @@ carry forward the new `data-admin-collection`, `data-collection-body`,
 template relationship when upgrading. Existing column-based CSS classes remain
 available for styling; old overridden markup without the markers does not satisfy
 the updated view/script contract.
+
+Readonly support additionally requires the field-provided `collectionReadonly`
+variable, native readonly input attributes and `data-collection-locked` on locked
+roots. See the [collection state contract](LIST_FIELD.md#readonly-collections).

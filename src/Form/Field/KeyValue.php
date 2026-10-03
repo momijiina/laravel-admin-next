@@ -70,7 +70,8 @@ $('[data-admin-collection="key-value"]').each(function () {
     // HasMany reruns child scripts after insertion. Replace only our handlers.
     root.off('.adminCollection')
         .on('click.adminCollection', '[data-collection-add]', function () {
-            if ($(this).closest('[data-admin-collection]')[0] !== root[0]) {
+            if (root.is('[data-collection-locked]') ||
+                $(this).closest('[data-admin-collection]')[0] !== root[0]) {
                 return;
             }
 
@@ -80,7 +81,8 @@ $('[data-admin-collection="key-value"]').each(function () {
             table.append(root.children('template').html());
         })
         .on('click.adminCollection', '[data-collection-remove]', function () {
-            if ($(this).closest('[data-admin-collection]')[0] !== root[0]) {
+            if (root.is('[data-collection-locked]') ||
+                $(this).closest('[data-admin-collection]')[0] !== root[0]) {
                 return;
             }
 
@@ -107,6 +109,11 @@ SCRIPT;
 
     public function render()
     {
+        // HTML boolean attributes are enabled by presence, even with a false/empty value.
+        $this->addVariables([
+            'collectionReadonly' => array_key_exists('readonly', $this->attributes),
+        ]);
+
         $this->setupScript();
 
         Admin::style('td .form-group {margin-bottom: 0 !important;}');
