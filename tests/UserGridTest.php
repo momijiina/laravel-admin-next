@@ -129,17 +129,23 @@ class UserGridTest extends TestCase
             ->seeInElement('td', $user->mobile)
             ->seeElement("img[src='{$user->avatar}']")
             ->seeInElement('td', "{$user->profile->first_name} {$user->profile->last_name}")
-            ->seeInElement('td', $user->postcode)
-            ->seeInElement('td', $user->address)
+            ->seeInElement('td', $user->profile->postcode)
+            ->seeInElement('td', $user->profile->address)
             ->seeInElement('td', "{$user->profile->latitude} {$user->profile->longitude}")
-            ->seeInElement('td', $user->color)
-            ->seeInElement('td', $user->start_at)
-            ->seeInElement('td', $user->end_at);
+            ->seeInElement('td', $user->profile->color)
+            ->seeInElement('td', $user->profile->start_at)
+            ->seeInElement('td', $user->profile->end_at);
     }
 
     public function testLikeFilter()
     {
         $this->seedsTable(50);
+        // Guarantee both matches and non-matches instead of relying on Faker
+        // randomly generating the substring (an empty grid has a placeholder row).
+        UserModel::all()->each(function ($user) {
+            $user->username = ($user->id <= 2 ? 'mi-match-' : 'other-user-').$user->id;
+            $user->save();
+        });
 
         $this->visit('admin/users')
             ->see('Users');
@@ -148,6 +154,7 @@ class UserGridTest extends TestCase
         $this->assertCount(50, ProfileModel::all());
 
         $users = UserModel::where('username', 'like', '%mi%')->get();
+        $this->assertCount(2, $users);
 
         $this->visit('admin/users?username=mi');
 
@@ -170,12 +177,12 @@ class UserGridTest extends TestCase
             ->seeInElement('td', $user->mobile)
             ->seeElement("img[src='{$user->avatar}']")
             ->seeInElement('td', "{$user->profile->first_name} {$user->profile->last_name}")
-            ->seeInElement('td', $user->postcode)
-            ->seeInElement('td', $user->address)
+            ->seeInElement('td', $user->profile->postcode)
+            ->seeInElement('td', $user->profile->address)
             ->seeInElement('td', "{$user->profile->latitude} {$user->profile->longitude}")
-            ->seeInElement('td', $user->color)
-            ->seeInElement('td', $user->start_at)
-            ->seeInElement('td', $user->end_at);
+            ->seeInElement('td', $user->profile->color)
+            ->seeInElement('td', $user->profile->start_at)
+            ->seeInElement('td', $user->profile->end_at);
     }
 
     public function testDisplayCallback()

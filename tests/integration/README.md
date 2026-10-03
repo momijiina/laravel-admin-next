@@ -48,7 +48,8 @@ this is not package-discovery or browser-cookie/CSRF end-to-end coverage.
 
 The root PHPUnit configuration excludes this consumer directory, keeping its
 classes and vendor tree out of legacy test discovery. This suite does not replace
-or claim to pass the 73 legacy BrowserKit tests.
+or claim to pass the 73 legacy BrowserKit tests; use the separate
+[historical BrowserKit runner](../browserkit/README.md) for that coverage.
 Uploads, browser JavaScript, complete CRUD, non-SQLite drivers and model-based
 generator compatibility remain separate work. The PHP baseline migration explicitly
 declares all 37 previously implicit nullable parameters; these integration runs
@@ -109,4 +110,5 @@ No production code, warning handling or dependency constraints changed.
 
 The source/standalone workflow now includes PHP 8.5, and the real lifecycle
 workflow includes PHP 8.5 with both framework families. These are focused results;
-the limitations above, including the unverified legacy suite, still apply.
+the limitations of this focused suite above still apply; historical coverage is
+tracked by the separate BrowserKit runner.

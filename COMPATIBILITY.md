@@ -32,9 +32,10 @@ and real integration on Laravel 12/PHP 8.2–8.4 and Laravel 13/PHP 8.3–8.4.
 PHP 8.2/8.3 CI results and PHP 8.5 runtime verification are not claimed locally.
 
 Obsolete Travis PHP 7.2–8.0 configuration has been retired. The historical root
-development dependencies and 73-test BrowserKit suite remain unchanged/blocked;
-use the isolated [integration harness](tests/integration/README.md) for modern
-framework checks. These targeted passes are not complete framework certification.
+development dependencies remain unchanged. The separate [BrowserKit runner](tests/browserkit/README.md)
+restores all 73 historical methods on supported frameworks with SQLite and real
+GD image processing; the [integration harness](tests/integration/README.md)
+continues its focused modern-framework checks. These targeted passes are not complete framework certification.
 
 ## Historical baseline evidence (2026-10-01)
 
@@ -109,6 +110,6 @@ and 54 assertions pass locally on PHP 8.4.25 with Laravel 12.69.3 and 13.34.0.
 A negative control using the old middleware fails the three redaction tests.
 
 This consumer has its own development dependencies; the root legacy development
-requirements remain unchanged. The package PHP requirement is now `^8.2`. The historical 73-test suite
-is still blocked, and these focused passes do not establish full Laravel support.
+requirements remain unchanged. The package PHP requirement is now `^8.2`. The historical 73-test suite now has a separate [BrowserKit runner](tests/browserkit/README.md);
+these focused passes do not establish full Laravel support.
 See the harness README for exact dependency versions and untested areas.

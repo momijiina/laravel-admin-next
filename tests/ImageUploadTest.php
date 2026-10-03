@@ -64,7 +64,10 @@ class ImageUploadTest extends TestCase
             $this->assertFileExists(public_path('uploads/'.$images['image'.$index]));
         }
 
-        $this->assertFileExists(public_path('uploads/images/asdasdasdasdasd.jpeg'));
+        $extension = (new \Symfony\Component\HttpFoundation\File\File(__DIR__.'/assets/test.jpg'))->guessExtension();
+        $namedImage = 'images/asdasdasdasdasd.'.$extension;
+        $this->assertSame($namedImage, $images['image5']);
+        $this->assertFileExists(public_path('uploads/'.$namedImage));
 
         File::cleanDirectory(public_path('uploads/images'));
     }

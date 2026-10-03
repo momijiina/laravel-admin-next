@@ -1,0 +1,35 @@
+{
+    "name": "laravel-admin-next/browserkit-tests",
+    "description": "Isolated runner for the historical BrowserKit feature tests",
+    "license": "MIT",
+    "require": {
+        "php": "^8.2",
+        "encore/laravel-admin": "dev-under-test",
+        "orchestra/testbench": "^10.0 || ^11.0",
+        "phpunit/phpunit": "^11.5 || ^12.0",
+        "laravel/browser-kit-testing": "^7.2.8",
+        "laravel/legacy-factories": "^1.4.2",
+        "fakerphp/faker": "^1.24",
+        "intervention/image": "^2.7",
+        "ext-gd": "*",
+        "ext-pdo_sqlite": "*"
+    },
+    "repositories": [
+        {
+            "type": "path",
+            "url": "../..",
+            "options": {
+                "symlink": true,
+                "versions": {
+                    "encore/laravel-admin": "dev-under-test"
+                }
+            }
+        }
+    ],
+    "config": {
+        "allow-plugins": false
+    },
+    "scripts": {
+        "test": "phpunit"
+    }
+}

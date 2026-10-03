@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit bootstrap="bootstrap.php" colors="true" failOnWarning="true" failOnRisky="true" failOnDeprecation="true" failOnPhpunitDeprecation="true">
+    <php>
+        <ini name="error_reporting" value="32767"/>
+        <env name="LOG_DEPRECATIONS_CHANNEL" value="stderr" force="true"/>
+        <env name="LOG_DEPRECATIONS_WHILE_TESTING" value="true" force="true"/>
+    </php>
+    <testsuites>
+        <testsuite name="Historical BrowserKit (SQLite)">
+            <file>../AuthTest.php</file>
+            <file>../FileUploadTest.php</file>
+            <file>../ImageUploadTest.php</file>
+            <file>../IndexTest.php</file>
+            <file>../InstallTest.php</file>
+            <file>../LaravelTest.php</file>
+            <file>../MenuTest.php</file>
+            <file>../ModelTreeTest.php</file>
+            <file>../OperationLogTest.php</file>
+            <file>../PermissionsTest.php</file>
+            <file>../RolesTest.php</file>
+            <file>../UserFormTest.php</file>
+            <file>../UserGridTest.php</file>
+            <file>../UserSettingTest.php</file>
+            <file>../UsersTest.php</file>
+        </testsuite>
+    </testsuites>
+</phpunit>
