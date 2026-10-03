@@ -117,13 +117,17 @@ class UserFormTest extends TestCase
 
         $user = UserModel::with('profile')->find($id);
 
+        // Exercise a valid Faker surname that cannot be interpolated into CSS.
+        $user->profile->last_name = "O'Hara";
+        $user->profile->save();
+
         $this->visit("admin/users/$id/edit")
             ->seeElement("input[type=text][name=username][value='{$user->username}']")
             ->seeElement("input[type=email][name=email][value='{$user->email}']")
             ->seeElement("input[type=text][name=mobile][value='{$user->mobile}']")
             ->seeElement('hr')
             ->seeElement("input[type=text][name='profile[first_name]'][value='{$user->profile->first_name}']")
-            ->seeElement("input[type=text][name='profile[last_name]'][value='{$user->profile->last_name}']")
+            ->seeElement("input[type=text][name='profile[last_name]']", ['value' => $user->profile->last_name])
             ->seeElement("input[type=text][name='profile[postcode]'][value='{$user->profile->postcode}']")
             ->seeInElement("textarea[name='profile[address]']", $user->profile->address)
             ->seeElement("input[type=hidden][name='profile[latitude]'][value='{$user->profile->latitude}']")
