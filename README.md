@@ -6,7 +6,7 @@ Laravel Admin Next は、[z-song/laravel-admin](https://github.com/z-song/larave
 
 OpenAI Dots による定期的な自動更新支援を計画しています。変更点や互換性への影響の調査、必要な修正、テスト、Pull Request の作成までを支援し、レビューとマージの判断はメンテナーが行います。定期実行のスケジュールは未設定で、自動マージや自動デプロイは行いません。
 
-最新の PHP / Laravel への対応を目指し、既存 API や Exment との互換性を重視します。対応状況は段階的に検証するため、すべてのバージョンでの動作を保証するものではありません。
+最新の PHP / Laravel への対応を目指し、既存 API や他の Laravel アプリケーションとの互換性・連携を重視します。対応状況は段階的に検証するため、すべてのバージョンやアプリケーションでの動作を保証するものではありません。
 
 - [ロードマップ](ROADMAP.md)
 - [互換性方針](COMPATIBILITY.md)
@@ -21,7 +21,7 @@ Laravel Admin Next is an independent project based on [z-song/laravel-admin](htt
 
 We plan to use OpenAI Dots for periodic automated maintenance assistance: investigating changes and compatibility impact, making necessary fixes, running tests, and preparing pull requests. The maintainer reviews changes and decides whether to merge them. No recurring schedule is configured yet, and changes are not automatically merged or deployed.
 
-The project aims to support modern PHP and Laravel while prioritizing existing APIs and Exment compatibility. Compatibility is verified incrementally; support for every version is not guaranteed.
+The project aims to support modern PHP and Laravel while prioritizing existing APIs, compatibility, and integration with other Laravel applications. Compatibility is verified incrementally; support for every version or application is not guaranteed.
 
 - [Roadmap](ROADMAP.md)
 - [Compatibility policy](COMPATIBILITY.md)

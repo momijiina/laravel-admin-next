@@ -2,7 +2,8 @@
 
 - Preserve existing laravel-admin APIs where practical
 - Avoid breaking changes unless necessary, and document them when required
-- Treat Exment compatibility as an important target and verify specific releases
+- Aim for compatibility and integration with other Laravel applications; verify
+  specific application/version combinations before claiming support
 - Separate dependency declarations, focused checks, and full runtime support
 
 ## Current verified coverage (2026-10-03, after PR #25)
@@ -66,9 +67,9 @@ See the [integration harness](tests/integration/README.md) and
 [generator details](tests/integration/RESOURCE_GENERATOR.md) for reproducible
 commands, dependency-resolution boundaries and test scope. Full JavaScript
 browser flows, every PDO option/third-party driver, universal downstream support
-and specific Exment releases remain unverified. Normal Composer security and
-platform checks remain enabled; DBAL 2's abandoned `doctrine/cache` dependency
-is reported. Prefer DBAL 3 for maintained dependencies and persistent PDO.
+and specific downstream application releases remain unverified. Normal Composer
+security and platform checks remain enabled; DBAL 2's abandoned `doctrine/cache`
+dependency is reported. Prefer DBAL 3 for maintained dependencies and persistent PDO.
 
 ## Historical migration and regression evidence
 
@@ -121,7 +122,7 @@ See the [full audit](docs/compatibility-audit-2026-10-01.md) for evidence and li
 | Test dependencies | BrowserKit `^6.0` | Its Illuminate constraints stop at Laravel 10; cannot resolve an 11–13 test matrix unchanged |
 | Test bootstrap | Legacy Eloquent factories | Requires migration for modern Laravel |
 | Historical CI | Travis PHP 7.2–8.0 | Configuration exists; no successful current run is established |
-| Exment | Important compatibility target | Exact application/version combinations not yet specified or tested |
+| Other Laravel applications | Compatibility and integration goal | Exact application/version combinations not yet specified or tested |
 
 A clean syntax check or a focused deprecation regression is not a Laravel support
 claim. Full support requires installation, bootstrap, database-backed tests,
