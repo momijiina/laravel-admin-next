@@ -60,6 +60,8 @@ The dated results below are historical snapshots, not the current suite totals.
   Eloquent arguments; [pagination regression scope](GRID_PAGINATION.md)
 - Explicit per-grid sort keys configured before sortable columns, with applied
   named filters and follow-up rendered links; [sort regression scope](GRID_EXPLICIT_SORT.md)
+- Ordinary nullable Select zero/NULL rendering and serialized HTTP persistence;
+  [selection contract, defaults, and upgrade notes](NULLABLE_SELECT.md)
 - Ordinary Tags hidden-input create/update/clear with exact storage parity;
   [Tags regressions](TAGS.md)
 - Explicit native-object grid display callbacks and actual streamed CSV round trips;
