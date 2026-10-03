@@ -39,10 +39,13 @@ class HistoricalBrowserKitApplication extends TestbenchApplication
     }
 }
 
+require_once __DIR__.'/PackageState.php';
+
 abstract class TestCase extends BrowserKitTestCase
 {
     protected $baseUrl = 'http://localhost:8000';
     private $fixturePath;
+    private $packageState;
     private static $suiteFixturePath;
 
     public function createApplication()
@@ -62,16 +65,23 @@ abstract class TestCase extends BrowserKitTestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
-        $this->artisan('vendor:publish', ['--provider' => AdminServiceProvider::class]);
-        $this->artisan('admin:install');
-        require_once __DIR__.'/../migrations/2016_11_22_093148_create_test_tables.php';
-        (new CreateTestTables())->up();
-        require admin_path('routes.php');
-        require __DIR__.'/../routes.php';
-        require __DIR__.'/../seeds/factory.php';
-        // Replaces the laravel/laravel skeleton welcome page used by LaravelTest.
-        $this->app['router']->get('/', static fn () => 'Laravel');
+        // Capture before boot: fixture bootstraps may register callbacks/assets.
+        $this->packageState = new HistoricalBrowserKitPackageState();
+        try {
+            parent::setUp();
+            $this->artisan('vendor:publish', ['--provider' => AdminServiceProvider::class]);
+            $this->artisan('admin:install');
+            require_once __DIR__.'/../migrations/2016_11_22_093148_create_test_tables.php';
+            (new CreateTestTables())->up();
+            require admin_path('routes.php');
+            require __DIR__.'/../routes.php';
+            require __DIR__.'/../seeds/factory.php';
+            // Replaces the laravel/laravel skeleton welcome page used by LaravelTest.
+            $this->app['router']->get('/', static fn () => 'Laravel');
+        } catch (\Throwable $exception) {
+            $this->packageState->restore();
+            throw $exception;
+        }
     }
 
     protected function tearDown(): void
@@ -79,8 +89,13 @@ abstract class TestCase extends BrowserKitTestCase
         try {
             parent::tearDown();
         } finally {
-            if ($this->fixturePath) {
-                (new Filesystem())->deleteDirectory($this->fixturePath);
+            try {
+                if ($this->fixturePath) {
+                    (new Filesystem())->deleteDirectory($this->fixturePath);
+                }
+            } finally {
+                // Also restore if application teardown or file cleanup fails.
+                $this->packageState?->restore();
             }
         }
     }

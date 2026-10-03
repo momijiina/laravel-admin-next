@@ -1,7 +1,7 @@
 # Historical BrowserKit suite
 
 This isolated runner executes all 73 historical methods in `tests/*Test.php`
-against supported Laravel 12/13 releases. It does not use the obsolete root
+and four harness-isolation regressions against supported Laravel 12/13 releases. It does not use the obsolete root
 `require-dev` graph or an installed `laravel/laravel` application.
 
 ## Run
@@ -76,14 +76,61 @@ No methods or assertions are removed. Five historical test files are updated:
    Whole-response matching previously passed accidentally when an earlier file
    upload test left `IndexTest.php` in the process-wide `Admin::$script` buffer.
    Tree-scoped assertions cannot be satisfied by these scripts or sidebar labels.
-   This corrects the menu test's coverage; it does not reset all package static
-   state or claim general request isolation for the historical harness.
+   The harness now separately checks and restores the package state described
+   below; tree-scoped assertions remain necessary within each test's requests.
 
 The original `tests/TestCase.php` and root PHPUnit configuration are left as
 historical references. Run this suite through its own configuration; recursively
 collecting the entire `tests/` tree mixes incompatible harnesses.
 
+## Package state between test methods
+
+`PackageState.php` explicitly inventories package-owned mutable static values.
+The harness captures their current values before application setup and restores
+those values after teardown, including when application teardown or fixture-file
+cleanup throws. Setup exceptions restore package state before being rethrown.
+The original exception/assertion is not converted into a pass.
+
+The inventory follows these sources:
+
+- `Admin` / `HasAssets`: inline/deferred scripts, CSS/JS/style/HTML/header queues,
+  title/favicon, base assets, minification settings/cache, extension registrations,
+  and booting/booted callbacks. `baseCss()` also accumulates skin entries.
+- `Form` / `HasFields` / `HasHooks`: collected assets, field registrations/aliases,
+  and initialization callbacks. The installed bootstrap removes default fields.
+- `Grid`, `Show`, and `Grid\Column`: initialization/extension registries, column
+  displayers/definitions, row/HTML attributes, original models and model cache.
+  The `ShouldSnakeAttributes` caches on Form, Grid and Show are restored too.
+- `Action`, grid `Selector`, `BelongsToMany`, and `Exporter`: generated action
+  selectors, parsed selections, relation keys, exporter registrations/instances.
+- `ModelTree`: branch ordering for the actual menu model and `Tests\Models\Tree`.
+  Admin's menu and navbar are instance properties; fresh Laravel applications
+  clear them, and the regression verifies that lifecycle separately.
+
+This uses the pre-test values, not empty arrays or class defaults: host assets,
+plugin registrations and callbacks installed before the test remain intact.
+Reflection is confined to this test helper; there is no production reset API or
+PHPUnit-wide static backup. Values are shallow snapshots. Existing object and
+closure identities are retained; mutation *inside* arbitrary plugin-owned objects
+is not undone. Unlisted package/third-party globals are outside this boundary.
+There is no per-request reset within a historical test, and this does not establish
+long-running-worker isolation for production applications.
+
+The dedicated `Historical harness isolation` suite runs two consecutive harness
+lifecycles in one process, reproduces the real file-upload script contamination,
+checks restored values and preserved host callbacks/defaults, and checks failure
+paths. Run it alone with `composer test -- --testsuite 'Historical harness isolation'`.
+The original 73-method suite remains independently selectable as
+`Historical BrowserKit (SQLite)`; neither suite depends on test execution order.
+
 ## Diagnostics and local evidence
+
+With the state boundary enabled, the combined 77-test suite passes on PHP 8.4.25
+with Laravel 12 and 13, both in default order and randomized seeds 7301, 9843 and
+18057. The separate real-Laravel integration suite also passes (39 tests).
+Running each isolation regression against the pre-restoration harness fails on
+both framework versions: leaked upload script, changed static value, or leaked
+setup/teardown script, respectively. No historical assertion was relaxed.
 
 All 73 methods pass locally on PHP 8.4.25 with both Laravel 12 and 13, including
 real GD-backed rotation/flip requests. The suite also passes in randomized order
