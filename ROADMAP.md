@@ -78,6 +78,22 @@ and application checks; do not silently remove or claim support for them.
       [preparation does not change validation or float precision](tests/integration/CURRENCY_RADIX.md).
       Exact pre-merge checks through PR #65 are recorded in
       [the hosted evidence](COMPATIBILITY.md#hosted-evidence-for-prs-6165)
+- [x] Align ordinary Grid `gt()`/`lt()` labels with their existing inclusive SQL,
+      render NULL carousels as empty cells, and retain integer/zero selections in
+      inline MultipleSelect popovers; reconcile affected views and review
+      [filter](tests/integration/GRID_INEQUALITY_FILTERS.md),
+      [carousel](tests/integration/GRID_CAROUSEL.md) and
+      [inline-editor limits](tests/integration/GRID_INLINE_MULTIPLE_SELECT.md)
+- [x] Restore collection conditional-field initialization/clearing and styled
+      Checkbox zero selections; review [cascade subclass hooks](tests/integration/COLLECTION_CONDITIONAL_FIELDS.md)
+      and [Button/Card view upgrades](tests/integration/STYLED_CHECKBOX_ZERO.md)
+- [x] Restore Slider double-range endpoints and serialize Switch label strings;
+      retain the [integer-range contract](tests/integration/SLIDER_RANGES.md) and
+      remove [manual label-escaping workarounds](tests/integration/SWITCH_LABELS.md)
+- [x] Restore attempted URL-options Select/MultipleSelect choices after validation
+      failure; [dependent loaders and remote availability remain separate](tests/integration/REMOTE_SELECT_OLD_INPUT.md).
+      The latest [hosted snapshot](COMPATIBILITY.md#hosted-evidence-for-pr-74)
+      records the exact pre-merge revision and coverage limits
 - [ ] Add real password-change and rendered-operation-log coverage
 - [ ] Review remaining deprecations, default credentials, login throttling,
       upload previews and AJAX-option escaping; these tests are not a penetration test

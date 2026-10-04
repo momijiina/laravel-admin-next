@@ -9,8 +9,8 @@
 ## Current maintenance summary
 
 Updated 2026-10-04. This index describes the changes merged through
-[PR #65](https://github.com/momijiina/laravel-admin-next/pull/65), at
-[`a87140f`](https://github.com/momijiina/laravel-admin-next/commit/a87140f48ffd974eb5dfecfc03b36967736b09a1).
+[PR #74](https://github.com/momijiina/laravel-admin-next/pull/74), at
+[`724834a`](https://github.com/momijiina/laravel-admin-next/commit/724834a03ced08b4c8094d13fd847f47011a7c1a).
 Use the linked guides for upgrade steps and each regression's precise boundary.
 Historical test totals below remain evidence for their own revisions, not
 current suite totals or validation of subsequent changes.
@@ -69,12 +69,6 @@ current suite totals or validation of subsequent changes.
   See the distinct [Select](tests/integration/NULLABLE_SELECT.md),
   [Checkbox](tests/integration/CHECKBOX_ZERO.md), and
   [Radio](tests/integration/NULLABLE_RADIO.md) contracts.
-- **Remote Select validation retries:** URL-options Select/MultipleSelect now
-  restore attempted selections and explicit clears after failed validation.
-  Old input takes precedence over remote/configured selected-option fallbacks;
-  without old input those overrides and defaults are unchanged. Dependent
-  loaders, Listbox and AJAX-search preloads retain their existing contracts. See
-  [retry behavior and custom-initializer cautions](tests/integration/REMOTE_SELECT_OLD_INPUT.md).
 - **Range cast presentation ([PR #50](https://github.com/momijiina/laravel-admin-next/pull/50)):**
   eligible native DateRange/DatetimeRange endpoints display in the application
   timezone to avoid unchanged edit/save drift. This is a narrow presentation fix,
@@ -164,10 +158,94 @@ current suite totals or validation of subsequent changes.
   localized/masked parser or a repair of already-truncated storage. No asset
   republish is needed; review [round-trip and subclass cautions](tests/integration/CURRENCY_RADIX.md).
 
+- **Inclusive Grid filter labels ([PR #67](https://github.com/momijiina/laravel-admin-next/pull/67)):**
+  `gt()` and `lt()` labels now show `>=` and `<=`, matching their unchanged
+  inclusive SQL behavior. Update published/overridden filter labels and review
+  custom conditions together; no strict-comparison API is added. See
+  [boundary, zero and reset coverage](tests/integration/GRID_INEQUALITY_FILTERS.md).
+- **Collection conditional fields ([PR #68](https://github.com/momijiina/laravel-admin-next/pull/68)):**
+  Checkbox, MultipleSelect and CheckboxButton/Card initialize cascade conditions
+  from string-choice arrays and handle NULL clearing markers. Existing operators
+  remain, including `oneNotIn` meaning no intersection. Collection initialization
+  bypasses the scalar `getValueByJs()` hook; review trait/subclass overrides.
+  Submission, disabled behavior and storage are unchanged; no asset/view refresh
+  is required. See [cascade contracts and limits](tests/integration/COLLECTION_CONDITIONAL_FIELDS.md).
+- **Styled Checkbox zero choices ([PR #69](https://github.com/momijiina/laravel-admin-next/pull/69)):**
+  CheckboxButton/Card retain integer/string zero in both checked inputs and active
+  labels, avoiding loss on untouched saves. Other falsey values remain filtered;
+  loose matching, additive `checked()` fallback and clearing behavior are unchanged.
+  Reconcile overridden/published Button/Card views; no asset refresh is needed.
+  See [selection and storage cautions](tests/integration/STYLED_CHECKBOX_ZERO.md).
+- **Slider double ranges ([PR #70](https://github.com/momijiina/laravel-admin-next/pull/70)):**
+  saved/old-input `from;to` pairs restore both endpoints in effective double mode.
+  Only canonical decimal-integer pairs that round-trip through JavaScript Number
+  are accepted; bounds, `data-to` precedence and malformed/empty fallbacks remain.
+  Custom views must supply `data-from`, and custom initializers need the restore
+  logic. Do not preload `input.value`: the shipped plugin reads it as bounds.
+  Storage and the integer-only widget contract are unchanged; see
+  [range and validation cautions](tests/integration/SLIDER_RANGES.md).
+- **Switch label strings ([PR #71](https://github.com/momijiina/laravel-admin-next/pull/71)):**
+  labels, colors and sizes are serialized as JavaScript string literals, preserving
+  quotes, backslashes and localized text without breaking the ready handler.
+  Remove manual JavaScript escaping from configured labels and reconcile custom
+  initializers. Labels still allow HTML; this is not sanitization. Hidden-state
+  submission and readonly/disabled behavior remain; no asset/view refresh is
+  required. See [label and server-validation cautions](tests/integration/SWITCH_LABELS.md).
+- **Nullable Grid carousel ([PR #72](https://github.com/momijiina/laravel-admin-next/pull/72)):**
+  NULL now renders an empty cell instead of preventing Grid rendering. Storage,
+  non-NULL arrays/Arrayable conversion, filtering and URL behavior are unchanged;
+  other scalar/object values are not newly supported. Custom replacement
+  displayers need their own NULL handling; no asset/view refresh is required.
+  See [presentation boundaries](tests/integration/GRID_CAROUSEL.md).
+- **Remote Select validation retries ([PR #73](https://github.com/momijiina/laravel-admin-next/pull/73)):**
+  URL-options Select/MultipleSelect restore attempted selections and explicit
+  clears after failed validation. Old input takes precedence over remote/configured
+  selected-option fallbacks; without old input those overrides and defaults are
+  unchanged. Custom views/initializers must preserve the old-input metadata.
+  Responses must still contain the IDs; dependent `load()`/`loads()`, Listbox,
+  AJAX-search preloads, comma-separated IDs and request sequencing are unchanged.
+  No asset/view refresh is required; see
+  [retry behavior and custom-initializer cautions](tests/integration/REMOTE_SELECT_OLD_INPUT.md).
+- **Grid inline MultipleSelect integers ([PR #74](https://github.com/momijiina/laravel-admin-next/pull/74)):**
+  the popover preserves stored integer IDs, including zero, by comparing their
+  string forms with option values. Strict matching keeps `"001"` distinct from
+  `"1"`; opening/cancelling does not mutate original metadata or storage. Submit
+  values still become strings in option order. Update overridden inline
+  MultipleSelect views and normal view caches; no asset refresh or data migration
+  is needed. This does not expand JavaScript integer precision or redesign
+  malformed/NULL and empty-selection semantics. See
+  [inline selection and persistence boundaries](tests/integration/GRID_INLINE_MULTIPLE_SELECT.md).
+
 Disabled-collection support and changes to Embeds replacement semantics remain
 separate design work, not shipped fixes. Readonly does not imply either; see the
 [collection cautions](tests/integration/LIST_FIELD.md#readonly-collections) and
 [Embeds replacement boundary](tests/integration/EMBEDDED_OBJECT_ORIGINALS.md#boundary).
+
+### Hosted evidence for PR #74
+
+All **61 jobs across 13 workflows** passed for PR #74 head
+[`c8a24e7`](https://github.com/momijiina/laravel-admin-next/commit/c8a24e77292cddc7ba84b3913401eb990d5f783a);
+see the [PR checks](https://github.com/momijiina/laravel-admin-next/pull/74/checks).
+All job logs identify synthetic checkout `5f3d8ca`, merging that head into
+`1a05d13`. Its tree matches the head and actual merge `724834a`. The 22 full
+integration/DomCrawler lanes each completed **386 tests / 260,583 assertions /
+2 skips**; all eight BrowserKit lanes completed **125 tests with no skips**
+(assertions vary with random fixtures).
+
+These are PR-triggered hosted results for that exact checkout, not new CI runs
+against merged main or this documentation update. The full-suite logs report
+aggregate skips; the source/configuration identifies the two optional
+MySQL/MariaDB and PostgreSQL service guards. Neither those skips nor separate
+generator-service checks establish ordinary form lifecycle coverage on those
+databases. Earlier per-PR and local totals remain separate historical snapshots.
+
+The new form and inline-editor regressions combine offline shipped-widget
+execution with in-process HTTP/SQLite persistence; the filter and carousel
+checks inspect HTTP-rendered HTML without browser JavaScript. These results do
+not establish live-browser layout/keyboard behavior, real network/PJAX,
+cookies/CSRF, nested HasMany validation identity, arbitrary custom overrides or
+universal downstream-application compatibility. Each linked guide defines its
+own narrower boundary; older evidence below remains unchanged.
 
 ### Hosted evidence for PRs #61–#65
 
