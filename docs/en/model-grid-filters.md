@@ -44,17 +44,22 @@ $filter->like('column', $label);
 $filter->ilike('column', $label);
 ```
 
-### Greater then
-`sql: ... WHERE `column` > "$input"`：
+### Greater than or equal
+`sql: ... WHERE `column` >= "$input"`：
 ```php
 $filter->gt('column', $label);
 ```
 
-### Less than
-`sql: ... WHERE `column` < "$input"`：
+### Less than or equal
+`sql: ... WHERE `column` <= "$input"`：
 ```php
 $filter->lt('column', $label);
 ```
+
+The existing `gt()` and `lt()` methods include values equal to the input. Only
+the labels and examples have been corrected; query behavior and method names are
+unchanged. Update published or overridden `filter/gt.blade.php` and
+`filter/lt.blade.php` views if they still show strict `>` / `<` labels.
 
 ### Between
 `sql: ... WHERE `column` BETWEEN "$start" AND "$end"`：

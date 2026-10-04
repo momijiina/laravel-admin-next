@@ -68,6 +68,9 @@ The dated results below are historical snapshots, not the current suite totals.
   DomCrawler compatibility and multiple-select null handling
 - Named grid pagination with configured sizes, independent links and explicit
   Eloquent arguments; [pagination regression scope](GRID_PAGINATION.md)
+- Ordinary Grid `gt()` / `lt()` inclusive labels, SQL bindings and HTTP/SQLite
+  boundaries, including zero, negative values, blanks and reset;
+  [query compatibility and overridden-view cautions](GRID_INEQUALITY_FILTERS.md)
 - Explicit per-grid sort keys configured before sortable columns, with applied
   named filters and follow-up rendered links; [sort regression scope](GRID_EXPLICIT_SORT.md)
 - Ordinary MultipleSelect null markers after failed validation, shipped Select2 clear/remove,
