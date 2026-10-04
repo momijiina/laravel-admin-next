@@ -73,6 +73,8 @@ The dated results below are historical snapshots, not the current suite totals.
   [query compatibility and overridden-view cautions](GRID_INEQUALITY_FILTERS.md)
 - Explicit per-grid sort keys configured before sortable columns, with applied
   named filters and follow-up rendered links; [sort regression scope](GRID_EXPLICIT_SORT.md)
+- Checkbox/MultipleSelect conditional collection initialization and selection/clear visibility;
+  [operator semantics, scalar-hook compatibility and limits](COLLECTION_CONDITIONAL_FIELDS.md)
 - Ordinary MultipleSelect null markers after failed validation, shipped Select2 clear/remove,
   old-input redisplay and corrected SQLite retries; [regression scope](MULTIPLE_SELECT_NULL_OLD_INPUT.md)
 - Ordinary nullable Select zero/NULL rendering and serialized HTTP persistence;
