@@ -112,7 +112,7 @@ class NumberIntegerTest extends TestCase
             $mode = $case['attributes']['mode'] ?? 'plain';
             $this->assertSame($mode === 'readonly', $result['readonly'], $label);
             $this->assertSame($mode === 'disabled', $result['disabled'], $label);
-            if ($case['actions'] !== [] && $mode !== 'disabled') {
+            if ($case['actions'] !== [] && $mode === 'plain') {
                 $this->assertGreaterThanOrEqual(count($case['actions']), $result['changes'], $label);
             } else {
                 $this->assertSame(0, $result['changes'], $label);

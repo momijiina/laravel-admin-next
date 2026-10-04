@@ -76,6 +76,8 @@ The dated results below are historical snapshots, not the current suite totals.
   [selection contract, defaults, and upgrade notes](NULLABLE_SELECT.md)
 - Ordinary Number exact integer keyup/blur/buttons, numeric bounds and HTTP/SQLite saves;
   [integer contract, asset refresh and storage cautions](NUMBER_INTEGERS.md)
+- Ordinary Number readonly/disabled widget guards, live state and disabled fieldsets;
+  [state contract, native submission and UI limitations](NUMBER_FIELD_STATES.md)
 - Ordinary nullable Radio NULL/zero rendering, native omission, iCheck and HTTP saves;
   [defaults, validation and clearing boundaries](NULLABLE_RADIO.md)
 - Checkbox zero-valued choices in flat/grouped views, native DOM successful controls,

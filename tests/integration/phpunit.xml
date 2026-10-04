@@ -15,6 +15,7 @@
             <file>CheckboxZeroTest.php</file>
             <file>NullableRadioTest.php</file>
             <file>NumberIntegerTest.php</file>
+            <file>NumberFieldStateTest.php</file>
             <file>TagsTest.php</file>
             <file>TextareaNewlineTest.php</file>
             <file>ListFieldTest.php</file>

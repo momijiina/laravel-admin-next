@@ -404,7 +404,17 @@ $form->currency($column[, $label])->symbol('￥');
 ## Number input
 ```php
 $form->number($column[, $label]);
+
+$form->number('quantity')->readonly(); // Submitted unchanged by the widget.
+$form->number('quantity')->disable();  // Omitted by native form submission.
 ```
+
+Readonly and disabled Number inputs ignore the widget's +/- buttons and
+keyup/blur normalization, including when the stored value is outside the input's
+bounds. Buttons keep their existing appearance. These are UI states; apply the
+application's server validation and authorization separately. After upgrading,
+refresh the published Number asset; see the
+[state contract and compatibility cautions](../../tests/integration/NUMBER_FIELD_STATES.md).
 
 ## Rate input
 ```php

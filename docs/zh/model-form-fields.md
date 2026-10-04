@@ -415,7 +415,16 @@ $form->currency($column[, $label])->symbol('￥');
 ## 数字输入框
 ```php
 $form->number($column[, $label]);
+
+$form->number('quantity')->readonly(); // 控件保持原值，表单仍提交该值。
+$form->number('quantity')->disable();  // 原生表单提交时省略该字段。
 ```
+
+只读或禁用的数字输入框不会响应控件的 +/- 按钮，也不会在 keyup/blur 时
+自动修正数值，即使原值超出输入框的上下限。按钮外观保持不变。
+这些状态仅约束界面行为，应用仍需单独执行服务端验证和权限检查。
+升级后请更新已发布的 Number 脚本；详见
+[状态约定与兼容性说明](../../tests/integration/NUMBER_FIELD_STATES.md)。
 
 ## 比例输入框
 ```php
