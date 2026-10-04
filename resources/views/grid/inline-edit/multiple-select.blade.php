@@ -12,8 +12,11 @@
     <script>
         @component('admin::grid.inline-edit.partials.popover', compact('trigger'))
             @slot('content')
+            var selectedValues = $trigger.data('value').map(function (value) {
+                return String(value);
+            });
             $template.find('select>option').each(function (index, option) {
-                if($.inArray($(option).attr('value'), $trigger.data('value')) >= 0) {
+                if($.inArray($(option).attr('value'), selectedValues) >= 0) {
                     $(option).attr('selected', true);
                 }
             });

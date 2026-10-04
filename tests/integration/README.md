@@ -73,6 +73,8 @@ The dated results below are historical snapshots, not the current suite totals.
   [query compatibility and overridden-view cautions](GRID_INEQUALITY_FILTERS.md)
 - Explicit per-grid sort keys configured before sortable columns, with applied
   named filters and follow-up rendered links; [sort regression scope](GRID_EXPLICIT_SORT.md)
+- Grid inline MultipleSelect integer/zero IDs, shipped popover cancellation and reopening,
+  actual AJAX payloads and HTTP/SQLite saves; [selection contract and override cautions](GRID_INLINE_MULTIPLE_SELECT.md)
 - Nullable array-cast Grid carousel images, actual HTTP/SQLite page rendering and
   unchanged array/URL controls; [empty-cell contract and limits](GRID_CAROUSEL.md)
 - Checkbox/MultipleSelect conditional collection initialization and selection/clear visibility;
