@@ -3,7 +3,7 @@
  * https://github.com/wpic/bootstrap-spin
  * ========================================================================
  * Copyright 2014 WPIC, Hamed Abdollahpour
- * Modified for laravel-admin-next: exact integer comparisons and unit steps.
+ * Modified for laravel-admin-next: exact integers and readonly/disabled guards.
  *
  * ========================================================================
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -79,6 +79,23 @@
             var integerMin = integerText(min);
             var integerMax = integerText(max);
 
+            function isLocked() {
+                if (clone.prop('readOnly') || clone.prop('disabled')) {
+                    return true;
+                }
+                // jQuery 2's :disabled does not include inherited fieldset state.
+                var disabled = false;
+                clone.parents('fieldset').each(function() {
+                    if (this.disabled) {
+                        var legend = $(this).children('legend').first()[0];
+                        if (!legend || !$.contains(legend, clone[0])) {
+                            disabled = true;
+                        }
+                    }
+                });
+                return disabled;
+            }
+
             function setText(n, numericFallback) {
                 n = isNaN(n) ? 0 : n;
                 var integer = integerText(n);
@@ -93,11 +110,17 @@
 
             var group = $("<div class='input-group'></div>");
             var down = $("<button type='button'>-</button>").attr('class', 'btn btn-' + settings.downClass).click(function() {
+                if (isLocked()) {
+                    return;
+                }
                 var integer = integerText(clone.val());
                 setText(integer === null ? parseInt(clone.val(), 10) - 1 : stepInteger(integer, -1), true);
                 clone.focus().trigger('change');
             });
             var up = $("<button type='button'>+</button>").attr('class', 'btn btn-' + settings.upClass).click(function() {
+                if (isLocked()) {
+                    return;
+                }
                 var integer = integerText(clone.val());
                 setText(integer === null ? parseInt(clone.val(), 10) + 1 : stepInteger(integer, 1), true);
                 clone.focus().trigger('change');
@@ -111,6 +134,9 @@
 
             // remove spins from original
             clone.prop('type', 'text').keydown(function(e) {
+                if (isLocked()) {
+                    return;
+                }
                 if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110, 190]) !== -1 || (e.keyCode == 65 && e.ctrlKey === true) || (e.keyCode >= 35 && e.keyCode <= 39)) {
                     return;
                 }
@@ -118,10 +144,16 @@
                     e.preventDefault();
                 }
             }).keyup(function(event) {
+                if (isLocked()) {
+                    return;
+                }
                 var n = clone.val().match(/\-?\d+/) || [0];
                 setText(n[0]);
                 clone.trigger('change');
             }).blur(function(e) {
+                if (isLocked()) {
+                    return;
+                }
                 var c = String.fromCharCode(e.which);
                 var integer = integerText(clone.val());
                 var n = integer === null ? parseInt(clone.val() + c, 10) : integer;

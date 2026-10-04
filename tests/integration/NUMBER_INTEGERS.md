@@ -43,11 +43,12 @@ using it. Custom widgets/overridden assets need their own review.
   preserves matched zero-padded digits, blur/buttons normalize them, and negative
   zero normalizes on blur/buttons. Noninteger/malformed bounds keep their legacy
   comparison fallback; use canonical integer bounds for the corrected contract.
-- Buttons still move by one even with `step=2`. Keyboard filtering, change-event
-  emission, cloning, and cached-at-initialization bounds remain unchanged.
-- Readonly input remains submitted and disabled input remains omitted. The
-  inherited widget's buttons do not honor those states; this change does not
-  add a UI locking or server authorization contract.
+- Enabled buttons still move by one even with `step=2`. Enabled keyboard
+  filtering, change-event emission, cloning, and cached-at-initialization bounds
+  remain unchanged.
+- Readonly/disabled controls now suppress widget-driven changes and normalization;
+  see [the state contract and limitations](NUMBER_FIELD_STATES.md). Readonly input
+  remains submitted and disabled input remains omitted by native FormData.
 
 ## Regression coverage
 

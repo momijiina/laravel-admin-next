@@ -40,6 +40,12 @@ current suite totals or validation of subsequent changes.
   collection Add/Remove is locked. Disabled collections remain unsupported. This
   does not add server authorization or concurrency protection; update overridden
   views and review the [behavior cautions](tests/integration/LIST_FIELD.md#readonly-collections).
+- **Number readonly/disabled UI:** the shipped Number widget no longer changes
+  locked values through +/- buttons, key events or focus/blur normalization.
+  Live input properties and inherited disabled fieldsets are honored; readonly
+  values remain submitted and disabled values are omitted by native FormData.
+  Refresh the published Number asset, and review the
+  [UI and older-jQuery serialization limitations](tests/integration/NUMBER_FIELD_STATES.md).
 - **Collection scripts ([PR #40](https://github.com/momijiina/laravel-admin-next/pull/40)):**
   same-column fields have root-local Add/Remove behavior and repeatable
   initialization. Consumers with overridden/published ListField or KeyValue
