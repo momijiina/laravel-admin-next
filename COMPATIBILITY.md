@@ -8,9 +8,9 @@
 
 ## Current maintenance summary
 
-Updated 2026-10-03. This index describes the changes merged through
-[PR #53](https://github.com/momijiina/laravel-admin-next/pull/53), at
-[`f51972f`](https://github.com/momijiina/laravel-admin-next/commit/f51972f90effe90a3792bbb3ff29935173392f7b).
+Updated 2026-10-04. This index describes the changes merged through
+[PR #59](https://github.com/momijiina/laravel-admin-next/pull/59), at
+[`0895654`](https://github.com/momijiina/laravel-admin-next/commit/0895654020908025bfbdfa51c67aa24f21530d67).
 Use the linked guides for upgrade steps and each regression's precise boundary.
 Historical test totals below remain evidence for their own revisions, not
 current suite totals or validation of subsequent changes.
@@ -89,11 +89,74 @@ current suite totals or validation of subsequent changes.
   custom parsers and non-default timezone options retain conservative exclusions. Existing
   change behavior and server validation are unchanged. See the
   [widget initialization contract](tests/integration/DATE_RANGE_INITIALIZATION.md).
+- **Textarea leading newlines ([PR #55](https://github.com/momijiina/laravel-admin-next/pull/55),
+  [PR #56](https://github.com/momijiina/laravel-admin-next/pull/56)):** ordinary
+  and action textarea views each add one literal LF after the opening tag so
+  HTML parsing preserves the value's leading LFs. Reconcile both overridden
+  views separately; keep escaped interpolation unindented and do not add a
+  workaround LF to stored values. CR/CRLF normalization and application trimming
+  middleware remain unchanged. Ordinary coverage includes HTTP/SQLite saves;
+  action coverage stops at outgoing native FormData. See the distinct
+  [ordinary](tests/integration/TEXTAREA_NEWLINES.md) and
+  [action](tests/integration/ACTION_TEXTAREA_NEWLINES.md) newline contracts.
+- **Action Select NULL ([PR #57](https://github.com/momijiina/laravel-admin-next/pull/57)):**
+  effective NULL retains the leading blank option rather than selecting zero.
+  An untouched blank submits an empty string; middleware normalization and action
+  persistence are not covered. Explicit zero remains valid, with other non-NULL
+  loose comparisons preserved. Update overridden action views and keep their
+  leading blank option. See [action Select cautions](tests/integration/ACTION_SELECT_NULL.md).
+- **Action Radio NULL ([PR #58](https://github.com/momijiina/laravel-admin-next/pull/58)):**
+  the option comparison no longer matches NULL to zero. The existing additive,
+  label-based `checked()` fallback still applies when the original field value
+  is NULL, including with old NULL input. Without a selection, native FormData
+  omits the group; this is not a clearing API or a server-side presence guarantee.
+  Explicit zero and other non-NULL loose comparisons remain. Update overridden
+  action Radio views; see [fallback, validation and submission limits](tests/integration/ACTION_NULLABLE_RADIO.md).
+- **Ordinary MultipleSelect NULL members ([PR #59](https://github.com/momijiina/laravel-admin-next/pull/59)):**
+  only NULL array members are excluded from option matching, preventing a blank
+  hidden marker normalized by middleware from selecting zero after validation
+  failure. Zero choices, other non-NULL loose comparisons, defaults and old-input
+  precedence remain. The hidden clearing marker and server preparation are
+  unchanged. Update overridden ordinary views; action MultipleSelect, Checkbox,
+  relationships and nested HasMany identity are outside this fix. See
+  [validation-redirect and SQLite retry coverage](tests/integration/MULTIPLE_SELECT_NULL_OLD_INPUT.md).
 
 Disabled-collection support and changes to Embeds replacement semantics remain
 separate design work, not shipped fixes. Readonly does not imply either; see the
 [collection cautions](tests/integration/LIST_FIELD.md#readonly-collections) and
 [Embeds replacement boundary](tests/integration/EMBEDDED_OBJECT_ORIGINALS.md#boundary).
+
+### Hosted evidence for PRs #55–#59
+
+Each recorded PR revision below passed **61 jobs across 13 workflows**. Each
+had 22 full integration/DomCrawler lanes with the per-lane totals shown, plus
+8 BrowserKit lanes of **125 tests** each (assertions vary with random fixtures).
+The checks links identify the PRs; the head/base and synthetic checkout identify
+exactly which code those results cover.
+
+| PR checks | PR head | Base used by CI | Synthetic checkout | Tests / assertions / skips per full lane |
+| --- | --- | --- | --- | --- |
+| [#55](https://github.com/momijiina/laravel-admin-next/pull/55/checks) | `a989250` | `4bfc930` | `1b15261` | 279 / 235,069 / 2 |
+| [#56](https://github.com/momijiina/laravel-admin-next/pull/56/checks) | `4ecb768` | `4bfc930` | `e7de312` | 266 / 235,164 / 2 |
+| [#57](https://github.com/momijiina/laravel-admin-next/pull/57/checks) | `a43b2d4` | `4e809a8` | `c3f2cbf` | 281 / 235,564 / 2 |
+| [#58](https://github.com/momijiina/laravel-admin-next/pull/58/checks) | `150295c` | `7d5f207` | `a62d725` | 282 / 235,746 / 2 |
+| [#59](https://github.com/momijiina/laravel-admin-next/pull/59/checks) | `39b6bef` | `7d5f207` | `b4be9e0` | 284 / 235,785 / 2 |
+
+These are pre-merge hosted snapshots, not CI for merged main `0895654` or this
+documentation update. In particular, #56's snapshot does not include #55, and #58/#59
+were tested separately against the same base: neither hosted total includes
+both fixes. Earlier local combined checks are also separate evidence, not a
+hosted-main result. The two full-suite skips correspond to optional external
+MySQL/MariaDB and PostgreSQL service checks; they do not establish ordinary
+lifecycle coverage on those databases.
+
+The new action regressions run emitted modal scripts in offline jsdom and inspect
+native FormData before network I/O, including hide/reopen/resubmission. They do
+not exercise action HTTP dispatch, middleware, server validation or persistence.
+The ordinary textarea and MultipleSelect regressions additionally exercise
+HTTP/SQLite paths, with different middleware policies documented in their guides.
+None establishes live-browser E2E, transport encoding, cookies/CSRF, arbitrary
+custom views or universal downstream-application compatibility.
 
 ### Hosted evidence for PR #53
 

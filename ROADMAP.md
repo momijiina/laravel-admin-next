@@ -64,6 +64,10 @@ and application checks; do not silently remove or claim support for them.
       see [coverage and upgrade links](COMPATIBILITY.md#current-maintenance-summary).
       Real-browser/PJAX and full unsaved-child validation-redirect coverage remain
       outside these regressions
+- [x] Preserve ordinary/action textarea leading newlines and distinguish NULL
+      from zero in action Select/Radio and ordinary MultipleSelect validation
+      redisplay; see [view upgrades and distinct submission/HTTP boundaries](COMPATIBILITY.md#current-maintenance-summary).
+      These regressions do not resolve nested HasMany old-input identity
 - [ ] Add real password-change and rendered-operation-log coverage
 - [ ] Review remaining deprecations, default credentials, login throttling,
       upload previews and AJAX-option escaping; these tests are not a penetration test

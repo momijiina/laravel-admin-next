@@ -10,9 +10,11 @@ OpenAI Dots による定期的な自動更新支援を計画しています。�
 
 **画像処理の破壊的変更:** 画像変換・サムネイルは任意依存の Intervention Image `^3.11.9` に移行しました。v2 の全 API との互換性はありません。型付きコールバックや既存設定を [画像処理の移行ガイド](IMAGE_MIGRATION.md) で確認してください。画像処理を行わない通常のアップロードには不要です。PHP の最低要件は 8.2 です。
 
+最近のフォーム修正では、通常・アクション Textarea の先頭改行、アクション Select / Radio の NULL と 0 の区別、通常 MultipleSelect の検証失敗後の再表示を改善しました。対象の Blade ビューを公開・上書きしている場合は、同じ修正を個別に取り込んでください。送信値、middleware、検証・保存の範囲は [変更点と注意事項](COMPATIBILITY.md#current-maintenance-summary) を確認してください。
+
 - [ロードマップ](ROADMAP.md)
 - [互換性方針](COMPATIBILITY.md)
-- [最近の変更点・アップグレード時の注意事項と検証範囲（PR #53 まで）](COMPATIBILITY.md#current-maintenance-summary)
+- [最近の変更点・アップグレード時の注意事項と検証範囲（PR #59 まで）](COMPATIBILITY.md#current-maintenance-summary)
 - [元プロジェクトについて](UPSTREAM.md)
 
 このプロジェクトは OpenAI の公式プロジェクトではなく、OpenAI による承認・推奨を示すものではありません。
@@ -27,9 +29,11 @@ The project aims to support modern PHP and Laravel while prioritizing existing A
 
 **Breaking image-processing change:** transformations and thumbnails now use optional Intervention Image `^3.11.9`, with a bounded legacy API rather than full v2 compatibility. Review callbacks and settings in the [image migration guide](IMAGE_MIGRATION.md). Ordinary uploads without processing do not need it. The PHP floor remains 8.2.
 
+Recent form fixes preserve leading newlines in ordinary/action Textarea, distinguish NULL from zero in action Select/Radio, and prevent unintended zero selections when ordinary MultipleSelect is redisplayed after validation failure. Overrides of the affected Blade views need the same changes. Review [submission, middleware and verification boundaries](COMPATIBILITY.md#current-maintenance-summary).
+
 - [Roadmap](ROADMAP.md)
 - [Compatibility policy](COMPATIBILITY.md)
-- [Recent changes, upgrade cautions and verification limits (through PR #53)](COMPATIBILITY.md#current-maintenance-summary)
+- [Recent changes, upgrade cautions and verification limits (through PR #59)](COMPATIBILITY.md#current-maintenance-summary)
 - [Upstream attribution](UPSTREAM.md)
 
 This is not an official OpenAI project and does not imply OpenAI endorsement.
