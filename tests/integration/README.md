@@ -78,7 +78,8 @@ The dated results below are historical snapshots, not the current suite totals.
 - Grid QuickCreate validation retries, cancel/reopen, scoped submit-button resets,
   and corrected HTTP/SQLite saves; [response behavior and coverage limits](GRID_QUICK_CREATE.md)
 - Ordinary Grid inline uploads isolated across fields, rows and repeated instances,
-  with idempotent handlers and HTTP/SQLite file retention;
+  with idempotent handlers, native single/multiple FileLists and HTTP/SQLite
+  replacement/append file retention;
   [generated-target compatibility and coverage limits](GRID_INLINE_UPLOAD.md)
 - Nullable array-cast Grid carousel images, actual HTTP/SQLite page rendering and
   unchanged array/URL controls; [empty-cell contract and limits](GRID_CAROUSEL.md)

@@ -42,9 +42,10 @@ const assets = path.resolve(__dirname, '../../../resources/assets');
             assert.equal(triggers[index].dataset.target, input.id);
             assert.equal(input.dataset.key, String(fixture.cells[index].key));
             assert.equal(triggers[index].textContent.trim(), fixture.cells[index].label);
-            assert.equal(input.multiple, false, 'this regression covers ordinary single-file upload only');
+            assert.equal(input.multiple, Boolean(fixture.multiple));
             assert.ok(input.files instanceof w.FileList);
             assert.equal(input.files.length, 0);
+            assert.equal(typeof input.files.forEach, 'undefined', 'native FileList has no Array.forEach method');
             $(triggers[index]).on('click.consumer', () => consumerClicks[index]++);
             $(input).on('click.consumer', () => consumerInputClicks[index]++);
             $(input).on('change.consumer', () => consumerChanges[index]++);
@@ -99,15 +100,17 @@ const assets = path.resolve(__dirname, '../../../resources/assets');
         if (!fixture.inspectOnly) {
             for (const [index, input] of inputs.entries()) {
                 const cell = fixture.cells[index];
-                const file = new w.File([Uint8Array.from(Buffer.from(cell.file.bytes, 'base64'))], cell.file.name, {
-                    type: cell.file.type,
-                });
+                const selected = cell.files || [cell.file];
                 const files = FileList.create(w);
-                utils.implForWrapper(files).push(utils.implForWrapper(file));
+                const nativeFiles = selected.map(file => new w.File([
+                    Uint8Array.from(Buffer.from(file.bytes, 'base64')),
+                ], file.name, { type: file.type }));
+                for (const file of nativeFiles) utils.implForWrapper(files).push(utils.implForWrapper(file));
                 input.files = files;
                 assert.ok(input.files instanceof w.FileList);
-                assert.equal(input.files.length, 1);
-                assert.equal(input.files[0], file);
+                assert.equal(typeof input.files.forEach, 'undefined');
+                assert.equal(input.files.length, selected.length);
+                for (const [position, file] of nativeFiles.entries()) assert.equal(input.files[position], file);
                 input.dispatchEvent(new w.Event('change', { bubbles: true }));
                 assert.equal(requests.length, index + 1, 'one native change must produce only its own field/resource request');
                 assert.deepEqual(consumerChanges, inputs.map((_, other) => other <= index ? 1 : 0),
@@ -120,9 +123,11 @@ const assets = path.resolve(__dirname, '../../../resources/assets');
                     } : value]);
                 }
                 assert.deepEqual(entries, [
-                    [cell.field, { ...cell.file, size: Buffer.from(cell.file.bytes, 'base64').length }],
+                    ...selected.map(file => [cell.field + (fixture.multiple ? '[]' : ''), {
+                        ...file, size: Buffer.from(file.bytes, 'base64').length,
+                    }]),
                     ['_token', 'test-token'], ['_method', 'PUT'],
-                ], 'the multipart body must contain only the intended field and original selected bytes');
+                ], 'the multipart body must contain only the intended field and selected bytes in their original order');
                 serialized.push({
                     url: request.url, type: request.type, processData: request.processData,
                     contentType: request.contentType, enctype: request.enctype, entries,
