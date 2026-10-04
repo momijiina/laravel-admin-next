@@ -360,6 +360,23 @@ $form->date($column[, $label]);
 $form->date($column[, $label])->format('YYYY-MM-DD');
 ```
 
+## 多日期选择
+```php
+$form->DateMultiple('dates')->format('d/m/Y')->options([
+    'locale' => 'zh',
+    'minDate' => '03/10/2026',
+    'disable' => ['05/10/2026'],
+]);
+```
+
+DateMultiple 使用 flatpickr 格式标记（默认为 `Y-m-d`），与 Date/Datetime 的
+Moment 标记不同。显式的 `options(['dateFormat' => ...])` 优先于 `format()`。
+默认语言仍为 `zh`，可通过 `options(['locale' => 'en'])` 覆盖；自带英文和
+中文，其他语言需提前加载相应 flatpickr 语言文件。多选模式和内置 Clear 按钮保持固定。`options()` 仅支持
+JSON 数据，不支持回调字符串或插件函数。此前被忽略的配置现在会生效，升级前
+请检查已保存的日期格式和限制。详见
+[配置优先级、存储格式及自定义注意事项](../../tests/integration/DATE_MULTIPLE_OPTIONS.md)。
+
 ## 日期时间输入框
 ```php
 $form->datetime($column[, $label]);

@@ -16,7 +16,8 @@ class DateMultiple extends Text
         '/vendor/laravel-admin/flatpickr/dist/l10n/zh.js',
     ];
 
-    protected $format = 'YYYY-MM-DD';
+    // Flatpickr tokens, unlike the Moment tokens used by Date/Datetime.
+    protected $format = 'Y-m-d';
 
     public function format($format)
     {
@@ -36,11 +37,14 @@ class DateMultiple extends Text
 
     public function render()
     {
-        $this->options['format'] = $this->format;
-        $this->options['locale'] = array_key_exists('locale', $this->options) ? $this->options['locale'] : config('app.locale');
-        $this->options['allowInputToggle'] = true;
+        // Explicit native options take precedence over the format()/locale defaults.
+        // Only JSON data is supported here; strings are never evaluated as callbacks.
+        $options = json_encode(array_merge([
+            'dateFormat' => $this->format,
+            'locale' => 'zh',
+        ], $this->options));
 
-        $this->script = "$('{$this->getElementClassSelector()}').flatpickr({mode: 'multiple',dateFormat: 'Y-m-d', locale: 'zh', plugins: [
+        $this->script = "$('{$this->getElementClassSelector()}').flatpickr($.extend({}, {$options}, {mode: 'multiple', plugins: [
             ShortcutButtonsPlugin({
               button: {
                 label: 'Clear',
@@ -50,7 +54,7 @@ class DateMultiple extends Text
                 fp.close();
               }
             })
-          ]});";
+          ]}));";
 
         $this->prepend('<i class="fa fa-calendar fa-fw"></i>')
             ->defaultAttribute('style', 'width: 100%');

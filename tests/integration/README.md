@@ -47,6 +47,8 @@ The dated results below are historical snapshots, not the current suite totals.
 - Real Artisan blank-controller generation and rejection of model-less `--output`
 - Generated model-backed controllers executing index/create/store/show/edit/update/delete
   through the real HTTP kernel; [CRUD regression scope](GENERATED_CONTROLLER_CRUD.md)
+- DateMultiple native flatpickr options, actual calendar selections and HTTP/SQLite saves;
+  [format precedence, JSON-only scope and upgrade cautions](DATE_MULTIPLE_OPTIONS.md)
 - Native mutable/immutable Date/Datetime edit/save round trips with shipped Moment;
   [date-cast presentation scope](DATE_CAST_PRESENTATION.md) and boundaries
 - Native mutable/immutable DateRange/DatetimeRange endpoint edit/save round trips;
