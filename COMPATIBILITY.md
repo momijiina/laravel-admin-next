@@ -6,6 +6,14 @@
   specific application/version combinations before claiming support
 - Separate dependency declarations, focused checks, and full runtime support
 
+## Currency configured-radix preparation
+
+Currency now normalizes its declared non-dot string radix before the existing
+float cast, preserving fractions in the shipped widget's unmasked submissions.
+Request payloads, raw-input hooks, pre-preparation validation and float precision
+are unchanged; Laravel's `numeric` rule still rejects comma-radix strings.
+Review the [round-trip boundary and upgrade cautions](tests/integration/CURRENCY_RADIX.md).
+
 ## Callback-bearing widget options
 
 The existing Text/Inputmask and File option helper now preserves distinct nested

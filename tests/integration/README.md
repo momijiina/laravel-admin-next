@@ -76,6 +76,8 @@ The dated results below are historical snapshots, not the current suite totals.
   [selection contract, defaults, and upgrade notes](NULLABLE_SELECT.md)
 - Ordinary Number exact integer keyup/blur/buttons, numeric bounds and HTTP/SQLite saves;
   [integer contract, asset refresh and storage cautions](NUMBER_INTEGERS.md)
+- Currency configured-radix unmasking, actual create/update persistence and raw hooks;
+  [validation, float-cast and custom-mask boundaries](CURRENCY_RADIX.md)
 - Text/Mobile nested Inputmask callbacks, scalar options and File initializer configuration;
   [callback convention, JSON parity and caller boundaries](WIDGET_OPTION_SERIALIZATION.md)
 - Ordinary Number readonly/disabled widget guards, live state and disabled fieldsets;
