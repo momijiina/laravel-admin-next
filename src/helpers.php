@@ -284,19 +284,38 @@ if (!function_exists('prepare_options')) {
     {
         $original = [];
         $toReplace = [];
+        $strings = [];
 
-        foreach ($options as $key => &$value) {
-            if (is_array($value)) {
-                $subArray = prepare_options($value);
-                $value = $subArray['options'];
-                $original = array_merge($original, $subArray['original']);
-                $toReplace = array_merge($toReplace, $subArray['toReplace']);
-            } elseif (strpos($value, 'function(') === 0) {
-                $original[] = $value;
-                $value = "%{$key}%";
-                $toReplace[] = "\"{$value}\"";
+        // Reserve literal values and keys before choosing internal callback markers.
+        $collect = function (array $values) use (&$collect, &$strings) {
+            foreach ($values as $key => $value) {
+                $strings[$key] = true;
+                if (is_array($value)) {
+                    $collect($value);
+                } elseif (is_string($value)) {
+                    $strings[$value] = true;
+                }
             }
-        }
+        };
+        $collect($options);
+
+        $index = 0;
+        $prepare = function (array &$values) use (&$prepare, &$original, &$toReplace, &$strings, &$index) {
+            foreach ($values as &$value) {
+                if (is_array($value)) {
+                    $prepare($value);
+                } elseif (is_string($value) && strpos($value, 'function(') === 0) {
+                    do {
+                        $marker = '%__laravel_admin_callback_'.$index++.'__%';
+                    } while (isset($strings[$marker]));
+
+                    $original[] = $value;
+                    $value = $marker;
+                    $toReplace[] = '"'.$marker.'"';
+                }
+            }
+        };
+        $prepare($options);
 
         return compact('original', 'toReplace', 'options');
     }
@@ -317,7 +336,72 @@ if (!function_exists('json_encode_options')) {
 
         $json = json_encode($data['options']);
 
-        return str_replace($data['toReplace'], $data['original'], $json);
+        if ($json === false || !$data['original']) {
+            return $json === false ? '' : $json;
+        }
+
+        // Skip one native JSON value without inspecting object/JsonSerializable
+        // contents or imposing regular-expression limits on long literal strings.
+        $position = 0;
+        $skip = function () use ($json, &$position) {
+            if (strpos('"[{', $json[$position]) === false) {
+                $position += strcspn($json, ',]}', $position);
+                return;
+            }
+            $depth = 0;
+            do {
+                $position += strcspn($json, '"[]{}', $position);
+                $token = $json[$position++];
+                if ($token === '"') {
+                    do {
+                        $position += strcspn($json, "\"\\", $position);
+                        $escaped = $json[$position++] === '\\';
+                        if ($escaped) {
+                            ++$position;
+                        }
+                    } while ($escaped);
+                } elseif ($token === '[' || $token === '{') {
+                    ++$depth;
+                } else {
+                    --$depth;
+                }
+            } while ($depth > 0);
+        };
+        $callbacks = array_combine($data['toReplace'], $data['original']);
+        $replacements = [];
+        $locate = function (array $values) use (&$locate, &$position, &$replacements, $json, $skip, $callbacks) {
+            $object = $json[$position++] === '{';
+            foreach ($values as $value) {
+                if ($object) {
+                    $skip();
+                    ++$position; // The associative-array key's colon.
+                }
+                if (is_array($value)) {
+                    $locate($value);
+                } else {
+                    $offset = $position;
+                    $skip();
+                    if (is_string($value) && isset($callbacks['"'.$value.'"'])) {
+                        $replacements[] = [$offset, $position - $offset, $callbacks['"'.$value.'"']];
+                    }
+                }
+                if ($json[$position] === ',') {
+                    ++$position;
+                }
+            }
+            ++$position; // The array/object's closing token.
+        };
+        $locate($data['options']);
+
+        // Copy untouched JSON verbatim and never scan an inserted callback again.
+        $result = '';
+        $position = 0;
+        foreach ($replacements as [$offset, $length, $callback]) {
+            $result .= substr($json, $position, $offset - $position).$callback;
+            $position = $offset + $length;
+        }
+
+        return $result.substr($json, $position);
     }
 }
 

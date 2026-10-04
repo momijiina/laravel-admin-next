@@ -6,6 +6,14 @@
   specific application/version combinations before claiming support
 - Separate dependency declarations, focused checks, and full runtime support
 
+## Callback-bearing widget options
+
+The existing Text/Inputmask and File option helper now preserves distinct nested
+callbacks and literal marker-like array values/keys. NULL/scalar data retains JSON
+types without callback-prefix coercion diagnostics. The exact `function(` string
+convention and encoding-failure policy remain; DateMultiple stays plain JSON.
+See the [verified caller and serialization boundaries](tests/integration/WIDGET_OPTION_SERIALIZATION.md).
+
 ## Current maintenance summary
 
 Updated 2026-10-04. This index describes the changes merged through
