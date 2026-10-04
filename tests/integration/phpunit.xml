@@ -43,6 +43,7 @@
             <file>GridExplicitSortTest.php</file>
             <file>GridCarouselTest.php</file>
             <file>GridInlineMultipleSelectTest.php</file>
+            <file>GridQuickCreateTest.php</file>
             <file>ActionRequestInputTest.php</file>
             <file>ActionTextareaLeadingNewlineTest.php</file>
             <file>ActionNullableRadioTest.php</file>

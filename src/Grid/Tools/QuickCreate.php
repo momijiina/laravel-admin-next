@@ -263,6 +263,8 @@ class QuickCreate implements Renderable
                     $.admin.reload();
                     return;
                 }
+
+                $(':submit', e.target).button('reset');
                 
                 if (typeof data.validation !== 'undefined') {
                     $.admin.toastr.warning(data.message, '', {positionClass:"toast-top-center"})
