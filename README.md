@@ -10,11 +10,11 @@ OpenAI Dots による定期的な自動更新支援を計画しています。�
 
 **画像処理の破壊的変更:** 画像変換・サムネイルは任意依存の Intervention Image `^3.11.9` に移行しました。v2 の全 API との互換性はありません。型付きコールバックや既存設定を [画像処理の移行ガイド](IMAGE_MIGRATION.md) で確認してください。画像処理を行わない通常のアップロードには不要です。PHP の最低要件は 8.2 です。
 
-2026-10-04 更新（PR #65 まで）: Number の整数精度・境界値と readonly / disabled、DateMultiple のネイティブ JSON オプション、ウィジェットのコールバック対応付け、Currency の設定済み小数点記号に応じた保存前変換を修正しました。Number は公開済みアセットとキャッシュの更新が必要です。DateMultiple では以前無視されていた書式・制約が有効になるため、保存値を確認してください。Currency の検証は変換前に行われ、浮動小数点の精度制限も変わりません。以前のビュー修正を含む [変更点・移行時の注意事項と検証範囲](COMPATIBILITY.md#current-maintenance-summary) を確認してください。
+2026-10-04 更新（PR #74 まで）: Grid の境界値を含む不等号ラベル、コレクション条件付きフィールド、CheckboxButton/Card のゼロ選択、Slider の範囲復元、Switch のラベル文字列、NULL の Grid carousel、リモート Select の検証失敗後の再表示、Grid インライン MultipleSelect の整数 ID 選択を修正しました。該当する上書きビューを更新し、Switch ラベルの手動 JavaScript エスケープを見直してください。Slider の保存形式、リモート選択肢の取得範囲、ID の精度制限は変わりません。以前の Number アセット更新や日付・通貨の注意事項も含む [変更点・移行時の注意事項と検証範囲](COMPATIBILITY.md#current-maintenance-summary) を確認してください。
 
 - [ロードマップ](ROADMAP.md)
 - [互換性方針](COMPATIBILITY.md)
-- [最近の変更点・アップグレード時の注意事項と検証範囲（PR #65 まで）](COMPATIBILITY.md#current-maintenance-summary)
+- [最近の変更点・アップグレード時の注意事項と検証範囲（PR #74 まで）](COMPATIBILITY.md#current-maintenance-summary)
 - [元プロジェクトについて](UPSTREAM.md)
 
 このプロジェクトは OpenAI の公式プロジェクトではなく、OpenAI による承認・推奨を示すものではありません。
@@ -29,11 +29,11 @@ The project aims to support modern PHP and Laravel while prioritizing existing A
 
 **Breaking image-processing change:** transformations and thumbnails now use optional Intervention Image `^3.11.9`, with a bounded legacy API rather than full v2 compatibility. Review callbacks and settings in the [image migration guide](IMAGE_MIGRATION.md). Ordinary uploads without processing do not need it. The PHP floor remains 8.2.
 
-Updated 2026-10-04 (through PR #65): recent fixes cover Number integer precision/bounds and readonly/disabled states, DateMultiple native JSON options, widget callback mapping, and Currency configured radix points. Refresh published Number assets and caches. Review stored dates before previously ignored DateMultiple formats/restrictions take effect. Currency validation still precedes preparation, and float precision limits remain. See [changes, upgrade cautions and verification limits](COMPATIBILITY.md#current-maintenance-summary), including earlier view fixes.
+Updated 2026-10-04 (through PR #74): recent fixes cover inclusive Grid filter labels, collection conditional fields, CheckboxButton/Card zero selections, Slider range restoration, Switch label strings, nullable Grid carousels, remote Select validation retries, and Grid inline MultipleSelect integer IDs. Reconcile affected overridden views and review manual JavaScript escaping in Switch labels. Slider storage format, remote-option availability and ID precision limits remain unchanged. See [changes, upgrade cautions and verification limits](COMPATIBILITY.md#current-maintenance-summary), including the earlier Number asset refresh and date/currency cautions.
 
 - [Roadmap](ROADMAP.md)
 - [Compatibility policy](COMPATIBILITY.md)
-- [Recent changes, upgrade cautions and verification limits (through PR #65)](COMPATIBILITY.md#current-maintenance-summary)
+- [Recent changes, upgrade cautions and verification limits (through PR #74)](COMPATIBILITY.md#current-maintenance-summary)
 - [Upstream attribution](UPSTREAM.md)
 
 This is not an official OpenAI project and does not imply OpenAI endorsement.
