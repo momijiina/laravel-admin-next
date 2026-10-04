@@ -347,6 +347,25 @@ $form->date($column[, $label]);
 $form->date($column[, $label])->format('YYYY-MM-DD');
 ```
 
+## Multiple dates
+```php
+$form->DateMultiple('dates')->format('d/m/Y')->options([
+    'locale' => 'en',
+    'minDate' => '03/10/2026',
+    'disable' => ['05/10/2026'],
+]);
+```
+
+DateMultiple uses flatpickr tokens (`Y-m-d` by default), unlike Date/Datetime's
+Moment tokens. An explicit `options(['dateFormat' => ...])` wins over `format()`.
+The existing `zh` locale remains the default; override it with
+`options(['locale' => 'en'])`. Other locales require their flatpickr locale assets.
+Multiple selection and
+the built-in Clear button remain fixed. Options support JSON data, not callback
+strings or plugin functions. Previously ignored options now take effect, so
+review stored date formats and bounds before upgrading. See the
+[contract, storage-format and customization cautions](../../tests/integration/DATE_MULTIPLE_OPTIONS.md).
+
 ## Datetime input
 ```php
 $form->datetime($column[, $label]);

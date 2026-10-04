@@ -43,6 +43,7 @@
             <file>DateCastPresentationTest.php</file>
             <file>DateRangeCastPresentationTest.php</file>
             <file>DateRangeInitializationTest.php</file>
+            <file>DateMultipleOptionsTest.php</file>
             <file>NullableTemporalDefaultsTest.php</file>
             <file>LiteralTemporalDefaultsTest.php</file>
         </testsuite>
