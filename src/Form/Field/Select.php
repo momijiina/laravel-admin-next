@@ -38,6 +38,13 @@ class Select extends Field
     protected $config = [];
 
     /**
+     * Whether this field uses the URL-options Select2 initializer.
+     *
+     * @var bool
+     */
+    private $remoteOptions = false;
+
+    /**
      * @var string
      */
     protected $cascadeEvent = 'change';
@@ -266,6 +273,8 @@ EOT;
      */
     protected function loadRemoteOptions($url, $parameters = [], $options = [])
     {
+        $this->remoteOptions = true;
+
         $ajaxOptions = [
             'url' => $url.'?'.http_build_query($parameters),
         ];
@@ -291,8 +300,9 @@ $.ajax($ajaxOptions).done(function(data) {
         data: data,
         $configs
       });
-      var value = $(element).data('value') + '';
-      if (value) {
+      var oldValue = $(element).attr('data-remote-value');
+      var value = oldValue === undefined ? $(element).data('value') + '' : oldValue;
+      if (value || oldValue !== undefined) {
         value = value.split(',');
         $(element).val(value).trigger("change");
       }
@@ -446,6 +456,16 @@ EOT;
         $this->addCascadeScript();
 
         $this->attribute('data-value', implode(',', (array) $this->value()));
+
+        if ($this->remoteOptions) {
+            // Keep data-value's stored/default contract for dependent selects.
+            // Presence matters: a submitted null is an explicit clear.
+            $this->removeAttribute('data-remote-value');
+            if (Arr::has((array) old(), $this->column)) {
+                $value = array_filter((array) old($this->column), 'is_scalar');
+                $this->attribute('data-remote-value', implode(',', $value));
+            }
+        }
 
         return parent::render();
     }

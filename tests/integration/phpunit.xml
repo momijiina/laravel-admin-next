@@ -13,6 +13,7 @@
             <file>MultipleSelectNullOldInputTest.php</file>
             <file>CollectionConditionalFieldsTest.php</file>
             <file>NullableSelectTest.php</file>
+            <file>RemoteSelectOldInputTest.php</file>
             <file>CheckboxZeroTest.php</file>
             <file>StyledCheckboxZeroTest.php</file>
             <file>SliderRangeTest.php</file>

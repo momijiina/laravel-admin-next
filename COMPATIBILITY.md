@@ -69,6 +69,12 @@ current suite totals or validation of subsequent changes.
   See the distinct [Select](tests/integration/NULLABLE_SELECT.md),
   [Checkbox](tests/integration/CHECKBOX_ZERO.md), and
   [Radio](tests/integration/NULLABLE_RADIO.md) contracts.
+- **Remote Select validation retries:** URL-options Select/MultipleSelect now
+  restore attempted selections and explicit clears after failed validation.
+  Old input takes precedence over remote/configured selected-option fallbacks;
+  without old input those overrides and defaults are unchanged. Dependent
+  loaders, Listbox and AJAX-search preloads retain their existing contracts. See
+  [retry behavior and custom-initializer cautions](tests/integration/REMOTE_SELECT_OLD_INPUT.md).
 - **Range cast presentation ([PR #50](https://github.com/momijiina/laravel-admin-next/pull/50)):**
   eligible native DateRange/DatetimeRange endpoints display in the application
   timezone to avoid unchanged edit/save drift. This is a narrow presentation fix,

@@ -79,6 +79,8 @@ The dated results below are historical snapshots, not the current suite totals.
   [operator semantics, scalar-hook compatibility and limits](COLLECTION_CONDITIONAL_FIELDS.md)
 - Ordinary MultipleSelect null markers after failed validation, shipped Select2 clear/remove,
   old-input redisplay and corrected SQLite retries; [regression scope](MULTIPLE_SELECT_NULL_OLD_INPUT.md)
+- URL-options Select/MultipleSelect selection and clearing across validation retries,
+  shipped Select2 and corrected HTTP/SQLite saves; [retry precedence and compatibility limits](REMOTE_SELECT_OLD_INPUT.md)
 - Ordinary nullable Select zero/NULL rendering and serialized HTTP persistence;
   [selection contract, defaults, and upgrade notes](NULLABLE_SELECT.md)
 - Ordinary Switch localized labels, shipped native/plugin clicks and HTTP/SQLite saves;
