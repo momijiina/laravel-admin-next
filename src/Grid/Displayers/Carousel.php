@@ -10,6 +10,10 @@ class Carousel extends AbstractDisplayer
 {
     public function display(int $width = 300, int $height = 200, $server = '')
     {
+        if ($this->value === null) {
+            return '';
+        }
+
         if ($this->value instanceof Arrayable) {
             $this->value = $this->value->toArray();
         }
