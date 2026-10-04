@@ -3,6 +3,7 @@
  * https://github.com/wpic/bootstrap-spin
  * ========================================================================
  * Copyright 2014 WPIC, Hamed Abdollahpour
+ * Modified for laravel-admin-next: exact integer comparisons and unit steps.
  *
  * ========================================================================
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,6 +22,46 @@
 
 (function($) {
 
+    // Compare and step integers as decimal text, including values above 2^53.
+    function integerText(value) {
+        var match = String(value).match(/^\s*([+-]?)(\d+)\s*$/);
+        if (!match) {
+            return null;
+        }
+        var digits = match[2].replace(/^0+/, '') || '0';
+        return match[1] === '-' && digits !== '0' ? '-' + digits : digits;
+    }
+
+    function compareIntegers(left, right) {
+        var leftNegative = left.charAt(0) === '-';
+        var rightNegative = right.charAt(0) === '-';
+        if (leftNegative !== rightNegative) {
+            return leftNegative ? -1 : 1;
+        }
+        var a = leftNegative ? left.slice(1) : left;
+        var b = rightNegative ? right.slice(1) : right;
+        var order = a.length === b.length ? (a === b ? 0 : (a < b ? -1 : 1)) : (a.length < b.length ? -1 : 1);
+        return leftNegative ? -order : order;
+    }
+
+    function stepInteger(value, direction) {
+        var negative = value.charAt(0) === '-';
+        var digits = (negative ? value.slice(1) : value).split('');
+        if (value === '0') {
+            return direction < 0 ? '-1' : '1';
+        }
+        var carry = negative ? -direction : direction;
+        for (var i = digits.length - 1; i >= 0 && carry !== 0; i--) {
+            var digit = Number(digits[i]) + carry;
+            digits[i] = String((digit + 10) % 10);
+            carry = digit < 0 ? -1 : (digit > 9 ? 1 : 0);
+        }
+        if (carry > 0) {
+            digits.unshift('1');
+        }
+        return integerText((negative ? '-' : '') + digits.join(''));
+    }
+
     $.fn.bootstrapNumber = function(options) {
 
         var settings = $.extend({
@@ -35,12 +76,16 @@
 
             var min = self.attr('min');
             var max = self.attr('max');
+            var integerMin = integerText(min);
+            var integerMax = integerText(max);
 
-            function setText(n) {
+            function setText(n, numericFallback) {
                 n = isNaN(n) ? 0 : n;
-                if ((min && n < min)) {
+                var integer = integerText(n);
+                // Noninteger bounds retain the event's legacy string/number comparison.
+                if (min && (integer !== null && integerMin !== null ? compareIntegers(integer, integerMin) < 0 : (numericFallback ? Number(n) : n) < min)) {
                     n = min;
-                } else if (max && n > max) {
+                } else if (max && (integer !== null && integerMax !== null ? compareIntegers(integer, integerMax) > 0 : (numericFallback ? Number(n) : n) > max)) {
                     n = max;
                 }
                 clone.val(n);
@@ -48,11 +93,13 @@
 
             var group = $("<div class='input-group'></div>");
             var down = $("<button type='button'>-</button>").attr('class', 'btn btn-' + settings.downClass).click(function() {
-                setText(parseInt(clone.val(), 10) - 1);
+                var integer = integerText(clone.val());
+                setText(integer === null ? parseInt(clone.val(), 10) - 1 : stepInteger(integer, -1), true);
                 clone.focus().trigger('change');
             });
             var up = $("<button type='button'>+</button>").attr('class', 'btn btn-' + settings.upClass).click(function() {
-                setText(parseInt(clone.val(), 10) + 1);
+                var integer = integerText(clone.val());
+                setText(integer === null ? parseInt(clone.val(), 10) + 1 : stepInteger(integer, 1), true);
                 clone.focus().trigger('change');
             });
             $("<span class='input-group-btn'></span>").append(down).appendTo(group);
@@ -76,8 +123,9 @@
                 clone.trigger('change');
             }).blur(function(e) {
                 var c = String.fromCharCode(e.which);
-                var n = parseInt(clone.val() + c, 10);
-                setText(n);
+                var integer = integerText(clone.val());
+                var n = integer === null ? parseInt(clone.val() + c, 10) : integer;
+                setText(n, true);
                 clone.trigger('change');
             });
 

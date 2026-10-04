@@ -72,6 +72,8 @@ The dated results below are historical snapshots, not the current suite totals.
   old-input redisplay and corrected SQLite retries; [regression scope](MULTIPLE_SELECT_NULL_OLD_INPUT.md)
 - Ordinary nullable Select zero/NULL rendering and serialized HTTP persistence;
   [selection contract, defaults, and upgrade notes](NULLABLE_SELECT.md)
+- Ordinary Number exact integer keyup/blur/buttons, numeric bounds and HTTP/SQLite saves;
+  [integer contract, asset refresh and storage cautions](NUMBER_INTEGERS.md)
 - Ordinary nullable Radio NULL/zero rendering, native omission, iCheck and HTTP saves;
   [defaults, validation and clearing boundaries](NULLABLE_RADIO.md)
 - Checkbox zero-valued choices in flat/grouped views, native DOM successful controls,
