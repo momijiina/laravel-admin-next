@@ -6,11 +6,11 @@
 </div>
 
 <script>
-$('.inline-upload-trigger').click(function () {
+$('.inline-upload-trigger[data-target="{{ $target }}"]').off('click.adminInlineUpload').on('click.adminInlineUpload', function () {
     $('#'+$(this).data('target')).trigger('click');
 });
 
-$('input.inline-upload').on('change', function () {
+$('#{{ $target }}').off('change.adminInlineUpload').on('change.adminInlineUpload', function (event) {
 
     var formData = new FormData();
 

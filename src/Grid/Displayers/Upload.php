@@ -12,7 +12,7 @@ class Upload extends AbstractDisplayer
             'key'      => $this->getKey(),
             'name'     => $this->getPayloadName(),
             'value'    => $this->getValue(),
-            'target'   => "inline-upload-{$this->getKey()}",
+            'target'   => uniqid('inline-upload-'),
             'resource' => $this->getResource(),
             'multiple' => $multiple,
         ]);
