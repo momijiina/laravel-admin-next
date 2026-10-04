@@ -6,27 +6,11 @@
   specific application/version combinations before claiming support
 - Separate dependency declarations, focused checks, and full runtime support
 
-## Currency configured-radix preparation
-
-Currency now normalizes its declared non-dot string radix before the existing
-float cast, preserving fractions in the shipped widget's unmasked submissions.
-Request payloads, raw-input hooks, pre-preparation validation and float precision
-are unchanged; Laravel's `numeric` rule still rejects comma-radix strings.
-Review the [round-trip boundary and upgrade cautions](tests/integration/CURRENCY_RADIX.md).
-
-## Callback-bearing widget options
-
-The existing Text/Inputmask and File option helper now preserves distinct nested
-callbacks and literal marker-like array values/keys. NULL/scalar data retains JSON
-types without callback-prefix coercion diagnostics. The exact `function(` string
-convention and encoding-failure policy remain; DateMultiple stays plain JSON.
-See the [verified caller and serialization boundaries](tests/integration/WIDGET_OPTION_SERIALIZATION.md).
-
 ## Current maintenance summary
 
 Updated 2026-10-04. This index describes the changes merged through
-[PR #59](https://github.com/momijiina/laravel-admin-next/pull/59), at
-[`0895654`](https://github.com/momijiina/laravel-admin-next/commit/0895654020908025bfbdfa51c67aa24f21530d67).
+[PR #65](https://github.com/momijiina/laravel-admin-next/pull/65), at
+[`a87140f`](https://github.com/momijiina/laravel-admin-next/commit/a87140f48ffd974eb5dfecfc03b36967736b09a1).
 Use the linked guides for upgrade steps and each regression's precise boundary.
 Historical test totals below remain evidence for their own revisions, not
 current suite totals or validation of subsequent changes.
@@ -56,12 +40,6 @@ current suite totals or validation of subsequent changes.
   collection Add/Remove is locked. Disabled collections remain unsupported. This
   does not add server authorization or concurrency protection; update overridden
   views and review the [behavior cautions](tests/integration/LIST_FIELD.md#readonly-collections).
-- **Number readonly/disabled UI:** the shipped Number widget no longer changes
-  locked values through +/- buttons, key events or focus/blur normalization.
-  Live input properties and inherited disabled fieldsets are honored; readonly
-  values remain submitted and disabled values are omitted by native FormData.
-  Refresh the published Number asset, and review the
-  [UI and older-jQuery serialization limitations](tests/integration/NUMBER_FIELD_STATES.md).
 - **Collection scripts ([PR #40](https://github.com/momijiina/laravel-admin-next/pull/40)):**
   same-column fields have root-local Add/Remove behavior and repeatable
   initialization. Consumers with overridden/published ListField or KeyValue
@@ -142,11 +120,77 @@ current suite totals or validation of subsequent changes.
   unchanged. Update overridden ordinary views; action MultipleSelect, Checkbox,
   relationships and nested HasMany identity are outside this fix. See
   [validation-redirect and SQLite retry coverage](tests/integration/MULTIPLE_SELECT_NULL_OLD_INPUT.md).
+- **Number integer editing ([PR #61](https://github.com/momijiina/laravel-admin-next/pull/61)):**
+  whole-number values and bounds use exact decimal-string comparisons and unit
+  +/- steps, avoiding lexical bounds and rounding above JavaScript's safe-integer
+  range. Refresh the published Number asset and cached/minified copies; reconcile
+  customized assets before republishing. Existing noninteger parsing remains.
+  This does not recover already-rounded values or expand PHP/SQL
+  integer ranges; keep server rules. See [integer and asset cautions](tests/integration/NUMBER_INTEGERS.md).
+- **DateMultiple options ([PR #62](https://github.com/momijiina/laravel-admin-next/pull/62)):**
+  native JSON-data options now reach flatpickr. `format()` uses flatpickr tokens;
+  explicit `dateFormat` overrides it. The default locale remains `zh`, while
+  multiple mode and the Clear plugin remain field-managed. Previously ignored
+  formats, conjunctions and restrictions now apply: review stored strings before
+  upgrading, as no data migration or server validation is added. Function-valued
+  options remain unsupported. No asset republish is needed solely for this fix;
+  see [format, locale and JSON-only boundaries](tests/integration/DATE_MULTIPLE_OPTIONS.md).
+- **Number readonly/disabled UI ([PR #63](https://github.com/momijiina/laravel-admin-next/pull/63)):**
+  +/- buttons, key events and focus/blur normalization no longer change locked
+  inputs. Live properties and inherited disabled fieldsets are honored. Readonly
+  values remain submitted; native FormData omits disabled values, but shipped
+  jQuery 2.1.4 `serialize()` does not omit inputs disabled only by a fieldset.
+  Refresh the published Number asset. These are UI guards, not server protection;
+  see [state and serialization limits](tests/integration/NUMBER_FIELD_STATES.md).
+- <a id="callback-bearing-widget-options"></a>**Widget callback mapping ([PR #64](https://github.com/momijiina/laravel-admin-next/pull/64)):**
+  the existing Text/Inputmask and File option helper preserves distinct nested
+  callbacks and literal marker-like data, with native JSON types for NULL/scalars
+  and object leaves. Generated markers are opaque; remove assumptions about
+  `%key%` names. The exact `function(` string convention and historical encoding
+  failure policy remain. DateMultiple stays plain JSON. No asset/view refresh is
+  required; see [caller and serialization boundaries](tests/integration/WIDGET_OPTION_SERIALIZATION.md).
+- <a id="currency-configured-radix-preparation"></a>**Currency preparation ([PR #65](https://github.com/momijiina/laravel-admin-next/pull/65)):**
+  a declared nonempty, non-dot string radix is normalized before the existing
+  float cast, preserving fractions in the shipped widget's unmasked submissions.
+  Validation still precedes preparation: Laravel's `numeric` rule rejects comma-radix
+  strings, and accepted raw-input hooks still see them. Float precision, blank
+  preparation as `0.0` and default dot behavior remain; this is not a generic
+  localized/masked parser or a repair of already-truncated storage. No asset
+  republish is needed; review [round-trip and subclass cautions](tests/integration/CURRENCY_RADIX.md).
 
 Disabled-collection support and changes to Embeds replacement semantics remain
 separate design work, not shipped fixes. Readonly does not imply either; see the
 [collection cautions](tests/integration/LIST_FIELD.md#readonly-collections) and
 [Embeds replacement boundary](tests/integration/EMBEDDED_OBJECT_ORIGINALS.md#boundary).
+
+### Hosted evidence for PRs #61–#65
+
+Each recorded PR revision passed **61 jobs across 13 workflows**, including
+22 full integration/DomCrawler lanes with the per-lane totals below and eight
+BrowserKit lanes of **125 tests** each (assertions vary with random fixtures).
+The head/base and synthetic checkout identify the exact pre-merge code tested.
+
+| PR checks | PR head | Base used by CI | Synthetic checkout | Tests / assertions / skips per full lane |
+| --- | --- | --- | --- | --- |
+| [#61](https://github.com/momijiina/laravel-admin-next/pull/61/checks) | `160918e` | `d8d94a4` | `dd32cfe` | 297 / 239,637 / 2 |
+| [#62](https://github.com/momijiina/laravel-admin-next/pull/62/checks) | `2d71410` | `c1b04c3` | `f5867c8` | 303 / 240,693 / 2 |
+| [#63](https://github.com/momijiina/laravel-admin-next/pull/63/checks) | `96731bc` | `215dae8` | `1051ae4` | 313 / 254,107 / 2 |
+| [#64](https://github.com/momijiina/laravel-admin-next/pull/64/checks) | `b408b5c` | `387da56` | `eb694cf` | 323 / 254,185 / 2 |
+| [#65](https://github.com/momijiina/laravel-admin-next/pull/65/checks) | `3010473` | `9399571` | `6e2ec4e` | 332 / 256,033 / 2 |
+
+These are PR-triggered hosted snapshots, not new runs against merged main
+`a87140f` or this documentation update. The two full-suite skips are the
+source-verified optional MySQL/MariaDB and PostgreSQL service guards; neither
+those skips nor separate generator-service checks establish ordinary form
+lifecycle coverage on those databases.
+
+Number, DateMultiple and Currency regressions combine offline shipped-widget
+execution with in-process HTTP/SQLite persistence. Callback-helper coverage
+exercises Inputmask offline and captures File initializer options; it does not
+execute the File plugin, transfer files or verify callback persistence. These
+checks do not establish live-browser layout/keyboard, PJAX, transport/cookies/CSRF,
+custom-widget or universal downstream-application compatibility. Each linked guide
+states its own narrower boundary; older evidence below remains unchanged.
 
 ### Hosted evidence for PRs #55–#59
 
