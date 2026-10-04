@@ -14,6 +14,7 @@
             <file>CollectionConditionalFieldsTest.php</file>
             <file>NullableSelectTest.php</file>
             <file>CheckboxZeroTest.php</file>
+            <file>StyledCheckboxZeroTest.php</file>
             <file>NullableRadioTest.php</file>
             <file>CurrencyRadixTest.php</file>
             <file>NumberIntegerTest.php</file>
