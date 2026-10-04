@@ -68,6 +68,16 @@ and application checks; do not silently remove or claim support for them.
       from zero in action Select/Radio and ordinary MultipleSelect validation
       redisplay; see [view upgrades and distinct submission/HTTP boundaries](COMPATIBILITY.md#current-maintenance-summary).
       These regressions do not resolve nested HasMany old-input identity
+- [x] Preserve Number integer precision/bounds and readonly/disabled widget states;
+      refresh published Number assets and review [integer](tests/integration/NUMBER_INTEGERS.md)
+      and [older-jQuery fieldset serialization](tests/integration/NUMBER_FIELD_STATES.md) limits
+- [x] Forward DateMultiple native JSON options and repair existing widget callback
+      mapping; review [date-format migration cautions](tests/integration/DATE_MULTIPLE_OPTIONS.md)
+      and [the separate callback-helper contract](tests/integration/WIDGET_OPTION_SERIALIZATION.md)
+- [x] Preserve Currency fractions for declared radix points during preparation;
+      [preparation does not change validation or float precision](tests/integration/CURRENCY_RADIX.md).
+      Exact pre-merge checks through PR #65 are recorded in
+      [the hosted evidence](COMPATIBILITY.md#hosted-evidence-for-prs-6165)
 - [ ] Add real password-change and rendered-operation-log coverage
 - [ ] Review remaining deprecations, default credentials, login throttling,
       upload previews and AJAX-option escaping; these tests are not a penetration test
