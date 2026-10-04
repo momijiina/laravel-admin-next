@@ -47,17 +47,21 @@ $filter->like('column', $label);
 $filter->ilike('column', $label);
 ```
 
-### 大于
-`sql: ... WHERE `column` > "$input"`：
+### 大于或等于
+`sql: ... WHERE `column` >= "$input"`：
 ```php
 $filter->gt('column', $label);
 ```
 
-### 小于
-`sql: ... WHERE `column` < "$input"`：
+### 小于或等于
+`sql: ... WHERE `column` <= "$input"`：
 ```php
 $filter->lt('column', $label);
 ```
+
+现有的 `gt()` 和 `lt()` 方法都包含等于输入值的记录。本次仅修正标签和示例，
+查询行为及方法名称保持不变。如果已发布或自定义的 `filter/gt.blade.php` 和
+`filter/lt.blade.php` 视图仍显示严格的 `>` / `<` 标签，请同步更新。
 
 ### between
 `sql: ... WHERE `column` BETWEEN "$start" AND "$end"`：
