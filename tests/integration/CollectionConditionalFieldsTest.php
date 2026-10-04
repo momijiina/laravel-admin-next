@@ -168,7 +168,7 @@ class CollectionConditionalFieldsTest extends TestCase
 
     public function test_zero_values_and_explicit_empty_old_input_override_defaults(): void
     {
-        foreach (['checkbox', 'multipleSelect'] as $widget) {
+        foreach (['checkbox', 'multipleSelect', 'checkboxButton', 'checkboxCard'] as $widget) {
             foreach ([[0], ['0'], [0, 2], ['0', 'alpha']] as $value) {
                 $this->flushSession();
                 $expected = array_map('strval', $value);
@@ -188,7 +188,7 @@ class CollectionConditionalFieldsTest extends TestCase
     public function test_validation_old_input_and_corrected_create_update_keep_storage_unchanged(): void
     {
         foreach (['checkbox', 'multipleSelect', 'checkboxButton', 'checkboxCard'] as $widget) {
-            foreach ([[], ['alpha'], ['2']] as $expected) {
+            foreach ([[], ['alpha'], ['2'], ['0'], ['0', '2']] as $expected) {
                 $this->flushSession();
                 $this->config = ['widget' => $widget, 'default' => ['blocked']];
                 $submitted = array_merge($expected, ['']);

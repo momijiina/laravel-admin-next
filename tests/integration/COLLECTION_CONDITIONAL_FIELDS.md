@@ -22,11 +22,12 @@ intersection checks. Null old-input clearing markers are not choice values.
   comparisons and the JavaScript string comparisons are not redesigned.
 - Application overrides of the trait or field classes need reconciliation. No
   published views or assets are replaced by this change.
-- CheckboxButton/Card's separate initial zero-selection view behavior is outside
-  this fix. Their zero-valued user changes are covered; zero defaults/edits are
-  covered on ordinary Checkbox and MultipleSelect. Checkbox `checked()` fallbacks,
-  ambiguous loose-matching option keys, nested collection identity, relation
-  storage, remote options and custom field implementations are not tested.
+- Zero-valued changes, defaults/edits and validation redisplay are covered on all
+  four collection widgets. CheckboxButton/Card initial checked/active selection
+  uses the separate [styled zero-selection correction](STYLED_CHECKBOX_ZERO.md).
+  Checkbox `checked()` fallback/cascade interactions, ambiguous loose-matching
+  option keys, nested collection identity, relation storage, remote options and
+  custom field implementations are not tested here.
 
 ## Regression coverage
 

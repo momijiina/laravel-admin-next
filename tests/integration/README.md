@@ -89,6 +89,8 @@ The dated results below are historical snapshots, not the current suite totals.
   [state contract, native submission and UI limitations](NUMBER_FIELD_STATES.md)
 - Ordinary nullable Radio NULL/zero rendering, native omission, iCheck and HTTP saves;
   [defaults, validation and clearing boundaries](NULLABLE_RADIO.md)
+- CheckboxButton/Card zero-valued checked/active states, shipped clicks and HTTP/SQLite retries;
+  [styled selection contract and overridden-view cautions](STYLED_CHECKBOX_ZERO.md)
 - Checkbox zero-valued choices in flat/grouped views, native DOM successful controls,
   JSON/CSV saves and validation redisplay; [selection contract](CHECKBOX_ZERO.md)
 - Ordinary Textarea leading-LF preservation through native HTML parsing and HTTP saves;

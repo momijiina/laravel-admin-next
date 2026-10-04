@@ -6,11 +6,18 @@
 
         @include('admin::form.error')
 
+        @php
+            $selected = array_filter(old($column, $value ?? []), function ($item) {
+                return $item === 0 || $item === '0' || (bool) $item;
+            });
+        @endphp
+
         <div class="card-group checkbox-group-toggle">
         @foreach($options as $option => $label)
-            <label class="panel panel-default {{ false !== array_search($option, array_filter(old($column, $value ?? []))) || ($value === null && in_array($option, $checked)) ?'active':'' }}">
+            @php($isChecked = false !== array_search($option, $selected) || ($value === null && in_array($option, $checked)))
+            <label class="panel panel-default {{ $isChecked ?'active':'' }}">
                 <div class="panel-body">
-                <input type="checkbox" name="{{$name}}[]" value="{{$option}}" class="hide {{$class}}" {{ false !== array_search($option, array_filter(old($column, $value ?? []))) || ($value === null && in_array($option, $checked)) ?'checked':'' }} {!! $attributes !!} />&nbsp;{{$label}}&nbsp;&nbsp;
+                <input type="checkbox" name="{{$name}}[]" value="{{$option}}" class="hide {{$class}}" {{ $isChecked ?'checked':'' }} {!! $attributes !!} />&nbsp;{{$label}}&nbsp;&nbsp;
                 </div>
             </label>
         @endforeach
