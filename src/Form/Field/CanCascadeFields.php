@@ -145,11 +145,11 @@ trait CanCascadeFields
             case 'notIn':
                 return !in_array($old, $value);
             case 'has':
-                return in_array($value, $old);
+                return in_array($value, $old ?? []);
             case 'oneIn':
-                return count(array_intersect($value, $old)) >= 1;
+                return count(array_intersect($value, $old ?? [])) >= 1;
             case 'oneNotIn':
-                return count(array_intersect($value, $old)) == 0;
+                return count(array_intersect($value, $old ?? [])) == 0;
             default:
                 throw new \Exception("Operator [$operator] not support.");
         }
@@ -160,7 +160,7 @@ trait CanCascadeFields
      */
     protected function getValueByJs()
     {
-        return addslashes(old($this->column(), $this->value()));
+        return addslashes((string) old($this->column(), $this->value()));
     }
 
     /**
@@ -172,6 +172,20 @@ trait CanCascadeFields
     {
         if (empty($this->conditions)) {
             return;
+        }
+
+        $value = old($this->column(), $this->value());
+        if ($this instanceof MultipleSelect || is_array($value)) {
+            // DOM choice values are strings. Null entries are hidden clearing
+            // markers after Laravel's empty-string middleware, not selections.
+            $value = array_filter((array) $value, function ($item) {
+                return $item !== null;
+            });
+            $defaultValue = json_encode(array_values(array_map('strval', $value)),
+                JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT);
+        } else {
+            // Preserve the escaped-string contract of custom scalar overrides.
+            $defaultValue = "'{$this->getValueByJs()}' + ''";
         }
 
         $cascadeGroups = collect($this->conditions)->map(function ($condition) {
@@ -206,15 +220,17 @@ trait CanCascadeFields
         'in': function(a, b) { return $.inArray(a, b) != -1; },
         'notIn': function(a, b) { return $.inArray(a, b) == -1; },
         'has': function(a, b) { return $.inArray(b, a) != -1; },
-        'oneIn': function(a, b) { return a.filter(v => b.includes(v)).length >= 1; },
-        'oneNotIn': function(a, b) { return a.filter(v => b.includes(v)).length == 0; },
+        'oneIn': function(a, b) { return (a == null ? [] : a).filter(v => b.includes(v)).length >= 1; },
+        'oneNotIn': function(a, b) { return (a == null ? [] : a).filter(v => b.includes(v)).length == 0; },
     };
     var cascade_groups = {$cascadeGroups};
         
     cascade_groups.forEach(function (event) {
-        var default_value = '{$this->getValueByJs()}' + '';
+        var default_value = {$defaultValue};
         var class_name = event.class;
-        if(default_value == event.value) {
+        if ($.isArray(default_value)) {
+            $('div.cascade-group.'+class_name).toggleClass('hide', !operator_table[event.operator](default_value, event.value));
+        } else if(default_value == event.value) {
             $('.'+class_name+'').removeClass('hide');
         }
     });
