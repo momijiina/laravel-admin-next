@@ -79,6 +79,8 @@ The dated results below are historical snapshots, not the current suite totals.
   old-input redisplay and corrected SQLite retries; [regression scope](MULTIPLE_SELECT_NULL_OLD_INPUT.md)
 - Ordinary nullable Select zero/NULL rendering and serialized HTTP persistence;
   [selection contract, defaults, and upgrade notes](NULLABLE_SELECT.md)
+- Ordinary Switch localized labels, shipped native/plugin clicks and HTTP/SQLite saves;
+  [literal strings, HTML labels and override cautions](SWITCH_LABELS.md)
 - Ordinary double Slider saved/old-input integer pairs, shipped widget initialization and HTTP/SQLite round trips;
   [endpoint precedence, defaults and override cautions](SLIDER_RANGES.md)
 - Ordinary Number exact integer keyup/blur/buttons, numeric bounds and HTTP/SQLite saves;

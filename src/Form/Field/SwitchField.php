@@ -60,14 +60,20 @@ class SwitchField extends Field
             }
         }
 
+        $size = json_encode((string) $this->size);
+        $onText = json_encode((string) $this->states['on']['text']);
+        $offText = json_encode((string) $this->states['off']['text']);
+        $onColor = json_encode((string) $this->states['on']['color']);
+        $offColor = json_encode((string) $this->states['off']['color']);
+
         $this->script = <<<EOT
 
 $('{$this->getElementClassSelector()}.la_checkbox').bootstrapSwitch({
-    size:'{$this->size}',
-    onText: '{$this->states['on']['text']}',
-    offText: '{$this->states['off']['text']}',
-    onColor: '{$this->states['on']['color']}',
-    offColor: '{$this->states['off']['color']}',
+    size: {$size},
+    onText: {$onText},
+    offText: {$offText},
+    onColor: {$onColor},
+    offColor: {$offColor},
     onSwitchChange: function(event, state) {
         $(event.target).closest('.bootstrap-switch').next().val(state ? 'on' : 'off').change();
     }
