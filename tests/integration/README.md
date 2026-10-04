@@ -68,6 +68,8 @@ The dated results below are historical snapshots, not the current suite totals.
   Eloquent arguments; [pagination regression scope](GRID_PAGINATION.md)
 - Explicit per-grid sort keys configured before sortable columns, with applied
   named filters and follow-up rendered links; [sort regression scope](GRID_EXPLICIT_SORT.md)
+- Ordinary MultipleSelect null markers after failed validation, shipped Select2 clear/remove,
+  old-input redisplay and corrected SQLite retries; [regression scope](MULTIPLE_SELECT_NULL_OLD_INPUT.md)
 - Ordinary nullable Select zero/NULL rendering and serialized HTTP persistence;
   [selection contract, defaults, and upgrade notes](NULLABLE_SELECT.md)
 - Ordinary nullable Radio NULL/zero rendering, native omission, iCheck and HTTP saves;
