@@ -399,7 +399,17 @@ $form->currency($column[, $label]);
 // set the unit symbol
 $form->currency($column[, $label])->symbol('￥');
 
+// use a comma decimal separator
+$form->currency($column[, $label])->options(['radixPoint' => ',']);
+
 ```
+
+Currency normalizes the configured radix before its existing float cast. With
+its default unmask-on-submit behavior, grouping and currency affixes are removed
+by the widget, but the submitted radix is retained. Validation and raw-input
+hooks still receive that localized value: Laravel's `numeric` rule rejects a
+comma-radix string before preparation. See the [round-trip guide and
+limitations](../../tests/integration/CURRENCY_RADIX.md).
 
 ## Number input
 ```php

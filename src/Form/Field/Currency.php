@@ -59,6 +59,13 @@ class Currency extends Text
      */
     public function prepare($value)
     {
+        // Inputmask removes grouping/affixes on submit but retains its radix.
+        $radixPoint = $this->options['radixPoint'] ?? '.';
+
+        if (is_string($value) && is_string($radixPoint) && $radixPoint !== '' && $radixPoint !== '.') {
+            $value = str_replace($radixPoint, '.', $value);
+        }
+
         return (float) $value;
     }
 

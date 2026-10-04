@@ -14,6 +14,7 @@
             <file>NullableSelectTest.php</file>
             <file>CheckboxZeroTest.php</file>
             <file>NullableRadioTest.php</file>
+            <file>CurrencyRadixTest.php</file>
             <file>NumberIntegerTest.php</file>
             <file>NumberFieldStateTest.php</file>
             <file>WidgetOptionSerializationTest.php</file>
