@@ -83,6 +83,8 @@ The dated results below are historical snapshots, not the current suite totals.
   [generated-target compatibility and coverage limits](GRID_INLINE_UPLOAD.md)
 - Nullable array-cast Grid carousel images, actual HTTP/SQLite page rendering and
   unchanged array/URL controls; [empty-cell contract and limits](GRID_CAROUSEL.md)
+- Ordinary Grid nested-table missing cells, configured column order, exact view
+  data and unchanged HTTP/SQLite storage; [alignment and custom-view cautions](GRID_TABLE.md)
 - Checkbox/MultipleSelect conditional collection initialization and selection/clear visibility;
   [operator semantics, scalar-hook compatibility and limits](COLLECTION_CONDITIONAL_FIELDS.md)
 - Ordinary MultipleSelect null markers after failed validation, shipped Select2 clear/remove,
