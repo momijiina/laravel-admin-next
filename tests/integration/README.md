@@ -60,6 +60,9 @@ The dated results below are historical snapshots, not the current suite totals.
   [generator default scope](NULLABLE_TEMPORAL_DEFAULTS.md) and existing-controller caveats
 - Model-backed Artisan generation and independent DBAL metadata/output parity;
   [generator regressions](RESOURCE_GENERATOR.md) cover SQLite and opt-in services
+- Action modal HTTP/transport failure and confirmation-cancellation retries, pending
+  request locks, independent forms and HTTP/SQLite persistence;
+  [retry behavior and upgrade cautions](ACTION_MODAL_RETRY.md)
 - Action modal Select NULL/zero choices through actual emitted native FormData;
   [selection contract and upgrade cautions](ACTION_SELECT_NULL.md)
 - Action modal textarea leading blank lines through actual emitted native FormData;
