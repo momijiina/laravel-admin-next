@@ -73,6 +73,8 @@ The dated results below are historical snapshots, not the current suite totals.
   [query compatibility and overridden-view cautions](GRID_INEQUALITY_FILTERS.md)
 - Explicit per-grid sort keys configured before sortable columns, with applied
   named filters and follow-up rendered links; [sort regression scope](GRID_EXPLICIT_SORT.md)
+- Nullable Grid inline Select/Radio labels, mixed rows and dynamic options, shipped
+  popover cancel/reopen and HTTP/SQLite saves; [NULL contract and upgrade cautions](GRID_INLINE_NULLABLE_CHOICES.md)
 - Grid inline MultipleSelect integer/zero IDs, shipped popover cancellation and reopening,
   actual AJAX payloads and HTTP/SQLite saves; [selection contract and override cautions](GRID_INLINE_MULTIPLE_SELECT.md)
 - Grid QuickCreate validation retries, cancel/reopen, scoped submit-button resets,
