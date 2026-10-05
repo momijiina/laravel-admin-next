@@ -29,9 +29,7 @@ class Table extends AbstractDisplayer
             $arr = Arr::only($item, $columns);
 
             foreach ($columns as $column) {
-                if (array_key_exists($column, $arr)) {
-                    $sorted[$column] = $arr[$column];
-                }
+                $sorted[$column] = array_key_exists($column, $arr) ? $arr[$column] : null;
             }
 
             return $sorted;
