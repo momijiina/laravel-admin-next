@@ -6,6 +6,20 @@
   specific application/version combinations before claiming support
 - Separate dependency declarations, focused checks, and full runtime support
 
+## Nullable Grid inline choices (2026-10-05)
+
+Grid inline Select/Radio now render a blank label for strict NULL instead of
+failing the entire table. Non-NULL lookups and per-row options callbacks remain.
+This PHP-only fix requires no asset/view republish or data migration; review
+custom displayer overrides. Existing popover defaults and loose comparisons are
+unchanged, and no NULL clearing protocol is added. See the
+[regression contract and upgrade cautions](tests/integration/GRID_INLINE_NULLABLE_CHOICES.md).
+
+日本語: Grid のインライン Select/Radio は NULL を空欄表示し、一覧全体の描画失敗を
+防ぎます。NULL 以外の検索と行ごとのコールバックは維持します。再公開・データ移行は
+不要ですが、独自表示クラスは確認してください。初期選択・緩い比較・保存形式は変更
+せず、NULL クリア用 API は追加しません。他の Laravel アプリとの連携は個別に検証してください。
+
 ## Current maintenance summary
 
 Updated 2026-10-04. This index describes the changes merged through

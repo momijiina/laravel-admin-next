@@ -44,6 +44,7 @@
             <file>GridCarouselTest.php</file>
             <file>GridTableTest.php</file>
             <file>GridInlineMultipleSelectTest.php</file>
+            <file>GridInlineNullableChoicesTest.php</file>
             <file>GridInlineUploadTest.php</file>
             <file>GridQuickCreateTest.php</file>
             <file>ActionRequestInputTest.php</file>
