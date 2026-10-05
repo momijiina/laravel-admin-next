@@ -52,6 +52,7 @@
             <file>ActionSelectNullTest.php</file>
             <file>HandleControllerRequestTest.php</file>
             <file>FileUploadFailureTest.php</file>
+            <file>MultipleFileSortTest.php</file>
             <file>ResourceGeneratorTest.php</file>
             <file>GeneratedControllerCrudTest.php</file>
             <file>DateCastPresentationTest.php</file>
