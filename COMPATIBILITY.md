@@ -6,6 +6,24 @@
   specific application/version combinations before claiming support
 - Separate dependency declarations, focused checks, and full runtime support
 
+## Mixed Grid inline editors (2026-10-05)
+
+Grid inline Input, Textarea, Datetime, Select, MultipleSelect, Radio and Checkbox
+submit handlers now stay with their resource and payload name. A later editor
+no longer replaces another field's value extractor, display callback or save URL.
+Existing APIs, values and save/display behavior remain unchanged. Reconcile both
+overridden `grid/inline-edit/comm.blade.php` and `partials/submit.blade.php` views
+together; no JavaScript asset republish or data migration is needed. See the
+[regression contract and upgrade cautions](tests/integration/GRID_INLINE_MIXED_EDITORS.md).
+
+日本語: Grid のインライン Input・Textarea・Datetime・Select・MultipleSelect・Radio・
+Checkbox の送信処理をリソースと送信項目名ごとに分離し、後続のエディターによる
+値の取得・表示更新・送信先の上書きを防ぎます。既存 API、値と保存・表示の仕様は
+維持します。上書きした共通ビューと送信 partial は必ず一緒に反映してください。
+JS アセットの再公開やデータ移行は不要です。Popover 全体の再初期化や複数 Grid の
+同名フィールド識別を修正するものではありません。他の Laravel アプリとの連携は
+アプリごとに検証してください。
+
 ## Action modal retry recovery (2026-10-05)
 
 Action form Submit buttons now reset after AJAX failure or confirmation
