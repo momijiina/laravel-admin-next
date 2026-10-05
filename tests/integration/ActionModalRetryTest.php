@@ -180,12 +180,12 @@ class ActionModalRetryTest extends TestCase
 
 trait ModalRetryForm
 {
-    public $name = 'Retry action';
     private int $fixtureKey = 1;
     private bool $confirmation = false;
 
     public function configure(int $key, bool $confirmation)
     {
+        $this->name = 'Retry action';
         $this->fixtureKey = $key;
         $this->confirmation = $confirmation;
         $this->selector = '.modal-retry-'.$key;
