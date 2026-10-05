@@ -565,9 +565,11 @@ SCRIPT;
         $settings = trim(substr(json_encode($settings, JSON_PRETTY_PRINT), 1, -1));
 
         return <<<PROMISE
+        var confirmed = false;
         var process = $.admin.swal({
             {$settings},
             preConfirm: function() {
+                confirmed = true;
                 {$this->buildGeneralActionPromise()}
 
                 return process;
@@ -575,6 +577,10 @@ SCRIPT;
         }).then(function(result) {
 
             if (typeof result.dismiss !== 'undefined') {
+                // Once confirmed, the pending request owns the button state.
+                if (!confirmed) {
+                    $(':submit', form).button('reset');
+                }
                 return Promise.reject();
             }
 
@@ -620,6 +626,7 @@ PROMISE;
                     $(':submit', '#'+modalId).button('reset');
                 },
                 error:function(request){
+                    $(':submit', form).button('reset');
                     reject(request);
                 }
             });

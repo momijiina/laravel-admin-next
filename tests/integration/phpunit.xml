@@ -52,6 +52,7 @@
             <file>ActionTextareaLeadingNewlineTest.php</file>
             <file>ActionNullableRadioTest.php</file>
             <file>ActionSelectNullTest.php</file>
+            <file>ActionModalRetryTest.php</file>
             <file>HandleControllerRequestTest.php</file>
             <file>FileUploadFailureTest.php</file>
             <file>MultipleFileSortTest.php</file>

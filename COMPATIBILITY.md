@@ -6,6 +6,24 @@
   specific application/version combinations before claiming support
 - Separate dependency declarations, focused checks, and full runtime support
 
+## Action modal retry recovery (2026-10-05)
+
+Action form Submit buttons now reset after AJAX failure or confirmation
+cancellation before sending a request. Entered values and existing error notices
+are preserved. Once confirmed, a pending request retains ownership of the button
+state even if its confirmation is dismissed. Existing successful modal close,
+button reset and navigation behavior stays unchanged. This PHP-generated script
+change needs no asset/view republish or data migration; check overridden Action
+Form interactors. See the [retry contract and cautions](tests/integration/ACTION_MODAL_RETRY.md).
+
+日本語: Action フォームの通信失敗、または送信前の確認キャンセル後に送信ボタンを
+復帰させ、入力を保持したまま再試行できます。送信開始後に確認画面を閉じても、
+通信が完了するまではこの修正によってボタンを解除しません。成功時の画面を閉じる
+処理・ボタン復帰・遷移は維持します。ビュー・アセットの再公開やデータ移行は不要
+ですが、独自の Form interactor は確認してください。通信失敗時のサーバー側保存の
+有無や重複処理を保証する修正ではなく、他の Laravel アプリとの互換性は個別に
+検証してください。
+
 ## Dependent Select loader isolation (2026-10-05)
 
 Each `Select::loads()` initializer now keeps its target fields, URLs and refresh
