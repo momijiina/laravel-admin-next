@@ -1,4 +1,5 @@
-$(document).off('click', '.ie-content .ie-submit').on('click', '.ie-content .ie-submit', function () {
+{{-- Keep each resource/field's extractor and display callback without using the payload name as CSS. --}}
+$(document).off('click', '.ie-content .ie-submit-{{ md5($resource."\0".$name) }}').on('click', '.ie-content .ie-submit-{{ md5($resource."\0".$name) }}', function () {
 
     var $popover = $(this).closest('.ie-content');
     var $trigger = $popover.data('trigger');

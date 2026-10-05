@@ -78,6 +78,8 @@ The dated results below are historical snapshots, not the current suite totals.
   named filters and follow-up rendered links; [sort regression scope](GRID_EXPLICIT_SORT.md)
 - Nullable Grid inline Select/Radio labels, mixed rows and dynamic options, shipped
   popover cancel/reopen and HTTP/SQLite saves; [NULL contract and upgrade cautions](GRID_INLINE_NULLABLE_CHOICES.md)
+- Mixed Grid inline editor submit-handler ownership across types and resources;
+  [binding scope, regression coverage and overridden-view cautions](GRID_INLINE_MIXED_EDITORS.md)
 - Grid inline MultipleSelect integer/zero IDs, shipped popover cancellation and reopening,
   actual AJAX payloads and HTTP/SQLite saves; [selection contract and override cautions](GRID_INLINE_MULTIPLE_SELECT.md)
 - Grid QuickCreate validation retries, cancel/reopen, scoped submit-button resets,
