@@ -93,6 +93,10 @@ The dated results below are historical snapshots, not the current suite totals.
   old-input redisplay and corrected SQLite retries; [regression scope](MULTIPLE_SELECT_NULL_OLD_INPUT.md)
 - URL-options Select/MultipleSelect selection and clearing across validation retries,
   shipped Select2 and corrected HTTP/SQLite saves; [retry precedence and compatibility limits](REMOTE_SELECT_OLD_INPUT.md)
+- Independent `Select::loads()` initializers in both registration orders, custom
+  response mappings, clear settings and repeated initialization, with shipped
+  Select2 and native FormData HTTP/SQLite saves;
+  [loader isolation and unchanged AJAX boundaries](SELECT_LOADS_ISOLATION.md)
 - Ordinary nullable Select zero/NULL rendering and serialized HTTP persistence;
   [selection contract, defaults, and upgrade notes](NULLABLE_SELECT.md)
 - Ordinary Switch localized labels, shipped native/plugin clicks and HTTP/SQLite saves;

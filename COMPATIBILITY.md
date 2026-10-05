@@ -6,6 +6,21 @@
   specific application/version combinations before claiming support
 - Separate dependency declarations, focused checks, and full runtime support
 
+## Dependent Select loader isolation (2026-10-05)
+
+Each `Select::loads()` initializer now keeps its target fields, URLs and refresh
+callback in its own function scope. Independent loaders in the shared Admin
+ready callback no longer overwrite one another's configuration. Single-loader
+selection/clearing and the existing ID and AJAX contracts remain unchanged.
+No asset/view change or republish is needed; review overridden PHP `loads()`
+implementations. See the [coverage and boundaries](tests/integration/SELECT_LOADS_ISOLATION.md).
+
+日本語: `Select::loads()` ごとに初期化スクリプトの変数を分離し、後続のローダーが
+先行ローダーの対象・URL・更新処理を上書きする問題を防ぎます。単独利用時の選択・
+クリア、ID 形式と AJAX の既存仕様は維持します。ビュー・アセットの変更や再公開は
+不要ですが、PHP の `loads()` を独自実装している場合は確認してください。
+入れ子のフィールド識別や非同期応答順序を保証する変更ではありません。
+
 ## Nullable Grid inline choices (2026-10-05)
 
 Grid inline Select/Radio now render a blank label for strict NULL instead of
