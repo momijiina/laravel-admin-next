@@ -75,7 +75,15 @@ class MultipleFile extends Field
 
         $attributes[$this->column] = $this->label;
 
-        list($rules, $input) = $this->hydrateFiles(Arr::get($input, $this->column, []));
+        $files = Arr::get($input, $this->column, []);
+
+        // A sort-only update contains an order string, not a new upload.
+        if (is_string($files) && $files !== '' &&
+            $files === Arr::get($input, static::FILE_SORT_FLAG.'.'.$this->column)) {
+            $files = [];
+        }
+
+        list($rules, $input) = $this->hydrateFiles($files);
 
         return \validator($input, $rules, $this->getValidationMessages(), $attributes);
     }
@@ -145,6 +153,12 @@ class MultipleFile extends Field
             return $this->sortFiles($files);
         }
 
+        $original = $this->original();
+
+        if ($order = Arr::get(request(static::FILE_SORT_FLAG, []), $this->column)) {
+            $original = $this->sortFiles($order);
+        }
+
         $targets = array_map([$this, 'prepareForeach'], $files);
 
         // for create or update
@@ -154,7 +168,7 @@ class MultipleFile extends Field
             }, $targets);
         }
 
-        return array_merge($this->original(), $targets);
+        return array_merge($original, $targets);
     }
 
     /**

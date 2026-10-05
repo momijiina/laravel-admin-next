@@ -135,6 +135,9 @@ The dated results below are historical snapshots, not the current suite totals.
   identities, real Bootstrap tab behavior and HTTP/SQLite saves;
   [regression scope](HASMANY_MODES_REINITIALIZATION.md)
 - Main-file upload failure preservation and successful replacement
+- Ordinary sortable MultipleFile saves, validated sort-and-append uploads, and
+  raw hook/custom-validator input compatibility;
+  [sorting contract and coverage limits](MULTIPLE_FILE_SORT.md)
 - Actual HTTP-kernel middleware lifecycle, including consumer bootstrap execution
 - SQLite-persisted operation logs, recursive redaction, preserved controller input,
   validation failures, custom redaction fields, logging disablement and exclusions
