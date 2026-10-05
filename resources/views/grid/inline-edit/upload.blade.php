@@ -15,9 +15,9 @@ $('#{{ $target }}').off('change.adminInlineUpload').on('change.adminInlineUpload
     var formData = new FormData();
 
     @if ($multiple)
-        event.target.files.forEach(function (file) {
-            formData.append("{{ $name }}[]", file);
-        });
+        for (var index = 0; index < event.target.files.length; index++) {
+            formData.append("{{ $name }}[]", event.target.files[index]);
+        }
     @else
     formData.append("{{ $name }}", event.target.files[0]);
     @endif
