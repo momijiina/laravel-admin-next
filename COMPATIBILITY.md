@@ -13,15 +13,21 @@ submit handlers now stay with their resource and payload name. A later editor
 no longer replaces another field's value extractor, display callback or save URL.
 Existing APIs, values and save/display behavior remain unchanged. Reconcile both
 overridden `grid/inline-edit/comm.blade.php` and `partials/submit.blade.php` views
-together; no JavaScript asset republish or data migration is needed. See the
+together. Fully reload open admin pages after deployment so old generic submit
+handlers cannot survive alongside the new scoped bindings, including across
+PJAX updates. Refresh stale compiled views through the normal deployment process;
+no JavaScript asset republish or data migration is needed. Previously overwritten
+values are not reconstructed. See the
 [regression contract and upgrade cautions](tests/integration/GRID_INLINE_MIXED_EDITORS.md).
 
 日本語: Grid のインライン Input・Textarea・Datetime・Select・MultipleSelect・Radio・
 Checkbox の送信処理をリソースと送信項目名ごとに分離し、後続のエディターによる
 値の取得・表示更新・送信先の上書きを防ぎます。既存 API、値と保存・表示の仕様は
 維持します。上書きした共通ビューと送信 partial は必ず一緒に反映してください。
-JS アセットの再公開やデータ移行は不要です。Popover 全体の再初期化や複数 Grid の
-同名フィールド識別を修正するものではありません。他の Laravel アプリとの連携は
+デプロイ後は管理画面をページ全体で再読み込みし、PJAX などで旧送信処理を残さないで
+ください。古いコンパイル済みビューも通常の手順で更新してください。JS アセットの
+再公開やデータ移行は不要ですが、過去の誤った上書きは復元しません。Popover 全体の
+再初期化や複数 Grid の同名フィールド識別を修正するものではありません。他の Laravel アプリとの連携は
 アプリごとに検証してください。
 
 ## Action modal retry recovery (2026-10-05)
@@ -73,9 +79,9 @@ unchanged, and no NULL clearing protocol is added. See the
 
 ## Current maintenance summary
 
-Updated 2026-10-04. This index describes the changes merged through
-[PR #74](https://github.com/momijiina/laravel-admin-next/pull/74), at
-[`724834a`](https://github.com/momijiina/laravel-admin-next/commit/724834a03ced08b4c8094d13fd847f47011a7c1a).
+Updated 2026-10-05. This index describes the changes merged through
+[PR #85](https://github.com/momijiina/laravel-admin-next/pull/85), at
+[`d292ea4`](https://github.com/momijiina/laravel-admin-next/commit/d292ea4bb82e14f676ab6d127d5901525c1136b0).
 Use the linked guides for upgrade steps and each regression's precise boundary.
 Historical test totals below remain evidence for their own revisions, not
 current suite totals or validation of subsequent changes.
@@ -280,6 +286,105 @@ current suite totals or validation of subsequent changes.
   is needed. This does not expand JavaScript integer precision or redesign
   malformed/NULL and empty-selection semantics. See
   [inline selection and persistence boundaries](tests/integration/GRID_INLINE_MULTIPLE_SELECT.md).
+
+
+- **Grid QuickCreate retries ([PR #76](https://github.com/momijiina/laravel-admin-next/pull/76)):**
+  unsuccessful JSON responses reset only the originating Submit button, retaining
+  input for correction/retry. Successful responses keep it loading until reload;
+  the existing HTTP-error reset is unchanged. Review custom `QuickCreate::script()`
+  implementations; no asset/view refresh is needed. See the
+  [retry contract and limits](tests/integration/GRID_QUICK_CREATE.md).
+- **Grid uploads ([PR #77](https://github.com/momijiina/laravel-admin-next/pull/77),
+  [PR #78](https://github.com/momijiina/laravel-admin-next/pull/78)):** per-cell
+  targets and repeatable namespaced handlers prevent unrelated upload columns
+  from submitting. The existing `uplaodMany()` API iterates native FileList by
+  index, preserving every selected file and its order. Update overridden upload
+  views with both changes; follow rendered `data-target` / `$target` values instead
+  of constructing or retaining input IDs across renders. Custom targets must be
+  unique across cells and Grids. Refresh stale compiled views; JS asset updates
+  alone do not update Blade overrides. See [upload cautions](tests/integration/GRID_INLINE_UPLOAD.md).
+- **Grid nested-table alignment ([PR #79](https://github.com/momijiina/laravel-admin-next/pull/79)):**
+  missing keys produce empty cells in configured column order. Custom table views
+  now receive explicit NULL for absent keys, so review key-presence/count logic.
+  Stored JSON, first-row header inference and supported row types are unchanged;
+  no asset/view refresh is needed. See [table boundaries](tests/integration/GRID_TABLE.md).
+- **MultipleFile sorting ([PR #80](https://github.com/momijiina/laravel-admin-next/pull/80)):**
+  ordinary top-level sortable fields retain new uploads after sorted existing
+  files, in selection order; optional built-in file/image rules allow sort-only
+  submissions. Combined sort/upload requests now pass the actual `UploadedFile`
+  array to custom validators and saving hooks instead of the erroneous order
+  string. Review those hooks; order remains in `_file_sort_[field]`, and sort-only
+  hook input is unchanged. No asset/view refresh is needed. Required-rule,
+  nested/relation, malformed-order and storage-atomicity semantics are unchanged;
+  see [sorting and hook cautions](tests/integration/MULTIPLE_FILE_SORT.md).
+- **Nullable Grid inline choices ([PR #81](https://github.com/momijiina/laravel-admin-next/pull/81)):**
+  Select/Radio display strict NULL as a blank label without failing the table.
+  Review custom displayers; popover defaults, loose comparisons and storage remain,
+  with no new NULL-clearing protocol or asset/view refresh. See
+  [nullable-choice boundaries](tests/integration/GRID_INLINE_NULLABLE_CHOICES.md).
+- **Dependent Select isolation ([PR #82](https://github.com/momijiina/laravel-admin-next/pull/82)):**
+  independent `Select::loads()` initializers keep their targets, URLs and callbacks
+  in their own scopes. Review PHP overrides; existing ID/AJAX contracts and
+  single-loader behavior remain, with no asset/view refresh. See
+  [loader-isolation boundaries](tests/integration/SELECT_LOADS_ISOLATION.md).
+- **Action modal retries ([PR #83](https://github.com/momijiina/laravel-admin-next/pull/83)):**
+  AJAX failure and confirmation cancellation before sending restore the originating
+  form's Submit button and retain input. A request already sent owns the button
+  until its callback settles, even if confirmation is dismissed. Review overridden
+  Form interactors; no asset/view refresh is needed. A transport failure does not
+  prove that the server did not save, and this adds no server-side idempotency;
+  see [retry and pending-confirmation cautions](tests/integration/ACTION_MODAL_RETRY.md).
+- **Mixed Grid inline editors ([PR #84](https://github.com/momijiina/laravel-admin-next/pull/84)):**
+  Input, Textarea, Datetime, Select, MultipleSelect, Radio and Checkbox submit
+  bindings are scoped by resource/payload name, preventing later editors from
+  replacing another field's value extractor, display callback or save URL.
+  Update **both** `grid/inline-edit/comm.blade.php` and
+  `grid/inline-edit/partials/submit.blade.php` overrides together, refresh stale
+  compiled views and **fully reload open admin pages**. PJAX alone can retain the
+  old generic handler alongside the new bindings. No JS asset republish or data
+  migration is needed; this cannot restore previously overwritten values or fix
+  all popover/cross-Grid identity issues. See
+  [paired-view and reload cautions](tests/integration/GRID_INLINE_MIXED_EDITORS.md).
+- **Root development dependency ([PR #85](https://github.com/momijiina/laravel-admin-next/pull/85)):**
+  `laravel/browser-kit-testing` now allows `^6.0 || ^7.0` in root `require-dev`,
+  removing the v6-only resolution conflict for modern Laravel development setups.
+  The isolated [BrowserKit runner](tests/browserkit/README.md) already required
+  `^7.2.8`; this does not change its requirement, runtime dependencies, or application
+  APIs. It is a development-resolution fix, not a new security fix or a guarantee
+  for every version allowed by the root's historical dependency graph.
+
+### 日本語: PR #76–#85 の変更点と更新時の注意
+
+- Grid QuickCreate は失敗 JSON 応答後、Action モーダルは通信失敗・送信前の確認
+  キャンセル後に、入力を保ったまま再試行できます。独自の PHP スクリプト生成を
+  確認してください。通信失敗は未保存の保証ではなく、重要な操作の重複処理対策は
+  アプリ側で必要です。
+- Grid アップロードはセル単位に分離し、`uplaodMany()` は native FileList を
+  選択順で送信します。上書きビューに両方の修正を反映し、独自 selector は生成 ID を
+  組み立てず、描画された `data-target` / `$target` を参照してください。
+- 通常のトップレベル MultipleFile は並び替えと追加アップロードを同時に保存できます。
+  この組み合わせの saving フック・独自 validator には `UploadedFile` 配列が渡るため、
+  以前の並び順文字列を前提とする処理を確認してください。並び替えだけの入力は維持します。
+- Grid 内テーブルの欠損キーは NULL の空セルになり、インライン Select/Radio の NULL は
+  空欄表示になります。独自ビューのキー有無・要素数の判定や独自表示クラスを確認して
+  ください。依存 Select ローダーも初期化ごとに分離しますが、既存の取得・選択仕様は維持します。
+- 異種インラインエディターは共通ビューと送信 partial を必ず一緒に更新し、古い
+  コンパイル済みビューを更新したうえで管理画面をページ全体で再読み込みしてください。
+  PJAX の更新だけでは旧送信処理が残る場合があります。過去の誤った上書きは復元しません。
+- ルート開発依存の BrowserKit は `^6.0 || ^7.0` になりました。分離されたテスト環境は
+  既に `^7.2.8` を要求しており、新しいセキュリティ修正や全バージョンの動作保証ではありません。
+
+The linked guides distinguish offline DOM/widget execution and in-process
+HTTP/SQLite checks from live-browser, network/PJAX, cookies/CSRF, external-database
+and downstream-override coverage. PR #78 also raised the full integration and
+DomCrawler workflow timeouts to 30 minutes; that CI configuration is not evidence
+of broader runtime support. No new runtime validation is claimed by this
+documentation refresh, and historical test totals below keep their original scope.
+
+日本語: 検証範囲は各ガイドを参照してください。offline DOM とプロセス内 HTTP/SQLite の
+確認は、実ブラウザー・実通信/PJAX・cookie/CSRF・他の DB・独自上書きの保証ではありません。
+PR #78 の統合・DomCrawler CI の制限時間延長（30 分）も対応範囲を広げるものではなく、
+今回の文書更新による新たなランタイム検証や、他の Laravel アプリとの一律の互換性は主張しません。
 
 Disabled-collection support and changes to Embeds replacement semantics remain
 separate design work, not shipped fixes. Readonly does not imply either; see the

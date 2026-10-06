@@ -13,6 +13,13 @@ The [original PR candidate inventory](docs/pr-candidates-2026-10-01.md) is a
 historical snapshot. Current completed coverage and its limits are recorded in
 [the current maintenance summary](COMPATIBILITY.md#current-maintenance-summary).
 
+Updated through PR #85 (2026-10-05): the summary covers recent retry, upload,
+display and inline-editor fixes, plus the root BrowserKit development constraint.
+Review the paired-view/full-page-reload and upload-hook cautions before upgrading.
+日本語: PR #85 までの変更点・更新時の注意は上記のまとめを参照してください。
+インラインエディターの共通ビューと送信 partial の同時更新・ページ全体の再読み込み、
+並び替えとアップロードを同時に扱う独自フックの確認が必要です。
+
 ## Phase 1: Establish a verified baseline
 
 - [x] Audit the imported code, dependency constraints, assets, tests, and CI
@@ -23,7 +30,10 @@ historical snapshot. Current completed coverage and its limits are recorded in
       ([isolated SQLite runner](tests/browserkit/README.md)); retain 73 historical
       methods and add four package-state isolation regressions
 - [x] Isolate FakerPHP, legacy factories and disposable application setup in the
-      modern runner without changing the root historical development graph
+      modern runner, separate from the root historical development graph
+- [x] Allow BrowserKit `^6.0 || ^7.0` in root development dependencies (PR #85);
+      the isolated runner already requires `^7.2.8`. This resolves the v6-only
+      constraint conflict without retiring the remaining legacy development setup
 - [x] Add selected Laravel 12/13 and PHP 8.2–8.5 CI combinations, respecting each
       framework's PHP minimum; record exact tested dependency floors separately
 - [x] Exercise shipped configuration through the real integration consumer and
@@ -92,8 +102,23 @@ and application checks; do not silently remove or claim support for them.
       remove [manual label-escaping workarounds](tests/integration/SWITCH_LABELS.md)
 - [x] Restore attempted URL-options Select/MultipleSelect choices after validation
       failure; [dependent loaders and remote availability remain separate](tests/integration/REMOTE_SELECT_OLD_INPUT.md).
-      The latest [hosted snapshot](COMPATIBILITY.md#hosted-evidence-for-pr-74)
-      records the exact pre-merge revision and coverage limits
+      The [PR #74 hosted snapshot](COMPATIBILITY.md#hosted-evidence-for-pr-74)
+      records that exact pre-merge revision and coverage limits
+- [x] Restore Grid QuickCreate and Action modal retries while retaining input;
+      review [QuickCreate overrides](tests/integration/GRID_QUICK_CREATE.md) and
+      [Action retry/idempotency limits](tests/integration/ACTION_MODAL_RETRY.md)
+- [x] Isolate Grid upload cells and iterate native FileList for `uplaodMany()`;
+      update [overridden upload views and generated-target selectors](tests/integration/GRID_INLINE_UPLOAD.md)
+- [x] Preserve new MultipleFile uploads during sorting and allow optional file/image
+      validation on sort-only saves; review [changed combined-request hook inputs](tests/integration/MULTIPLE_FILE_SORT.md)
+- [x] Keep missing Grid table cells aligned and render nullable inline Select/Radio;
+      review [custom table-view input](tests/integration/GRID_TABLE.md) and
+      [nullable-choice boundaries](tests/integration/GRID_INLINE_NULLABLE_CHOICES.md)
+- [x] Isolate independent dependent-Select initializers; review
+      [PHP overrides and loader boundaries](tests/integration/SELECT_LOADS_ISOLATION.md)
+- [x] Scope mixed Grid inline submit handlers by resource/payload name; update both
+      common/submit views, refresh stale compiled views and fully reload admin pages.
+      See [paired-view, reload and remaining identity limits](tests/integration/GRID_INLINE_MIXED_EDITORS.md)
 - [ ] Add real password-change and rendered-operation-log coverage
 - [ ] Review remaining deprecations, default credentials, login throttling,
       upload previews and AJAX-option escaping; these tests are not a penetration test
