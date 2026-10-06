@@ -35,17 +35,7 @@ class Between extends AbstractFilter
      */
     protected function formatName($column)
     {
-        $columns = explode('.', $column);
-
-        if (count($columns) == 1) {
-            $name = $columns[0];
-        } else {
-            $name = array_shift($columns);
-
-            foreach ($columns as $column) {
-                $name .= "[$column]";
-            }
-        }
+        $name = parent::formatName($column);
 
         return ['start' => "{$name}[start]", 'end' => "{$name}[end]"];
     }

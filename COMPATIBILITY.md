@@ -6,6 +6,26 @@
   specific application/version combinations before claiming support
 - Separate dependency declarations, focused checks, and full runtime support
 
+## Named Grid Between form names (2026-10-06)
+
+Between controls now use their named Grid's existing input namespace, including
+both ordinary and datetime views. Submitted ranges are applied instead of being
+silently ignored. Unnamed controls, correctly prefixed query URLs, dotted-name
+formatting, SQL, IDs and scripts retain their existing behavior. Review custom
+selectors, overridden filter views and name formatters that depend on the old
+unprefixed HTML names; reload open forms after updating. No dependency/floor,
+asset/view republish, schema or data migration is needed. See the
+[form-name contract and verification limits](tests/integration/GRID_BETWEEN_NAMES.md).
+
+日本語: Between の通常・日時表示で、名前付き Grid の既存の接頭辞を入力名に
+反映し、送信した範囲条件が無視される問題を修正します。名前なし Grid、接頭辞付き
+クエリ URL、ドット区切りの名前整形、SQL、ID とスクリプトの既存動作を維持します。
+旧入力名に依存する独自セレクター、上書きビュー、名前整形処理を確認し、更新後は
+開いたままのフォームを再読み込みしてください。最低要件・依存関係の変更、
+アセット・ビューの再公開、スキーマ・データ移行は不要です。日時ピッカーや
+複数 Grid の DOM ID を変更するものではありません。他の Laravel アプリとの
+互換性はアプリごとに検証してください。
+
 ## Modern Eloquent Attribute dispatch (2026-10-06)
 
 Grid `column()` and Grid/Show shorthand now recognize native Eloquent
