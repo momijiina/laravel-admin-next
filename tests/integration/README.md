@@ -76,6 +76,10 @@ The dated results below are historical snapshots, not the current suite totals.
     appends 設定と旧フレームワークに関する検証の限界
 - Named grid pagination with configured sizes, independent links and explicit
   Eloquent arguments; [pagination regression scope](GRID_PAGINATION.md)
+- Configured Grid quick-search keys through shipped header tools, native FormData,
+  HTTP/SQLite searches, value redisplay and action-query removal;
+  [static-key behavior, custom-renderer cautions and limits](GRID_QUICK_SEARCH_KEYS.md)
+  - 日本語: クイック検索の設定キー、単独ツール・サブクラス、既存検索仕様と検証範囲
 - Named Grid Between form namespaces through both shipped views, native FormData,
   HTTP/SQLite bounds, redisplay and independent resets;
   [field-name changes, custom-selector cautions and limits](GRID_BETWEEN_NAMES.md)
