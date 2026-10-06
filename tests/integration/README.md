@@ -129,6 +129,9 @@ The dated results below are historical snapshots, not the current suite totals.
   HTTP/SQLite searches, value redisplay and action-query removal;
   [static-key behavior, custom-renderer cautions and limits](GRID_QUICK_SEARCH_KEYS.md)
   - 日本語: クイック検索の設定キー、単独ツール・サブクラス、既存検索仕様と検証範囲
+- Grid copyable literal-text transport through native DOM selection, with quotes,
+  entities, JSON-like strings, multiline text and unchanged display:
+  [copy contract, upgrade cautions and limits](GRID_COPYABLE_TEXT.md)
 - Named Grid filter prefixes removed once while preserving repeated/interior column
   names, distinct inputs and array values through native FormData and HTTP/SQLite;
   [prefix contract, custom-override cautions and limits](GRID_FILTER_PREFIX.md)
