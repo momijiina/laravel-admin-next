@@ -6,6 +6,31 @@
   specific application/version combinations before claiming support
 - Separate dependency declarations, focused checks, and full runtime support
 
+## Named Grid filter prefix preservation (2026-10-06)
+
+Named Grid filters now remove exactly one leading Grid namespace from matching
+request keys. For `Grid::setName('user')`, `equal('user_id')` keeps the column
+`user_id` after receiving `user_user_id`; repeated or interior `user_` text in
+the column is preserved. Previously, all occurrences were removed, which could
+apply a different filter, ignore the intended condition, or collapse distinct
+inputs. Existing namespace matching, unnamed inputs, empty/zero handling, input
+shapes, HTML names and SQL/filter APIs are unchanged. Review custom
+`sanitizeInputs()` overrides and query URLs that relied on the incorrect aliasing;
+regenerate the intended query rather than relying on the former result. No new
+API, dependency/floor, asset/view republish, schema or data migration is needed.
+Verify integration with each consuming Laravel application. See the
+[prefix contract, regression coverage and limits](tests/integration/GRID_FILTER_PREFIX.md).
+
+日本語: 名前付き Grid のフィルター入力で、先頭の Grid 接頭辞を 1 回だけ除去
+します。Grid 名が `user`、列が `user_id` の場合、送信キー `user_user_id` を
+正しく `user_id` に戻し、列名内の繰り返しや途中の `user_` は保持します。従来は
+全箇所を除去し、別の条件への誤適用・条件の無視・複数入力の衝突が起こり得ました。
+名前空間の照合、名前なし入力、空欄・ゼロ、配列構造、HTML の入力名、SQL・
+フィルター API は維持します。独自の `sanitizeInputs()` と誤った別名変換に依存
+する URL を確認し、本来の条件でクエリを生成し直してください。新 API・依存関係・
+最低要件の変更、アセット・ビューの再公開、スキーマ・データ移行は不要です。
+他の Laravel アプリとの連携は個別に検証してください。
+
 ## Nullable styled Radio values (2026-10-06)
 
 RadioButton and RadioCard now leave a NULL effective value unselected instead of
