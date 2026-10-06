@@ -15,14 +15,22 @@ class Copyable extends AbstractDisplayer
     {
         $script = <<<SCRIPT
 $('#{$this->grid->tableID}').on('click','.grid-column-copyable',(function (e) {
-    var content = $(this).data('content');
+    var content = JSON.parse($(this).attr('data-content'));
     
-    var temp = $('<input>');
-    
+    var temp = $('<span contenteditable="true"></span>').css({
+        position: 'fixed', left: '-9999px', whiteSpace: 'pre'
+    });
+
     $("body").append(temp);
-    temp.val(content).select();
+    temp.text(content);
+    var range = document.createRange();
+    range.selectNodeContents(temp[0]);
+    var selection = window.getSelection();
+    selection.removeAllRanges();
+    selection.addRange(range);
     document.execCommand("copy");
     temp.remove();
+    selection.removeAllRanges();
     
     $(this).tooltip('show');
 }));
@@ -35,7 +43,8 @@ SCRIPT;
     {
         $this->addScript();
 
-        $content = $this->getColumn()->getOriginal();
+        // JSON retains literal newlines through the Grid and browser HTML parsers.
+        $content = e(json_encode((string) $this->getColumn()->getOriginal(), JSON_INVALID_UTF8_SUBSTITUTE));
 
         return <<<HTML
 <a href="javascript:void(0);" class="grid-column-copyable text-muted" data-content="{$content}" title="Copied!" data-placement="bottom">

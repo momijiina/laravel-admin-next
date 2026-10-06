@@ -6,6 +6,31 @@
   specific application/version combinations before claiming support
 - Separate dependency declarations, focused checks, and full runtime support
 
+## Grid copyable literal text (2026-10-06)
+
+Grid `copyable()` now retains the original literal text through native DOM
+selection, including quotes, entity/JSON-looking strings, the string `null`,
+Unicode, empty strings and LF/CRLF/CR line breaks. Formatted display stays
+independent. The private `data-content` attribute is now an escaped JSON string;
+review custom Copyable overrides and attribute-reading scripts, and reload open
+grids. PHP NULL/false still become empty text and existing scalar conversions
+remain; this does not add an array/object or binary-data copy API. Public methods,
+clipboard command and tooltip behavior remain unchanged. No dependency/floor,
+asset/view republish, schema or data migration is required. Verify each consuming
+Laravel application. The offline native-selection tests do not prove OS clipboard
+writes, empty-selection clearing or browser line-ending behavior. See the
+[copy-text contract, upgrade cautions and limits](tests/integration/GRID_COPYABLE_TEXT.md).
+
+日本語: Grid の `copyable()` で、引用符・実体参照風／JSON 風の文字列・文字列
+`null`・Unicode・空文字・LF/CRLF/CR を DOM の選択まで保持します。加工済みの
+表示は維持します。内部の `data-content` はエスケープ済み JSON 文字列になるため、
+独自の Copyable と属性参照を確認し、Grid を再読み込みしてください。PHP NULL・
+false の空文字化と従来のスカラー変換を維持し、配列・オブジェクト・バイナリの API は
+追加しません。公開メソッド・コピーコマンド・ツールチップは変更しません。依存関係・
+最低要件・アセット／ビューの再公開・スキーマ／データ移行の変更は不要です。他の
+Laravel アプリでは個別に確認してください。オフラインの選択検証は、OS への
+書き込み成功・空文字による消去・ブラウザーの改行動作を保証しません。
+
 ## Named Grid filter prefix preservation (2026-10-06)
 
 Named Grid filters now remove exactly one leading Grid namespace from matching
