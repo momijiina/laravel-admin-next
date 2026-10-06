@@ -28,6 +28,55 @@ and vendor files are local only so CI resolves each selected framework family.
 Testbench's [compatibility table](https://github.com/orchestral/testbench-core)
 explains the framework/version mapping.
 
+## CI Node compile cache / CI の Node コンパイルキャッシュ
+
+The ordinary full-suite test steps in `laravel-integration.yml` and
+`domcrawler-compatibility.yml` create a fresh private directory with `mktemp`
+under `RUNNER_TEMP`, then export `NODE_COMPILE_CACHE` for `composer test` and
+its Node children. Each matrix job starts cold; nothing is restored, shared
+between jobs, or saved with `actions/cache`. The runner cleans its temporary
+directory at job boundaries. Tests, fresh helper processes, assertions, matrix
+entries, dependency/security checks and timeouts are unchanged.
+
+These steps do not collect V8 coverage. If coverage is introduced, set
+`NODE_DISABLE_COMPILE_CACHE=1` for the coverage run: Node warns that cached
+functions can produce less precise V8 coverage. See the
+[Node 24 module compile-cache documentation](https://nodejs.org/download/release/v24.15.0/docs/api/module.html#module-compile-cache).
+The cache can also be disabled with that variable when diagnosing failures.
+
+A local comparison on 2026-10-06, before this workflow/documentation-only
+change, used Node 24.19.0 and the unchanged source tree of
+`c8b6d5226e624dee14be7ba09cd33956275ca531`:
+
+| Full integration lane | Uncached | Cold per-lane cache | Observed reduction |
+| --- | ---: | ---: | ---: |
+| PHP 8.2.34 / Laravel 12.69.3 | 1,565.852s | 1,381.725s | 11.76% |
+| PHP 8.3.35 / Laravel 13.34.0 | 1,533.889s | 1,410.767s | 8.03% |
+
+All four runs passed with 756 tests, 273,419 assertions and the same two
+optional external-database skips. Each retained 158 PHP and 1,234 fresh Node
+processes. Timing includes cold cache creation and writes, but excludes
+application preparation and receipt summarization. This was one pair per
+graph in one local session with opposing run order and concurrent lanes,
+including provenance-check overhead. It establishes neither repeatability
+nor hosted-CI savings, and does not validate every matrix entry or external
+database. Measure hosted results separately before claiming a CI speedup.
+
+日本語: 上記 2 ワークフローの通常の全件テストだけで、`RUNNER_TEMP` 内に
+`mktemp` で空の専用ディレクトリを作り、`NODE_COMPILE_CACHE` を子プロセスへ
+渡します。各マトリクスジョブは空のキャッシュから開始し、ジョブ間の共有・復元・
+永続保存は行いません。テスト、アサーション、独立した補助プロセス、マトリクス、
+依存関係・セキュリティ検査、タイムアウトは変更しません。V8 カバレッジを導入する
+場合は、精度低下を避けるため、その実行で `NODE_DISABLE_COMPILE_CACHE=1` を
+設定してください。障害調査時にも同じ変数で無効化できます。
+
+表は変更前の同一ソースで測ったローカル結果です。4 回とも 756 テスト・273,419
+アサーション、同じ任意 DB テスト 2 件のスキップで成功し、各回の PHP 158・Node
+1,234 プロセスも維持しました。空のキャッシュ作成・書き込み時間を含み、アプリ準備・
+検証記録の集計時間は除きます。各構成 1 組のみを同じセッションで順序を入れ替えて
+並行実行した測定で、検証用のハッシュ照合負荷も含みます。再現性、全マトリクス・
+外部 DB の検証、ホスト型 CI での短縮率を保証する結果ではありません。
+
 ## Current evidence
 
 See the [current maintenance summary](../../COMPATIBILITY.md#current-maintenance-summary)

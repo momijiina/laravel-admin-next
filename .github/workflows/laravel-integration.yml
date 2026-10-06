@@ -61,4 +61,8 @@ jobs:
       - name: Install pinned collection DOM test dependencies
         run: npm ci --ignore-scripts --prefix javascript
       - name: Run real Laravel lifecycle tests
-        run: composer test
+        # For V8 coverage runs, set NODE_DISABLE_COMPILE_CACHE=1.
+        run: |
+          NODE_COMPILE_CACHE="$(mktemp -d "${RUNNER_TEMP}/node-compile-cache.XXXXXX")"
+          export NODE_COMPILE_CACHE
+          composer test
