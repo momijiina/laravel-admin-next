@@ -726,7 +726,11 @@ class Grid
      */
     protected function handleGetMutatorColumn($method, $label)
     {
-        if ($this->model()->eloquent()->hasGetMutator($method)) {
+        $model = $this->model()->eloquent();
+
+        if ($model->hasGetMutator($method) ||
+            (method_exists($model, 'hasAttributeMutator') && $model->hasAttributeMutator($method))
+        ) {
             return $this->addColumn($method, $label);
         }
 

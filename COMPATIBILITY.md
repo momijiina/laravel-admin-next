@@ -6,6 +6,31 @@
   specific application/version combinations before claiming support
 - Separate dependency declarations, focused checks, and full runtime support
 
+## Modern Eloquent Attribute dispatch (2026-10-06)
+
+Grid `column()` and Grid/Show shorthand now recognize native Eloquent
+`Illuminate\Database\Eloquent\Casts\Attribute` methods before relation dispatch,
+including protected/public methods and setter-only attributes. Legacy getter
+detection remains first; names, labels, native Eloquent read/serialization
+behavior, Grid macros and real single relations keep their existing behavior.
+The guarded `hasAttributeMutator()` check preserves the previous fallback when that framework capability is absent.
+Review custom Grid/Show dispatch overrides. Computed Grid values still need the
+application's normal Eloquent appends/serialization configuration. No PHP or
+Laravel floor, dependency, asset, view, schema or data migration changes are
+required. See the [dispatch contract and verification limits](tests/integration/MODERN_ATTRIBUTE_DISPATCH.md).
+
+日本語: Grid の `column()` と Grid/Show の短縮記法は、リレーション判定より前に
+Eloquent 標準の `Attribute` メソッドを属性として認識します。protected/public と
+setter のみの属性も対象です。従来の getter の判定を先に行い、名前・ラベル、
+Eloquent 標準の読み取り・シリアライズ、Grid マクロと実際の単一リレーションの
+既存動作を維持します。
+`hasAttributeMutator()` がない環境では従来の分岐を使用します。独自の Grid/Show
+振り分け処理を確認してください。Grid の計算属性には引き続きアプリ側の通常の
+appends・シリアライズ設定が必要です。最低要件・依存関係の変更、アセット・ビューの
+再公開、スキーマ・データ移行は不要です。入れ子のリレーションは変更しません。
+古いフレームワークでの実行や、他の Laravel アプリとの互換性を一律に保証するもの
+ではありません。
+
 ## Mixed Grid inline editors (2026-10-05)
 
 Grid inline Input, Textarea, Datetime, Select, MultipleSelect, Radio and Checkbox
