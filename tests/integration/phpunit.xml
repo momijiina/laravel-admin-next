@@ -20,6 +20,7 @@
             <file>SliderRangeTest.php</file>
             <file>SwitchLabelsTest.php</file>
             <file>NullableRadioTest.php</file>
+            <file>StyledRadioNullSelectionTest.php</file>
             <file>CurrencyRadixTest.php</file>
             <file>NumberIntegerTest.php</file>
             <file>NumberFieldStateTest.php</file>

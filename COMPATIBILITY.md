@@ -6,6 +6,30 @@
   specific application/version combinations before claiming support
 - Separate dependency declarations, focused checks, and full runtime support
 
+## Nullable styled Radio values (2026-10-06)
+
+RadioButton and RadioCard now leave a NULL effective value unselected instead of
+silently selecting zero. Checked inputs and active labels use the same selection.
+Non-NULL loose comparisons, old-input precedence, intentional scalar/closure
+defaults and the additive label-based `checked()` fallback are preserved.
+An unselected radio group is omitted from submission, preserving existing values
+on update; this is not a NULL-clearing API. Reconcile overridden/published
+`admin::form.radiobutton` and `admin::form.radiocard` views, refresh compiled views
+through the normal deployment process and reload open forms. No new API,
+dependency/floor, JavaScript asset republish, schema or data migration is needed.
+Previously overwritten values cannot be reconstructed. See the
+[selection contract and verification limits](tests/integration/STYLED_RADIO_NULL.md).
+
+日本語: RadioButton / RadioCard で実効値が NULL の場合にゼロが自動選択される
+問題を修正し、入力の checked とラベルの active を同じ判定に揃えます。NULL 以外の
+緩い比較、old input の優先、明示的な値・クロージャの既定値、ラベルによる
+`checked()` の追加選択は維持します。未選択の項目は送信されず、更新時には保存済み
+の値を保持します。NULL に消去する API の追加ではありません。上書き・公開済みの
+両ビューを確認し、通常の手順でコンパイル済みビューを更新して、フォームを
+再読み込みしてください。API・依存関係・最低要件の変更、JS アセットの再公開、
+スキーマ・データ移行は不要ですが、過去の誤上書きは復元できません。他の Laravel
+アプリとの互換性は個別に検証してください。
+
 ## Configured Grid quick-search keys (2026-10-06)
 
 Quick-search forms now use the bound Grid's configured search key for the input

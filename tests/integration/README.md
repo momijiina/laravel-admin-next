@@ -84,6 +84,10 @@ The dated results below are historical snapshots, not the current suite totals.
   HTTP/SQLite bounds, redisplay and independent resets;
   [field-name changes, custom-selector cautions and limits](GRID_BETWEEN_NAMES.md)
   - 日本語: 名前付き Grid の範囲入力名、既存のクエリ形式、独自セレクターと検証範囲
+- Nullable RadioButton/RadioCard choices through checked/active state, native FormData,
+  real form create/edit and validation-retry persistence;
+  [selection, omission and overridden-view cautions](STYLED_RADIO_NULL.md)
+  - 日本語: NULL の誤選択防止、既定値・再表示、未送信時の保存仕様と検証範囲
 - Ordinary Grid `gt()` / `lt()` inclusive labels, SQL bindings and HTTP/SQLite
   boundaries, including zero, negative values, blanks and reset;
   [query compatibility and overridden-view cautions](GRID_INEQUALITY_FILTERS.md)
