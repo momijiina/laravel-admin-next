@@ -348,7 +348,7 @@ class Filter implements Renderable
         $inputs = collect($inputs)->filter(function ($input, $key) {
             return Str::startsWith($key, "{$this->name}_");
         })->mapWithKeys(function ($val, $key) {
-            $key = str_replace("{$this->name}_", '', $key);
+            $key = substr($key, strlen("{$this->name}_"));
 
             return [$key => $val];
         })->toArray();

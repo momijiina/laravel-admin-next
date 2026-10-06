@@ -129,6 +129,10 @@ The dated results below are historical snapshots, not the current suite totals.
   HTTP/SQLite searches, value redisplay and action-query removal;
   [static-key behavior, custom-renderer cautions and limits](GRID_QUICK_SEARCH_KEYS.md)
   - 日本語: クイック検索の設定キー、単独ツール・サブクラス、既存検索仕様と検証範囲
+- Named Grid filter prefixes removed once while preserving repeated/interior column
+  names, distinct inputs and array values through native FormData and HTTP/SQLite;
+  [prefix contract, custom-override cautions and limits](GRID_FILTER_PREFIX.md)
+  - 日本語: 名前付き Grid の接頭辞除去、列名・配列の保持、独自実装と検証範囲
 - Named Grid Between form namespaces through both shipped views, native FormData,
   HTTP/SQLite bounds, redisplay and independent resets;
   [field-name changes, custom-selector cautions and limits](GRID_BETWEEN_NAMES.md)
