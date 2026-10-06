@@ -6,6 +6,27 @@
   specific application/version combinations before claiming support
 - Separate dependency declarations, focused checks, and full runtime support
 
+## Configured Grid quick-search keys (2026-10-06)
+
+Quick-search forms now use the bound Grid's configured search key for the input
+name, redisplayed value and action-query removal. Standalone tools fall back to
+`Grid::$searchKey`; subclass keys and changes before rendering are respected.
+Default-key behavior, query execution, source precedence, parsing, SQL and the
+existing falsey/zero short-circuit remain unchanged. Review custom selectors,
+overridden quick-search renderers/views and URLs that expect `__search__` despite
+a custom key; reload open forms. No new API, dependency/floor, asset/view republish,
+schema or data migration is needed. See the
+[search-key contract and verification limits](tests/integration/GRID_QUICK_SEARCH_KEYS.md).
+
+日本語: クイック検索の入力名・再表示・action のクエリ除去を、関連付けられた
+Grid の検索キーに揃えます。単独ツールは `Grid::$searchKey` を使い、サブクラスや
+描画前のキー変更にも対応します。既定キー、検索処理・取得順序・構文・SQL・
+falsey 値（文字列ゼロを含む）の既存動作は維持します。独自キーでも旧入力名を
+前提とするセレクター、上書き描画・ビュー、URL を確認し、フォームを再読み込み
+してください。新 API・依存関係・最低要件の変更や、再公開・データ移行は不要です。
+Grid ごとの名前空間追加や、古い Laravel での実行保証ではありません。他の
+Laravel アプリとの互換性は個別に検証してください。
+
 ## Named Grid Between form names (2026-10-06)
 
 Between controls now use their named Grid's existing input namespace, including
