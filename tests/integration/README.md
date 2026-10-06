@@ -76,6 +76,10 @@ The dated results below are historical snapshots, not the current suite totals.
     appends 設定と旧フレームワークに関する検証の限界
 - Named grid pagination with configured sizes, independent links and explicit
   Eloquent arguments; [pagination regression scope](GRID_PAGINATION.md)
+- Named Grid Between form namespaces through both shipped views, native FormData,
+  HTTP/SQLite bounds, redisplay and independent resets;
+  [field-name changes, custom-selector cautions and limits](GRID_BETWEEN_NAMES.md)
+  - 日本語: 名前付き Grid の範囲入力名、既存のクエリ形式、独自セレクターと検証範囲
 - Ordinary Grid `gt()` / `lt()` inclusive labels, SQL bindings and HTTP/SQLite
   boundaries, including zero, negative values, blanks and reset;
   [query compatibility and overridden-view cautions](GRID_INEQUALITY_FILTERS.md)
