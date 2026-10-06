@@ -69,6 +69,11 @@ The dated results below are historical snapshots, not the current suite totals.
   [parser behavior and custom-view cautions](ACTION_TEXTAREA_NEWLINES.md)
 - Real request-input parity for grid, row/batch actions and controller dispatch;
   DomCrawler compatibility and multiple-select null handling
+- Modern native Eloquent `Attribute` dispatch for explicit Grid columns and
+  Grid/Show shorthand through HTTP/SQLite, with legacy getter, macro and single
+  relation controls; [attribute scope, serialization and fallback limits](MODERN_ATTRIBUTE_DISPATCH.md)
+  - 日本語: Grid/Show の標準 `Attribute` 判定、既存動作との互換性、
+    appends 設定と旧フレームワークに関する検証の限界
 - Named grid pagination with configured sizes, independent links and explicit
   Eloquent arguments; [pagination regression scope](GRID_PAGINATION.md)
 - Ordinary Grid `gt()` / `lt()` inclusive labels, SQL bindings and HTTP/SQLite
@@ -155,6 +160,10 @@ The dated results below are historical snapshots, not the current suite totals.
 
 No package/framework classes are replaced with stubs. Small fixture routes return
 JSON or validate input to observe the real middleware before/after a controller.
+The modern-attribute regression also uses a small receiver double without
+`hasAttributeMutator()` to exercise the guarded fallback. It does not replace
+Eloquent in the HTTP tests or prove execution on a historical Laravel release.
+日本語: この補助的な代役による検証は、旧 Laravel での実行確認ではありません。
 Tests use a fresh application with disposable SQLite databases; the opt-in
 generator fixtures additionally use dedicated database services. Testbench registers
 the provider explicitly and Laravel's testing environment bypasses CSRF validation;
