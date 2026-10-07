@@ -129,6 +129,10 @@ The dated results below are historical snapshots, not the current suite totals.
   HTTP/SQLite searches, value redisplay and action-query removal;
   [static-key behavior, custom-renderer cautions and limits](GRID_QUICK_SEARCH_KEYS.md)
   - 日本語: クイック検索の設定キー、単独ツール・サブクラス、既存検索仕様と検証範囲
+- Grid legacy editable Select callback sources through HTML/JSON parsing, shipped
+  X-editable controls, cancel/reopen and HTTP/SQLite saves;
+  [source escaping, upgrade cautions and offline limits](GRID_EDITABLE_SELECT_SOURCE.md)
+  - 日本語: 行別選択肢の引用符・実体参照の保持、再編集・保存と検証範囲
 - Grid copyable literal-text transport through native DOM selection, with quotes,
   entities, JSON-like strings, multiline text and unchanged display:
   [copy contract, upgrade cautions and limits](GRID_COPYABLE_TEXT.md)

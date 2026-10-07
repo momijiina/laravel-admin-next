@@ -88,7 +88,7 @@ class Editable extends AbstractDisplayer
         }
 
         if ($useClosure) {
-            $this->addAttributes(['data-source' => json_encode($source)]);
+            $this->addAttributes(['data-source' => e(json_encode($source))]);
         } else {
             $this->addOptions(compact('source'));
         }
