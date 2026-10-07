@@ -215,14 +215,14 @@ class Tags extends Field
     protected function setupScript()
     {
         $separators = json_encode($this->separators);
-        $separatorsStr = implode('', $this->separators);
+        $separatorsPattern = json_encode('['.preg_quote(implode('', $this->separators)).']');
         $this->script = <<<JS
 $("{$this->getElementClassSelector()}").select2({
     tags: true,
     tokenSeparators: $separators,
     createTag: function(params) {
-        if (/[$separatorsStr]/.test(params.term)) {
-            var str = params.term.trim().replace(/[$separatorsStr]*$/, '');
+        if (new RegExp($separatorsPattern).test(params.term)) {
+            var str = params.term.trim().replace(new RegExp($separatorsPattern + '*$'), '');
             return { id: str, text: str }
         } else {
             return null;

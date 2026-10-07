@@ -21,6 +21,26 @@ Composer の制約変更だけでは既存 PDO アダプターやスキーマ AP
 通常の Composer 検査を有効にしたまま宣言範囲内で解決してください。Laravel 12/13
 全体では DBAL 3 を使用し、DBAL 2 の限定的な検証は全組み合わせの保証ではありません。
 
+## Literal Tags separators (2026-10-07)
+
+Custom `Tags::separators()` characters are now escaped and JSON-serialized for
+JavaScript regular expressions. Backslashes and line breaks no longer break
+initialization; brackets, carets and hyphens no longer prevent tag creation or
+match/remove ordinary tag text. Review custom separator lists and overridden
+initializers/callbacks that may rely on the old regex interpretation, and reload
+open admin forms after deployment. Defaults, trimming order and comma storage
+remain unchanged; no asset or database migration is needed. See the
+[regression contract, upgrade cautions and validation limits](tests/integration/TAGS_SEPARATORS.md),
+and verify the change in each consuming Laravel application.
+
+日本語: `Tags::separators()` の区切り文字をエスケープし、JSON 経由で正規表現へ
+渡すようにしました。バックスラッシュ・改行による初期化エラーや、角括弧・
+キャレット・ハイフンによる誤判定とタグ文字列の欠落を防ぎます。従来の正規表現
+としての解釈に依存する設定・独自コールバックは確認し、デプロイ後は管理画面を
+再読み込みしてください。既定の区切り文字・トリム順序・カンマ区切り保存は
+変更せず、アセット更新・DB 移行も不要です。利用先の Laravel アプリごとに
+確認してください。
+
 ## Listbox remote literal options (2026-10-07)
 
 URL-option Listbox fields now create native options with literal IDs and labels,
