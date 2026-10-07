@@ -44,6 +44,7 @@
             <file>ModernAttributeDispatchTest.php</file>
             <file>GridPaginationTest.php</file>
             <file>GridInequalityFilterTest.php</file>
+            <file>GridGroupOperatorTest.php</file>
             <file>GridBetweenNameTest.php</file>
             <file>GridFilterPrefixTest.php</file>
             <file>GridExplicitSortTest.php</file>

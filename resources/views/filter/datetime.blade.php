@@ -1,7 +1,7 @@
 <div class="input-group input-group-sm">
     @if($group)
         <div class="input-group-btn">
-            <input type="hidden" name="{{ $id }}_group" class="{{ $group_name }}-operation" value="0"/>
+            <input type="hidden" name="{{ $id }}_group" class="{{ $group_name }}-operation" value="{{ $group_index }}"/>
             <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" style="min-width: 32px;">
                 <span class="{{ $group_name }}-label">{{ $default['label'] }}</span>
                 &nbsp;&nbsp;

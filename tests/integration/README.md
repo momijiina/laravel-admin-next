@@ -87,6 +87,10 @@ The dated results below are historical snapshots, not the current suite totals.
 
 ## What this covers
 
+- Grid Group selected-operator retention through both shipped presenters, native
+  FormData and repeated HTTP/SQLite queries;
+  [selection contract, upgrade cautions and limits](GRID_GROUP_OPERATOR.md)
+  - 日本語: グループ条件の演算子保持、未変更の再送信、既存の既定値と検証範囲
 - Grid inline Checkbox integer IDs, cancel/reopen and replayed HTTP/SQLite saves;
   [selection contract and upgrade cautions](GRID_INLINE_CHECKBOX.md)
 - Real package service provider, published-default configuration, middleware
