@@ -6,6 +6,30 @@
   specific application/version combinations before claiming support
 - Separate dependency declarations, focused checks, and full runtime support
 
+## Grid editable Select callback sources (2026-10-06)
+
+Legacy Grid `editable('select', $closure)` now HTML-escapes its per-row JSON
+`data-source` attribute. Apostrophes no longer truncate the options, and literal
+HTML entities remain literal keys/labels instead of being decoded or corrupting
+the JSON. Static option arrays, callback binding/arguments, JSON source shape,
+selection, update payloads and other editor types keep their existing behavior.
+Review custom `Editable::select()` / `addAttributes()` overrides that inspect or
+re-escape generated source attributes, and reload open grids. No dependency/floor,
+asset/view republish, schema or data migration is needed. This does not redesign
+source validation, custom attributes or X-editable/PJAX lifecycle behavior.
+Verify each consuming Laravel application. See the
+[source contract, regression coverage and limits](tests/integration/GRID_EDITABLE_SELECT_SOURCE.md).
+
+日本語: Grid の従来型 `editable('select', $closure)` で、行別の選択肢 JSON を
+`data-source` 属性向けにエスケープします。アポストロフィによる属性の途中切れを
+防ぎ、実体参照風のキー・ラベルを文字列のまま保持します。固定配列、クロージャの
+束縛・引数、JSON 構造、選択・送信形式と他の編集型は維持します。生成された属性を
+参照・再エスケープする独自の `Editable::select()` / `addAttributes()` を確認し、
+開いた Grid を再読み込みしてください。依存関係・最低要件の変更、アセット・ビューの
+再公開、スキーマ・データ移行は不要です。入力検証、独自属性、X-editable / PJAX
+のライフサイクルを再設計する修正ではありません。他の Laravel アプリでは個別に
+検証してください。
+
 ## Grid copyable literal text (2026-10-06)
 
 Grid `copyable()` now retains the original literal text through native DOM

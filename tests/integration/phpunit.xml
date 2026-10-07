@@ -50,6 +50,7 @@
             <file>GridCarouselTest.php</file>
             <file>GridTableTest.php</file>
             <file>GridCopyableTextTest.php</file>
+            <file>GridEditableSelectSourceTest.php</file>
             <file>GridInlineMultipleSelectTest.php</file>
             <file>GridInlineNullableChoicesTest.php</file>
             <file>GridInlineMixedEditorsTest.php</file>
