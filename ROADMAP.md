@@ -13,12 +13,15 @@ The [original PR candidate inventory](docs/pr-candidates-2026-10-01.md) is a
 historical snapshot. Current completed coverage and its limits are recorded in
 [the current maintenance summary](COMPATIBILITY.md#current-maintenance-summary).
 
-Updated through PR #85 (2026-10-05): the summary covers recent retry, upload,
-display and inline-editor fixes, plus the root BrowserKit development constraint.
-Review the paired-view/full-page-reload and upload-hook cautions before upgrading.
-日本語: PR #85 までの変更点・更新時の注意は上記のまとめを参照してください。
-インラインエディターの共通ビューと送信 partial の同時更新・ページ全体の再読み込み、
-並び替えとアップロードを同時に扱う独自フックの確認が必要です。
+Updated through merged PR #95 (2026-10-07): the summary includes Grid/Show
+Attribute dispatch, Grid query names, styled Radio NULL values, literal copy text
+and Editable Select callback sources. Review the view/attribute-reader and reload
+cautions, alongside earlier paired-view and upload-hook guidance. The
+[DBAL 2/3 support boundary](COMPATIBILITY.md#doctrine-dbal-support-boundary) remains;
+DBAL 4 is not supported.
+日本語: マージ済み PR #95 までの変更点・更新時の注意は上記のまとめを参照してください。
+独自ビュー・属性参照・クエリ URL と再読み込みの注意、以前の同時ビュー更新・
+アップロードフックの注意を確認してください。DBAL 4 は非対応です。
 
 ## Phase 1: Establish a verified baseline
 
@@ -119,6 +122,13 @@ and application checks; do not silently remove or claim support for them.
 - [x] Scope mixed Grid inline submit handlers by resource/payload name; update both
       common/submit views, refresh stale compiled views and fully reload admin pages.
       See [paired-view, reload and remaining identity limits](tests/integration/GRID_INLINE_MIXED_EDITORS.md)
+- [x] Recognize modern Eloquent Attributes in Grid/Show dispatch and repair named
+      Grid range inputs, configured quick-search keys and single-prefix removal;
+      review [dispatch/query boundaries](COMPATIBILITY.md#recent-merged-changes-prs-8795).
+      Form Attribute discovery/saving and existing string-zero search behavior are unchanged
+- [x] Preserve nullable styled Radio selections and literal Copyable text, and escape
+      Editable Select callback-source JSON; review [view/attribute upgrades and offline verification limits](COMPATIBILITY.md#recent-merged-changes-prs-8795).
+      OS clipboard writes, live-browser transport and full PJAX remain unverified
 - [ ] Add real password-change and rendered-operation-log coverage
 - [ ] Review remaining deprecations, default credentials, login throttling,
       upload previews and AJAX-option escaping; these tests are not a penetration test
