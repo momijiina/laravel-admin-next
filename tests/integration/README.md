@@ -328,3 +328,6 @@ tracked by the separate BrowserKit runner.
 
 Action modal NULL/zero radio selection and emitted FormData are covered by
 [the dedicated action Radio regression](ACTION_NULLABLE_RADIO.md).
+
+- [Literal Tags separators](TAGS_SEPARATORS.md): escaped custom characters, shipped
+  Select2 selection, native form serialization and HTTP/SQLite create/update/reopen.

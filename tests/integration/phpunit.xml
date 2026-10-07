@@ -27,6 +27,7 @@
             <file>NumberFieldStateTest.php</file>
             <file>WidgetOptionSerializationTest.php</file>
             <file>TagsTest.php</file>
+            <file>TagsSeparatorsTest.php</file>
             <file>TextareaNewlineTest.php</file>
             <file>ListFieldTest.php</file>
             <file>ListFieldScopedNameTest.php</file>
