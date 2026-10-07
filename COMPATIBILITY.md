@@ -21,6 +21,28 @@ Composer の制約変更だけでは既存 PDO アダプターやスキーマ AP
 通常の Composer 検査を有効にしたまま宣言範囲内で解決してください。Laravel 12/13
 全体では DBAL 3 を使用し、DBAL 2 の限定的な検証は全組み合わせの保証ではありません。
 
+## Grid inline Checkbox integer IDs (2026-10-07)
+
+Grid `checkbox($options)` now checks stored integer IDs when opening its inline
+popover, including zero and mixed integer/string arrays. Adding a choice no
+longer silently drops the existing integer choices. Only a local comparison
+array is string-normalized; strict matching, original JSON metadata, display,
+callbacks and string-valued submissions retain their existing behavior. Review
+published/custom `admin::grid.inline-edit.checkbox` views, apply normal compiled
+view-cache deployment practices and reload open grids. No dependency/floor,
+asset republish, schema or data migration is required. Previously lost choices
+cannot be reconstructed. Verify each consuming Laravel application. See the
+[selection contract, regression coverage and limits](tests/integration/GRID_INLINE_CHECKBOX.md).
+
+日本語: Grid の `checkbox($options)` で、ポップオーバーを開く際に整数の ID
+を選択済みとして表示します。ゼロや整数・文字列の混在にも対応し、別の選択肢を
+追加しただけで既存の整数 ID が保存対象から落ちる問題を修正します。比較用の
+ローカル配列だけを文字列化し、厳密な一致判定、元の JSON、表示、コールバックと
+文字列での送信は維持します。公開済み・独自の対象ビューを確認し、通常の手順で
+コンパイル済みビューを更新して、Grid を再読み込みしてください。依存関係・
+最低要件の変更、アセット再公開、スキーマ・データ移行は不要です。過去に失われた
+選択肢は復元できません。他の Laravel アプリとの連携は個別に検証してください。
+
 ## Grid editable Select callback sources (2026-10-06)
 
 Legacy Grid `editable('select', $closure)` now HTML-escapes its per-row JSON

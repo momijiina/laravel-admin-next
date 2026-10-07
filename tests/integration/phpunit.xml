@@ -52,6 +52,7 @@
             <file>GridCopyableTextTest.php</file>
             <file>GridEditableSelectSourceTest.php</file>
             <file>GridInlineMultipleSelectTest.php</file>
+            <file>GridInlineCheckboxTest.php</file>
             <file>GridInlineNullableChoicesTest.php</file>
             <file>GridInlineMixedEditorsTest.php</file>
             <file>GridInlineUploadTest.php</file>

@@ -25,8 +25,14 @@
     <script>
         @component('admin::grid.inline-edit.partials.popover', compact('trigger'))
             @slot('content')
+            var selectedValues = $trigger.data('value');
+            if (Array.isArray(selectedValues)) {
+                selectedValues = selectedValues.map(function (value) {
+                    return String(value);
+                });
+            }
             $template.find('input[type=checkbox]').each(function (index, checkbox) {
-                if($.inArray($(checkbox).attr('value'), $trigger.data('value')) >= 0) {
+                if($.inArray($(checkbox).attr('value'), selectedValues) >= 0) {
                     $(checkbox).attr('checked', true);
                 }
             });
