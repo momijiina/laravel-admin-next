@@ -31,7 +31,8 @@ class Like extends AbstractFilter
             $value = array_filter($value);
         }
 
-        if (is_null($value) || empty($value)) {
+        // A scalar zero is a search term, while legacy empty/array handling stays unchanged.
+        if (empty($value) && $value !== 0 && $value !== '0') {
             return;
         }
 

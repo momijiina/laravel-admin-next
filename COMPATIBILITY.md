@@ -21,6 +21,21 @@ Composer の制約変更だけでは既存 PDO アダプターやスキーマ AP
 通常の Composer 検査を有効にしたまま宣言範囲内で解決してください。Laravel 12/13
 全体では DBAL 3 を使用し、DBAL 2 の限定的な検証は全組み合わせの保証ではありません。
 
+## Grid LIKE zero searches (2026-10-07)
+
+Grid `like()`, `startsWith()` and `endsWith()` now apply scalar string/integer zero
+instead of silently omitting the condition. `ilike()` shares the guard. Other
+empty values and array handling are unchanged. Review custom `Like::condition()`
+overrides or reliance on zero disabling a filter. No dependency/minimum-version,
+schema/data migration or asset/view republish is required. See the
+[focused contract and verification limits](tests/integration/GRID_LIKE_ZERO.md).
+Verify compatibility with each consuming Laravel application separately.
+
+日本語: Grid の LIKE 系検索で文字列・整数のゼロを条件として適用します。
+他の空値・配列の処理は維持します。独自の条件生成やゼロで検索を解除する使い方を
+確認してください。依存関係・最低要件、移行、アセット・ビューの再公開は不要です。
+検証範囲は上記ガイドを参照し、他の Laravel アプリとの連携は個別に確認してください。
+
 ## Literal Tags separators (2026-10-07)
 
 Custom `Tags::separators()` characters are now escaped and JSON-serialized for

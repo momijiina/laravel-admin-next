@@ -87,6 +87,9 @@ The dated results below are historical snapshots, not the current suite totals.
 
 ## What this covers
 
+- Scalar zero LIKE/starts-with/ends-with Grid searches, native GET resubmission
+  and HTTP/SQLite results; [zero-term contract and limits](GRID_LIKE_ZERO.md)
+  - 日本語: ゼロの検索条件・再送信・SQL と既存の空値処理の境界
 - Listbox remote literal IDs and labels, shipped widget moves/reset and HTTP/SQLite saves;
   [text contract, custom-initializer cautions and limits](LISTBOX_REMOTE_OPTIONS.md)
   - 日本語: リモート選択肢の ID・ラベル保持、保存・リセットと独自処理の注意事項
