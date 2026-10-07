@@ -87,6 +87,8 @@ The dated results below are historical snapshots, not the current suite totals.
 
 ## What this covers
 
+- Grid inline Checkbox integer IDs, cancel/reopen and replayed HTTP/SQLite saves;
+  [selection contract and upgrade cautions](GRID_INLINE_CHECKBOX.md)
 - Real package service provider, published-default configuration, middleware
   aliases/groups, session guard, migrations and seed data
 - Login view, guest redirect, valid/invalid login, authenticated request, logout
