@@ -60,8 +60,8 @@ $.ajax($ajaxOptions).done(function(data) {
     }
     
     for (var key in data) {
-        var selected =  ($.inArray(key, value) >= 0) ? 'selected' : '';
-        listbox.append('<option value="'+key+'" '+selected+'>'+data[key]+'</option>');
+        var selected = $.inArray(key, value) >= 0;
+        listbox.append(new Option(data[key], key, selected, selected));
     }
     
     listbox.bootstrapDualListbox('refresh', true);

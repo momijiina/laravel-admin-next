@@ -14,6 +14,7 @@
             <file>CollectionConditionalFieldsTest.php</file>
             <file>NullableSelectTest.php</file>
             <file>RemoteSelectOldInputTest.php</file>
+            <file>ListboxRemoteOptionsTest.php</file>
             <file>SelectLoadsIsolationTest.php</file>
             <file>CheckboxZeroTest.php</file>
             <file>StyledCheckboxZeroTest.php</file>

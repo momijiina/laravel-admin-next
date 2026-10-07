@@ -21,6 +21,28 @@ Composer の制約変更だけでは既存 PDO アダプターやスキーマ AP
 通常の Composer 検査を有効にしたまま宣言範囲内で解決してください。Laravel 12/13
 全体では DBAL 3 を使用し、DBAL 2 の限定的な検証は全組み合わせの保証ではありません。
 
+## Listbox remote literal options (2026-10-07)
+
+URL-option Listbox fields now create native options with literal IDs and labels,
+preventing quotes and HTML/entity-looking text from changing values on unchanged
+submissions. Current selection and native reset defaults are preserved. Review
+custom `loadRemoteOptions()` overrides and endpoints returning HTML or pre-escaped
+labels: remote labels now remain literal plain text. Reload forms after updating;
+no asset/view republish, dependency/minimum-version, schema or data migration is
+required. Old-input precedence, static Blade rendering and comma-separated ID
+transport are unchanged. See [the focused contract, upgrade cautions and validation
+limits](tests/integration/LISTBOX_REMOTE_OPTIONS.md), and verify each consuming
+Laravel application separately.
+
+日本語: URL から選択肢を取得する Listbox で、ID・ラベルをそのまま持つネイティブ
+選択肢を作り、引用符・HTML・実体参照のような文字列による意図しない値の変化を
+防ぎます。初期選択とリセット時の既定値は維持します。独自の `loadRemoteOptions()`
+と HTML・エスケープ済みラベルを返す API を確認し、更新後はフォームを再読み込み
+してください。リモートラベルはプレーンテキストになります。アセット・ビューの
+再公開、依存関係・最低要件、スキーマ・データ移行は不要です。旧入力の優先順位、
+静的 Blade 表示、カンマ区切りの ID 形式は変更しません。検証範囲と注意事項は上記の
+専用ガイドを参照し、他の Laravel アプリとの連携は個別に確認してください。
+
 ## Grid Group selected-operator retention (2026-10-07)
 
 Ordinary unnamed Grid Group filters now retain the selected operator in the
