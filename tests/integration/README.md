@@ -87,6 +87,9 @@ The dated results below are historical snapshots, not the current suite totals.
 
 ## What this covers
 
+- Listbox remote literal IDs and labels, shipped widget moves/reset and HTTP/SQLite saves;
+  [text contract, custom-initializer cautions and limits](LISTBOX_REMOTE_OPTIONS.md)
+  - 日本語: リモート選択肢の ID・ラベル保持、保存・リセットと独自処理の注意事項
 - Grid Group selected-operator retention through both shipped presenters, native
   FormData and repeated HTTP/SQLite queries;
   [selection contract, upgrade cautions and limits](GRID_GROUP_OPERATOR.md)
