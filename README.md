@@ -10,13 +10,13 @@ OpenAI Dots による定期的な自動更新支援を計画しています。�
 
 **画像処理の破壊的変更:** 画像変換・サムネイルは任意依存の Intervention Image `^3.11.9` に移行しました。v2 の全 API との互換性はありません。型付きコールバックや既存設定を [画像処理の移行ガイド](IMAGE_MIGRATION.md) で確認してください。画像処理を行わない通常のアップロードには不要です。PHP の最低要件は 8.2 です。
 
-2026-10-05 更新（PR #85 まで）: Grid QuickCreate・Action モーダルの再試行、Grid アップロードの分離と複数ファイル送信、ファイル並び替え時の追加アップロード、欠損セル・NULL 選択肢の表示、依存 Select ローダーと異種インラインエディターの送信処理を修正しました。ルート開発依存の BrowserKit は `^6.0 || ^7.0` になりました。
+2026-10-07 更新（マージ済み PR #95 まで）: Grid/Show の Eloquent Attribute 判定、名前付き Grid の範囲入力・接頭辞処理、独自キーのクイック検索、RadioButton/RadioCard の NULL 選択を修正しました。Grid のコピー文字列は DOM の選択まで保持し、従来型 Editable Select の行別選択肢 JSON は HTML 属性向けにエスケープします。Doctrine DBAL は引き続き `^2.13.9 || ^3.10.6` が対象で、DBAL 4 には対応していません。
 
-**更新時の注意:** インラインエディターの共通ビューと送信 partial は必ず一緒に更新し、デプロイ後は管理画面をページ全体で再読み込みしてください。上書きしたアップロードビューと独自 selector、ファイル並び替えとアップロードを同時に扱う saving フック・validator も確認してください。以前の Number アセット更新や画像・日付・通貨の注意事項も含む [変更点・移行時の注意事項と検証範囲](COMPATIBILITY.md#current-maintenance-summary) を参照してください。
+**更新時の注意:** 上書きした RadioButton/RadioCard ビュー、Grid の独自 selector・クエリ URL、Copyable/Editable の属性参照・エスケープ処理を確認し、古いコンパイル済みビューを更新して管理画面をページ全体で再読み込みしてください。以前のインラインエディターの共通ビューと送信 partial の同時更新、アップロードの独自フック、Number アセット更新、画像・日付・通貨の注意事項も含む [変更点・移行時の注意事項と検証範囲](COMPATIBILITY.md#current-maintenance-summary) を参照してください。
 
 - [ロードマップ](ROADMAP.md)
 - [互換性方針](COMPATIBILITY.md)
-- [最近の変更点・アップグレード時の注意事項と検証範囲（PR #85 まで）](COMPATIBILITY.md#current-maintenance-summary)
+- [最近の変更点・アップグレード時の注意事項と検証範囲（マージ済み PR #95 まで）](COMPATIBILITY.md#current-maintenance-summary)
 - [元プロジェクトについて](UPSTREAM.md)
 
 このプロジェクトは OpenAI の公式プロジェクトではなく、OpenAI による承認・推奨を示すものではありません。
@@ -31,13 +31,13 @@ The project aims to support modern PHP and Laravel while prioritizing existing A
 
 **Breaking image-processing change:** transformations and thumbnails now use optional Intervention Image `^3.11.9`, with a bounded legacy API rather than full v2 compatibility. Review callbacks and settings in the [image migration guide](IMAGE_MIGRATION.md). Ordinary uploads without processing do not need it. The PHP floor remains 8.2.
 
-Updated 2026-10-05 (through PR #85): fixes cover Grid QuickCreate and Action modal retries, isolated Grid uploads and multiple-file submission, sorting with new uploads, missing table cells and nullable choices, dependent Select loaders, and mixed inline-editor submissions. The root BrowserKit development constraint now allows `^6.0 || ^7.0`.
+Updated 2026-10-07 (merged changes through PR #95): fixes cover Grid/Show Eloquent Attribute dispatch, named Grid range inputs and filter prefixes, custom quick-search keys, and nullable RadioButton/RadioCard selections. Grid copy text now survives through DOM selection, and legacy Editable Select callback-source JSON is escaped for its HTML attribute. Doctrine DBAL remains limited to `^2.13.9 || ^3.10.6`; DBAL 4 is not supported.
 
-**Upgrade cautions:** update the common inline-editor view and submit partial together, then fully reload admin pages after deployment. Review overridden upload views and custom selectors, plus saving hooks and validators handling combined file sorting/uploads. See [changes, upgrade cautions and verification limits](COMPATIBILITY.md#current-maintenance-summary), including earlier Number asset updates and image/date/currency cautions.
+**Upgrade cautions:** review overridden RadioButton/RadioCard views, custom Grid selectors/query URLs, and Copyable/Editable attribute readers or escaping. Refresh stale compiled views and fully reload admin pages. See [changes, upgrade cautions and verification limits](COMPATIBILITY.md#current-maintenance-summary), including earlier requirements to update the common inline-editor view and submit partial together, review custom upload hooks, and check Number asset updates and image/date/currency cautions.
 
 - [Roadmap](ROADMAP.md)
 - [Compatibility policy](COMPATIBILITY.md)
-- [Recent changes, upgrade cautions and verification limits (through PR #85)](COMPATIBILITY.md#current-maintenance-summary)
+- [Recent changes, upgrade cautions and verification limits (merged through PR #95)](COMPATIBILITY.md#current-maintenance-summary)
 - [Upstream attribution](UPSTREAM.md)
 
 This is not an official OpenAI project and does not imply OpenAI endorsement.

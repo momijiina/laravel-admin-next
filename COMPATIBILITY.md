@@ -6,6 +6,21 @@
   specific application/version combinations before claiming support
 - Separate dependency declarations, focused checks, and full runtime support
 
+## Doctrine DBAL support boundary
+
+The production requirement remains `doctrine/dbal: ^2.13.9 || ^3.10.6`.
+DBAL 4 is not supported; widening the Composer constraint alone does not migrate
+the existing-PDO adapter or schema metadata APIs. Keep normal Composer checks
+enabled and resolve within the declared range. Full Laravel 12/13 consumers use
+DBAL 3; retained DBAL 2 coverage includes separately resolved Illuminate components
+and representative older frameworks, not every framework/driver combination.
+See the [generator compatibility boundaries](tests/integration/RESOURCE_GENERATOR.md#upgrade-and-compatibility-boundaries).
+
+日本語: 本番依存は引き続き `^2.13.9 || ^3.10.6` で、DBAL 4 は非対応です。
+Composer の制約変更だけでは既存 PDO アダプターやスキーマ API は移行できません。
+通常の Composer 検査を有効にしたまま宣言範囲内で解決してください。Laravel 12/13
+全体では DBAL 3 を使用し、DBAL 2 の限定的な検証は全組み合わせの保証ではありません。
+
 ## Grid editable Select callback sources (2026-10-06)
 
 Legacy Grid `editable('select', $closure)` now HTML-escapes its per-row JSON
@@ -243,12 +258,71 @@ unchanged, and no NULL clearing protocol is added. See the
 
 ## Current maintenance summary
 
-Updated 2026-10-05. This index describes the changes merged through
-[PR #85](https://github.com/momijiina/laravel-admin-next/pull/85), at
-[`d292ea4`](https://github.com/momijiina/laravel-admin-next/commit/d292ea4bb82e14f676ab6d127d5901525c1136b0).
+Updated 2026-10-07. This index describes the changes merged through
+[PR #95](https://github.com/momijiina/laravel-admin-next/pull/95), at
+[`4be2198`](https://github.com/momijiina/laravel-admin-next/commit/4be2198846d6a740d71896ea45003a6bad8e8cf3).
 Use the linked guides for upgrade steps and each regression's precise boundary.
 Historical test totals below remain evidence for their own revisions, not
 current suite totals or validation of subsequent changes.
+
+### Recent merged changes: PRs #87–#95
+
+- **Grid/Show Attribute dispatch ([PR #87](https://github.com/momijiina/laravel-admin-next/pull/87)):**
+  native Eloquent Attribute methods are recognized before relation dispatch.
+  Review Grid/Show overrides and normal Eloquent appends/serialization settings;
+  this does not change Form discovery or saving. See the
+  [dispatch contract](tests/integration/MODERN_ATTRIBUTE_DISPATCH.md).
+- **Grid query names ([PR #88](https://github.com/momijiina/laravel-admin-next/pull/88),
+  [PR #89](https://github.com/momijiina/laravel-admin-next/pull/89),
+  [PR #92](https://github.com/momijiina/laravel-admin-next/pull/92)):**
+  Between controls use their named Grid's prefix, quick-search rendering follows
+  the configured key, and filter normalization strips exactly one leading prefix.
+  Review selectors, overridden renderers/name formatters and hand-written URLs;
+  reload open forms and regenerate queries that relied on incorrect aliasing.
+  SQL/filter operators, quick-search string-zero behavior and DOM IDs are unchanged.
+  See [Between](tests/integration/GRID_BETWEEN_NAMES.md),
+  [quick-search](tests/integration/GRID_QUICK_SEARCH_KEYS.md) and
+  [prefix boundaries](tests/integration/GRID_FILTER_PREFIX.md).
+- **Styled Radio NULL ([PR #90](https://github.com/momijiina/laravel-admin-next/pull/90)):**
+  RadioButton/RadioCard no longer select zero solely because the effective value
+  is NULL; explicit defaults and the additive label-based `checked()` fallback
+  remain. Reconcile both view overrides, refresh compiled views and reload forms.
+  Unselected groups are omitted on submission and preserve stored values on
+  update; this adds no NULL-clearing API or recovery of earlier overwritten values.
+  See [selection and upgrade cautions](tests/integration/STYLED_RADIO_NULL.md).
+- **Literal Grid text ([PR #93](https://github.com/momijiina/laravel-admin-next/pull/93),
+  [PR #95](https://github.com/momijiina/laravel-admin-next/pull/95)):**
+  Copyable retains original literal text through DOM selection; its private
+  `data-content` is now an escaped JSON string. Legacy Editable Select escapes
+  per-row callback-source JSON for `data-source`, preserving quotes and entities.
+  Review custom attribute readers/escaping and reload grids. No asset/view
+  republish or data migration is needed for these two fixes. See the separate
+  [copy-text](tests/integration/GRID_COPYABLE_TEXT.md) and
+  [Editable source contracts](tests/integration/GRID_EDITABLE_SELECT_SOURCE.md).
+  Offline selection does not prove OS clipboard writes or empty-clipboard clearing;
+  offline plugin execution and replayed HTTP/SQLite requests do not establish
+  live-browser layout, network transport or the full PJAX lifecycle.
+- **CI only ([PR #91](https://github.com/momijiina/laravel-admin-next/pull/91)):**
+  the full integration/DomCrawler test steps use a fresh Node compile cache per
+  matrix job, with no cross-job persistence. Tests and runtime support are
+  unchanged. Disable it for V8 coverage; the
+  [cache notes](tests/integration/README.md#ci-node-compile-cache--ci-の-node-コンパイルキャッシュ)
+  distinguish the local timing comparison from unmeasured hosted-CI savings.
+
+日本語: Grid/Show の Attribute 判定は Form の属性検出・保存の変更ではありません。
+Grid の範囲入力・検索キー・接頭辞修正では独自 selector、名前整形、URL を確認し、
+開いたフォームを再読み込みしてください。文字列ゼロの検索や DOM ID は従来どおりです。
+RadioButton/RadioCard は上書きビューとコンパイル済みビューを更新してください。
+既定値と `checked()` の追加選択は維持し、未選択は更新時に保存値を保持します。
+NULL 消去 API や過去の誤上書きの復元は追加しません。Copyable の内部属性は JSON
+文字列になり、Editable Select の行別 JSON は HTML 属性用にエスケープされます。
+独自の属性参照・二重エスケープを確認し、Grid を再読み込みしてください。OS の
+クリップボード書き込み・空文字での消去、実ブラウザー・通信・PJAX 全体は未検証です。
+CI のキャッシュはジョブ内だけで使い、V8 カバレッジ時は無効化してください。
+ホスト型 CI の短縮率や対応範囲の拡大は主張しません。DBAL の制約は変更せず、
+[DBAL 2/3 の対応範囲](#doctrine-dbal-support-boundary)を維持します。
+
+### Earlier changes and upgrade cautions
 
 - **Image processing ([PR #35](https://github.com/momijiina/laravel-admin-next/pull/35)):**
   optional Intervention Image `^3.11.9` replaces v2 for transformations and
