@@ -21,6 +21,28 @@ Composer の制約変更だけでは既存 PDO アダプターやスキーマ AP
 通常の Composer 検査を有効にしたまま宣言範囲内で解決してください。Laravel 12/13
 全体では DBAL 3 を使用し、DBAL 2 の限定的な検証は全組み合わせの保証ではありません。
 
+## Grid Group selected-operator retention (2026-10-07)
+
+Ordinary unnamed Grid Group filters now retain the selected operator in the
+hidden input of both text and datetime presenters. Submitting an unchanged
+form no longer resets a nonzero operator to the first condition. Valid zero,
+first-label/hidden-zero fallback for absent or unknown scalar indexes, and query
+selection semantics remain unchanged. Review overridden/published filter views
+and custom Group `variables()` implementations, refresh compiled views through
+normal deployment practices, and reload open forms. No dependency/floor, asset
+republish, schema or data migration is required. Named Group namespaces and
+multi-grid script isolation remain outside this repair. Verify each consuming
+application. See the [selection contract, upgrade cautions and limits](tests/integration/GRID_GROUP_OPERATOR.md).
+
+日本語: 名前なしの通常の Grid Group で、選択中の演算子を通常・日時表示の
+hidden 入力に保持し、未変更の再送信で先頭の条件に戻る問題を修正します。有効な
+ゼロ、未指定・未知のスカラー値に対する先頭ラベル／hidden 値ゼロへの表示と、
+条件適用の既存仕様は維持します。公開済み・独自のフィルタービューと Group
+`variables()` を確認し、通常の手順でコンパイル済みビューを更新して、フォームを
+再読み込みしてください。依存関係・最低要件の変更、アセット再公開、スキーマ・
+データ移行は不要です。名前付き Group の名前空間と複数 Grid のスクリプト分離は
+対象外です。他の Laravel アプリとの連携は個別に検証してください。
+
 ## Grid inline Checkbox integer IDs (2026-10-07)
 
 Grid `checkbox($options)` now checks stored integer IDs when opening its inline

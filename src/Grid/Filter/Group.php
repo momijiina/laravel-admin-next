@@ -301,11 +301,13 @@ SCRIPT;
     {
         $select = request("{$this->id}_group");
 
-        $default = $this->group->get($select) ?: $this->group->first();
+        $selected = $this->group->get($select);
+        $default = $selected ?: $this->group->first();
 
         return array_merge(parent::variables(), [
-            'group_name' => $this->name,
-            'default'    => $default,
+            'group_name'  => $this->name,
+            'default'     => $default,
+            'group_index' => $selected ? $select : 0,
         ]);
     }
 
