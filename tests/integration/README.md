@@ -87,6 +87,10 @@ The dated results below are historical snapshots, not the current suite totals.
 
 ## What this covers
 
+- Grid Between named lower/upper bounds independent of query-key order, with
+  unchanged native form resubmission and HTTP/SQLite results;
+  [range contract and limits](GRID_BETWEEN_BOUND_ORDER.md)
+  - 日本語: 範囲のキー順に依存しない条件・再送信・SQL と既存範囲処理の境界
 - Scalar zero LIKE/starts-with/ends-with Grid searches, native GET resubmission
   and HTTP/SQLite results; [zero-term contract and limits](GRID_LIKE_ZERO.md)
   - 日本語: ゼロの検索条件・再送信・SQL と既存の空値処理の境界
