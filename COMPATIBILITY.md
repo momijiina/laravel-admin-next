@@ -21,6 +21,24 @@ Composer の制約変更だけでは既存 PDO アダプターやスキーマ AP
 通常の Composer 検査を有効にしたまま宣言範囲内で解決してください。Laravel 12/13
 全体では DBAL 3 を使用し、DBAL 2 の限定的な検証は全組み合わせの保証ではありません。
 
+## Remote Grid filter selection lists (2026-10-08)
+
+URL-backed Grid filter Select/MultipleSelect presenters retain integer/string
+zero IDs and serialize sparse selections as JSON arrays. Previously, zero or
+non-contiguous query arrays could lose selections after remote initialization,
+changing an unchanged GET's result set. Other legacy empty-value handling and
+SQL filter semantics remain unchanged.
+
+The regression exercises Laravel HTTP/SQLite, both shipped filter layouts,
+named grids, shipped Select2 with old/modern jQuery, native resubmission,
+clear/reset and reselection. See [the focused contract and upgrade boundaries](tests/integration/GRID_REMOTE_SELECT.md).
+External APIs, live-browser layout and consuming Laravel applications still
+need their own verification; this is not a full-compatibility claim.
+
+日本語: URL 指定の Grid 絞り込みでゼロ ID と疎な配列の選択を保持します。
+検索条件を変えずに再送信した際の結果変化を防ぎ、既存の空値・SQL 処理は維持します。
+検証範囲と独自 Presenter の注意事項は上記の専用ガイドを参照してください。
+
 ## Grid Between bound order (2026-10-08)
 
 Grid `between()` now binds paired ranges in named `start`, then `end` order,
