@@ -49,6 +49,7 @@
             <file>GridGroupOperatorTest.php</file>
             <file>GridLikeZeroTest.php</file>
             <file>GridRemoteSelectTest.php</file>
+            <file>GridCheckboxFilterTest.php</file>
             <file>GridBetweenNameTest.php</file>
             <file>GridFilterPrefixTest.php</file>
             <file>GridExplicitSortTest.php</file>
