@@ -51,6 +51,7 @@
             <file>GridRemoteSelectTest.php</file>
             <file>GridModelSelectTest.php</file>
             <file>GridCheckboxFilterTest.php</file>
+            <file>GridRadioIntegerDefaultTest.php</file>
             <file>GridBetweenNameTest.php</file>
             <file>GridFilterPrefixTest.php</file>
             <file>GridExplicitSortTest.php</file>
