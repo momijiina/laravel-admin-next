@@ -21,6 +21,22 @@ Composer の制約変更だけでは既存 PDO アダプターやスキーマ AP
 通常の Composer 検査を有効にしたまま宣言範囲内で解決してください。Laravel 12/13
 全体では DBAL 3 を使用し、DBAL 2 の限定的な検証は全組み合わせの保証ではありません。
 
+## Grid Radio integer defaults (2026-10-08)
+
+Grid Radio integer defaults now select the same option as their string
+equivalents, so native GET submission includes the intended choice. Only
+integer selection normalization changes: exact string matching, query handling
+and the existing falsy-default API behavior are preserved. A display default
+still does not apply SQL until submitted. Update published/overridden
+`admin::filter.radio` views and refresh compiled views as needed. See the
+[selection contract and upgrade notes](tests/integration/GRID_RADIO_INTEGER_DEFAULTS.md)
+and verify each consuming Laravel application separately.
+
+日本語: Grid Radio の整数の既定値が文字列と同様に選択され、送信時に値が
+欠落しなくなります。文字列の厳密な照合、検索処理、ゼロなどの既定値 API の
+既存仕様は維持します。表示上の既定値は送信するまで SQL に適用しません。
+公開済み・独自ビューとコンパイル済みビューを確認してください。
+
 ## Model-backed Grid Select zero IDs (2026-10-08)
 
 Grid `select()->model(...)` now loads selected model options for integer/string
