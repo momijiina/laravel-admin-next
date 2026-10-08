@@ -445,6 +445,13 @@ unchanged, and no NULL clearing protocol is added. See the
 
 ## Current maintenance summary
 
+Numeric column-header `filter('range')` / `filter('range', 'equal')` now retain
+integer/string zero bounds and match the active indicator to the applied query.
+Existing strict one-sided operators, other empty values and temporal ranges are
+unchanged; see the [range-zero guide](tests/integration/GRID_COLUMN_RANGE_ZERO.md).
+日本語: 数値の列ヘッダー範囲でゼロを境界値として保持します。片側の比較演算子、
+他の空値と日時範囲は維持し、独自実装と検証範囲は上記ガイドで確認してください。
+
 Grid scope links with explicit `_scope_=0` now retain their selection when
 another scope uses `asDefault()`; see the [zero-scope guide](tests/integration/GRID_SCOPE_ZERO_DEFAULT.md)
 for the narrow default-assignment change, unchanged matching rules and upgrade
