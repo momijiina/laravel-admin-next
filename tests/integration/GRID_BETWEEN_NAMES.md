@@ -19,7 +19,7 @@ filter is also reflected when its controls are rendered.
 Review custom selectors, published/overridden filter views or custom filter
 name formatters that depend on the old unprefixed HTML `name` attributes.
 Hand-written query URLs for a named grid should use the existing prefixed query
-API; old unprefixed range URLs remain outside that namespace. This correction
+API; old unprefixed range URLs remain outside that namespace. This naming correction
 does not change HTML IDs, widget scripts, views, filter sanitization or SQL.
 No dependency or PHP/Laravel floor change, asset/view republish, schema change
 or data migration is required. Reload already open forms to get the corrected
@@ -33,8 +33,11 @@ Run the isolated [integration harness](README.md), or its focused suite:
 vendor/bin/phpunit --filter GridBetweenNameTest
 ```
 
-The 40 cases cover:
+The 57 cases cover:
 
+- End-first query strings and unchanged native resubmission, including negative,
+  zero-width and genuinely reversed bounds; see the [bound-order repair](GRID_BETWEEN_BOUND_ORDER.md).
+- Direct condition checks retain named keys and the unmodified display value.
 - Named and unnamed paired, lower-only, upper-only, zero-width, empty and
   reversed ranges through both shipped Between views.
 - Actual rendered controls filled in offline jsdom, native `FormData` and
@@ -86,7 +89,7 @@ Grid は異なる入力名を生成し、リセットは他方の範囲と無関
 フォームは再読み込みして新しい入力名を反映してください。他の Laravel アプリ
 との連携はアプリごとに検証してください。
 
-40 ケースで、実際のフォームのネイティブ FormData と Symfony の送信結果、
+57 ケースで、実際のフォームのネイティブ FormData と Symfony の送信結果、
 HTTP/SQLite の行・SQL・再表示・リセット、名前付き・名前なし・ゼロ・片側・空欄・
 逆順範囲、複数 Grid とドット区切りの名前整形を検証します。日時表示のケースは
 数値列を使うため、日時ピッカー・日付解析・タイムゾーンの検証ではありません。

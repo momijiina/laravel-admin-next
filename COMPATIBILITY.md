@@ -21,6 +21,25 @@ Composer の制約変更だけでは既存 PDO アダプターやスキーマ AP
 通常の Composer 検査を有効にしたまま宣言範囲内で解決してください。Laravel 12/13
 全体では DBAL 3 を使用し、DBAL 2 の限定的な検証は全組み合わせの保証ではありません。
 
+## Grid Between bound order (2026-10-08)
+
+Grid `between()` now binds paired ranges in named `start`, then `end` order,
+including URLs that list `end` first. Previously, equivalent query strings could
+return different rows and an unchanged form resubmission could change the result.
+One-sided/empty ranges and genuinely reversed values retain their existing
+behavior. Review custom `Between::condition()` overrides or code depending on
+raw array insertion order. No dependency/minimum-version, schema/data migration,
+or asset/view republish is required. See the [range contract and verification
+limits](tests/integration/GRID_BETWEEN_BOUND_ORDER.md), and verify each consuming
+Laravel application separately.
+
+日本語: Grid の `between()` は、URL のキー順にかかわらず `start`・`end` の
+順で範囲を適用します。同じ範囲でも結果が変わる問題と、未変更の再送信で結果が
+変わる問題を修正します。片側・空欄・始点が終点より大きい範囲の仕様は維持します。
+独自の条件生成や配列順への依存を確認してください。依存関係・最低要件の変更、
+移行や再公開は不要です。検証範囲は上記ガイドを参照し、他の Laravel アプリとの
+連携は個別に確認してください。
+
 ## Grid LIKE zero searches (2026-10-07)
 
 Grid `like()`, `startsWith()` and `endsWith()` now apply scalar string/integer zero

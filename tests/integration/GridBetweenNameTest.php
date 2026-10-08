@@ -175,6 +175,60 @@ class GridBetweenNameTest extends TestCase
         $this->assertSame([-2, -1, 0, 1, 2], GridBetweenNameItem::orderBy('id')->pluck('quantity')->all());
     }
 
+    public static function reorderedRanges(): iterable
+    {
+        foreach (['plain', 'orders'] as $name) {
+            foreach (['text', 'datetime'] as $mode) {
+                foreach ([
+                    'paired' => [['0', '1'], [0, 1]],
+                    'negative' => [['-2', '-1'], [-2, -1]],
+                    'zero width' => [['0', '0'], [0]],
+                    'reversed values' => [['1', '0'], []],
+                ] as $label => [$bounds, $rows]) {
+                    yield "$name $mode $label" => [$name, $mode, $bounds, $rows];
+                }
+            }
+        }
+    }
+
+    #[DataProvider('reorderedRanges')]
+    public function test_named_bounds_do_not_depend_on_query_parameter_order(string $name, string $mode, array $bounds, array $rows): void
+    {
+        $path = '/grid-between/'.$name.'/'.$mode;
+        $base = $name === 'plain' ? 'quantity' : 'orders_quantity';
+        // Bookmarked or programmatically built query strings can list end first.
+        $query = [$base => ['end' => $bounds[1], 'start' => $bounds[0]]];
+        $result = $this->get($path.'?'.http_build_query($query))->assertOk()->json();
+        $this->assertResult($result, $bounds, $rows);
+        for ($round = 0; $round < 2; $round++) {
+            // The shipped form emits start first; unchanged resubmission must
+            // retain the same result as the original end-first request.
+            $submission = $this->submitForm($result['html'], $path, $bounds);
+            $result = $this->get($submission['uri'])->assertOk()->json();
+            $this->assertResult($result, $bounds, $rows);
+        }
+        $reset = $this->resetUrl($result['html'], $path);
+        $this->assertResult($this->get($reset)->assertOk()->json(), ['', ''], [-2, -1, 0, 1, 2]);
+        $this->assertSame([-2, -1, 0, 1, 2], GridBetweenNameItem::orderBy('id')->pluck('quantity')->all());
+    }
+
+    public function test_paired_condition_keeps_named_keys_and_original_display_value(): void
+    {
+        foreach ([
+            ['end' => 1, 'start' => 0],
+            ['start' => 0, 'end' => 1],
+            ['end' => '00', 'start' => '-01'],
+            ['end' => '2026-10-08', 'start' => '2026-10-01'],
+            ['end' => '0', 'start' => '1'],
+        ] as $bounds) {
+            $between = new Grid\Filter\Between('quantity');
+            $this->assertSame(['whereBetween' => ['quantity', [
+                'start' => $bounds['start'], 'end' => $bounds['end'],
+            ]]], $between->condition(['quantity' => $bounds]));
+            $this->assertSame($bounds, $between->getValue());
+        }
+    }
+
     public static function views(): iterable
     {
         yield 'text' => ['text'];
