@@ -11,9 +11,9 @@ permissions:
 jobs:
   lifecycle:
     runs-on: ubuntu-latest
-    # PHP 8.5 needs headroom above the observed 26m40s same-tree full-suite run.
-    # See tests/integration/README.md for the cancelled 30-minute run and scope.
-    timeout-minutes: ${{ matrix.php == '8.5' && 40 || 30 }}
+    # Full-suite jobs across PHP versions approach or exhaust 30 minutes.
+    # See tests/integration/README.md for measured runtimes and limits.
+    timeout-minutes: 40
     strategy:
       fail-fast: false
       matrix:
