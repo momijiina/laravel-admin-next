@@ -77,6 +77,34 @@ database. Measure hosted results separately before claiming a CI speedup.
 並行実行した測定で、検証用のハッシュ照合負荷も含みます。再現性、全マトリクス・
 外部 DB の検証、ホスト型 CI での短縮率を保証する結果ではありません。
 
+## CI PHP 8.5 timeout headroom / CI の PHP 8.5 タイムアウト余裕
+
+The two PHP 8.5 lifecycle jobs have a 40-minute whole-job limit. The other
+five lifecycle jobs and all DomCrawler jobs retain their 30-minute limits.
+This adds runtime headroom without changing test selection, assertions,
+matrix entries, dependency checks or the test command.
+
+On 2026-10-08, the PHP 8.5 / Laravel 13 [PR #103 job](https://github.com/momijiina/laravel-admin-next/actions/runs/37719254135/job/113122861692)
+passed 1,023 tests and 282,419 assertions with two existing optional-database
+skips in 26m40s. The [post-merge job](https://github.com/momijiina/laravel-admin-next/actions/runs/37725545480/job/113142751304)
+used the identical repository tree and the same PHP, Laravel, PHPUnit and
+Testbench-core versions, but reached only 854/1,023 tests before cancellation
+at the 30-minute job budget. Its log contains no final suite result; it is
+not a pass. The runner images and regions differed, so these observations
+do not establish the underlying performance cause or a speedup.
+
+Forty minutes provides bounded headroom over both observations. The maximum
+additional allowance is ten minutes per PHP 8.5 job, twenty across the two
+jobs; already-completing jobs are not made to run longer. A subsequent hosted
+run must establish whether the extra headroom is sufficient.
+
+日本語: PHP 8.5 の lifecycle 2 構成だけ全ジョブの上限を 40 分にし、他の
+lifecycle 5 構成と DomCrawler は 30 分のままにします。テスト対象・検証内容・
+構成・依存関係チェック・実行コマンドは変えません。同一ソースの PR 検証は
+26 分 40 秒で完走しましたが、マージ後は 30 分の上限付近で 854/1,023 件まで
+進んだところで中断し、完走結果はありません。実行環境の差による原因や高速化
+を断定せず、余裕が十分かどうかは変更後の CI で確認します。
+
 ## Current evidence
 
 See the [current maintenance summary](../../COMPATIBILITY.md#current-maintenance-summary)
