@@ -87,6 +87,10 @@ The dated results below are historical snapshots, not the current suite totals.
 
 ## What this covers
 
+- Remote Grid Select/MultipleSelect zero IDs and sparse query arrays through shipped
+  Select2, native resubmission and HTTP/SQLite; [selection contract and limits](GRID_REMOTE_SELECT.md)
+  - 日本語: リモート選択肢のゼロ・疎な配列の保持、再送信・検索結果と検証範囲
+
 - Grid Between named lower/upper bounds independent of query-key order, with
   unchanged native form resubmission and HTTP/SQLite results;
   [range contract and limits](GRID_BETWEEN_BOUND_ORDER.md)

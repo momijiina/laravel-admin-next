@@ -170,7 +170,10 @@ SCRIPT;
         $ajaxOptions = json_encode(array_merge($ajaxOptions, $options), JSON_UNESCAPED_UNICODE);
 
         $values = (array) $this->filter->getValue();
-        $values = array_filter($values);
+        // Zero is an option ID; keep legacy empty handling for other values.
+        $values = array_values(array_filter($values, function ($value) {
+            return $value === 0 || $value === '0' || (bool) $value;
+        }));
         $values = json_encode($values);
 
         $this->script = <<<EOT
