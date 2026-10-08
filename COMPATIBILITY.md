@@ -21,6 +21,21 @@ Composer の制約変更だけでは既存 PDO アダプターやスキーマ AP
 通常の Composer 検査を有効にしたまま宣言範囲内で解決してください。Laravel 12/13
 全体では DBAL 3 を使用し、DBAL 2 の限定的な検証は全組み合わせの保証ではありません。
 
+## Model-backed Grid Select zero IDs (2026-10-08)
+
+Grid `select()->model(...)` now loads selected model options for integer/string
+zero IDs, preserving their label and unchanged form resubmission. Other empty
+inputs, missing models, record arrays and SQL behavior are unchanged. Check
+custom Grid Select `model()` overrides; no published view change, asset rebuild,
+migration, dependency or minimum-version change is required. See the
+[selection contract and regression limits](tests/integration/GRID_MODEL_SELECT.md)
+and verify each consuming Laravel application independently.
+
+日本語: Grid のモデル選択肢でゼロ ID が消える不具合を修正し、ラベルと
+未変更の再送信を保持します。他の空値・モデル未検出・配列・検索条件は維持します。
+独自の `model()` 実装を確認してください。ビュー変更・アセット再構築・移行・
+依存関係や最低要件の変更は不要です。検証範囲は上記ガイドを参照してください。
+
 ## Grid Checkbox scalar links (2026-10-08)
 
 Grid `in()->checkbox()` and `notIn()->checkbox()` now render scalar query links

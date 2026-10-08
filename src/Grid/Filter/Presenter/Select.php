@@ -119,7 +119,7 @@ SCRIPT;
         }
 
         $this->options = function ($value) use ($model, $idField, $textField) {
-            if (empty($value)) {
+            if (empty($value) && $value !== 0 && $value !== '0') {
                 return [];
             }
 
