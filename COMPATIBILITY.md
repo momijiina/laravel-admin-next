@@ -460,6 +460,12 @@ unchanged, and no NULL clearing protocol is added. See the
 
 ## Current maintenance summary
 
+Grid scope links with explicit `_scope_=0` now retain their selection when
+another scope uses `asDefault()`; see the [zero-scope guide](tests/integration/GRID_SCOPE_ZERO_DEFAULT.md)
+for the narrow default-assignment change, unchanged matching rules and upgrade
+cautions. 日本語: 別の既定スコープがあってもゼロの明示選択を保持します。
+既存の比較仕様と独自実装の注意事項は上記ガイドを確認してください。
+
 Updated 2026-10-08. This index describes the changes merged through
 [PR #107](https://github.com/momijiina/laravel-admin-next/pull/107), at
 [`f342662`](https://github.com/momijiina/laravel-admin-next/commit/f342662a88db28b5faf1132e4210658977ff9489).

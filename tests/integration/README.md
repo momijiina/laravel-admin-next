@@ -138,6 +138,10 @@ The dated results below are historical snapshots, not the current suite totals.
   HTTP/SQLite; [text-mode contract and unchanged temporal behavior](GRID_COLUMN_INPUT_ZERO.md)
   - 日本語: 列ヘッダーのゼロ検索・有効表示・再送信と日時モードの既存仕様
 
+- Explicit zero-key Grid scope selection with another configured default, rendered
+  scope links and HTTP/SQLite; [default-assignment contract and limits](GRID_SCOPE_ZERO_DEFAULT.md)
+  - 日本語: ゼロのスコープ選択、既定値の上書き防止と既存仕様の境界
+
 - Grid Radio integer defaults through shipped iCheck, native GET submission and
   HTTP/SQLite; [selection contract, unchanged defaults and upgrade notes](GRID_RADIO_INTEGER_DEFAULTS.md)
   - 日本語: 整数の既定値の選択・再送信と既存の既定値仕様、独自ビューの更新
