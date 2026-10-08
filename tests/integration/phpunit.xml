@@ -48,6 +48,7 @@
             <file>GridInequalityFilterTest.php</file>
             <file>GridGroupOperatorTest.php</file>
             <file>GridLikeZeroTest.php</file>
+            <file>GridColumnInputZeroTest.php</file>
             <file>GridRemoteSelectTest.php</file>
             <file>GridModelSelectTest.php</file>
             <file>GridCheckboxFilterTest.php</file>

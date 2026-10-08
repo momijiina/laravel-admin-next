@@ -21,6 +21,21 @@ Composer の制約変更だけでは既存 PDO アダプターやスキーマ AP
 通常の Composer 検査を有効にしたまま宣言範囲内で解決してください。Laravel 12/13
 全体では DBAL 3 を使用し、DBAL 2 の限定的な検証は全組み合わせの保証ではありません。
 
+## Grid column-header zero searches (2026-10-08)
+
+Column-header `filter()` / `filter('equal')` and `filter('like')` now apply
+integer/string zero and mark the header as active. Other empty inputs and the
+three temporal modes retain their existing behavior. Review custom
+`InputFilter` overrides and reliance on zero omitting a search. No dependency,
+minimum-version, migration, asset build or published-view refresh is needed.
+See the [focused contract and verification limits](tests/integration/GRID_COLUMN_INPUT_ZERO.md)
+and verify each consuming Laravel application separately.
+
+日本語: 列ヘッダーの等値・LIKE 検索で整数・文字列のゼロを適用し、有効表示も
+一致させます。他の空値と日時モードの既存仕様は維持します。独自実装とゼロを
+検索省略に使う前提を確認してください。依存関係・最低要件・移行・アセットや
+ビューの再公開は不要です。検証範囲は上記ガイドを参照してください。
+
 ## Grid Radio integer defaults (2026-10-08)
 
 Grid Radio integer defaults now select the same option as their string

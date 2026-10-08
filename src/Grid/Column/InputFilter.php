@@ -31,7 +31,7 @@ class InputFilter extends Filter
      */
     public function addBinding($value, Model $model)
     {
-        if (empty($value)) {
+        if (empty($value) && !(in_array($this->type, ['equal', 'like'], true) && ($value === 0 || $value === '0'))) {
             return;
         }
 
@@ -96,7 +96,8 @@ SCRIPT;
 
         $value = $this->getFilterValue();
 
-        $active = empty($value) ? '' : 'text-yellow';
+        $empty = empty($value) && !(in_array($this->type, ['equal', 'like'], true) && ($value === 0 || $value === '0'));
+        $active = $empty ? '' : 'text-yellow';
 
         return <<<EOT
 <span class="dropdown">
