@@ -115,6 +115,10 @@ The dated results below are historical snapshots, not the current suite totals.
 
 ## What this covers
 
+- Model-backed Grid Select scalar zero IDs through Eloquent options, shipped Select2,
+  native resubmission and HTTP/SQLite; [selection contract and limits](GRID_MODEL_SELECT.md)
+  - 日本語: モデル選択肢のゼロ ID、再送信・検索結果と既存入力仕様の境界
+
 - Scalar Grid Checkbox filter links through In/NotIn, shipped iCheck, native
   resubmission and HTTP/SQLite; [view upgrade and query compatibility limits](GRID_CHECKBOX_FILTER.md)
   - 日本語: 単一値 URL の表示、再送信、ビュー更新と既存クエリ仕様の境界
