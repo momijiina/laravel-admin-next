@@ -34,7 +34,9 @@ class RangeFilter extends Filter
      */
     public function addBinding($value, Model $model)
     {
-        $value = array_filter((array) $value);
+        $value = array_filter((array) $value, function ($bound) {
+            return !empty($bound) || ($this->type === 'equal' && ($bound === 0 || $bound === '0'));
+        });
 
         if (empty($value)) {
             return;
@@ -89,7 +91,9 @@ SCRIPT;
         $this->addScript();
 
         $value = array_merge(['start' => '', 'end' => ''], $this->getFilterValue([]));
-        $active = empty(array_filter($value)) ? '' : 'text-yellow';
+        $active = empty(array_filter($value, function ($bound) {
+            return !empty($bound) || ($this->type === 'equal' && ($bound === 0 || $bound === '0'));
+        })) ? '' : 'text-yellow';
 
         return <<<EOT
 <span class="dropdown">

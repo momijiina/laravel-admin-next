@@ -53,6 +53,7 @@
             <file>GridCheckboxFilterTest.php</file>
             <file>GridRadioIntegerDefaultTest.php</file>
             <file>GridScopeZeroDefaultTest.php</file>
+            <file>GridColumnRangeZeroTest.php</file>
             <file>GridBetweenNameTest.php</file>
             <file>GridFilterPrefixTest.php</file>
             <file>GridExplicitSortTest.php</file>
