@@ -445,12 +445,57 @@ unchanged, and no NULL clearing protocol is added. See the
 
 ## Current maintenance summary
 
-Updated 2026-10-07. This index describes the changes merged through
-[PR #95](https://github.com/momijiina/laravel-admin-next/pull/95), at
-[`4be2198`](https://github.com/momijiina/laravel-admin-next/commit/4be2198846d6a740d71896ea45003a6bad8e8cf3).
+Updated 2026-10-08. This index describes the changes merged through
+[PR #107](https://github.com/momijiina/laravel-admin-next/pull/107), at
+[`f342662`](https://github.com/momijiina/laravel-admin-next/commit/f342662a88db28b5faf1132e4210658977ff9489).
 Use the linked guides for upgrade steps and each regression's precise boundary.
 Historical test totals below remain evidence for their own revisions, not
 current suite totals or validation of subsequent changes.
+
+### Recent merged changes: PRs #97–#107
+
+- **Grid Checkbox views (#97, #105):** [inline Checkbox](tests/integration/GRID_INLINE_CHECKBOX.md)
+  retains stored integer IDs, including zero; [Checkbox filters](tests/integration/GRID_CHECKBOX_FILTER.md)
+  render scalar query links. Reconcile the respective overridden/published views,
+  refresh stale compiled views and reload grids. Earlier lost choices are not recovered.
+- **Grid filter values (#98, #101–#103, #106):** ordinary unnamed
+  [Group filters](tests/integration/GRID_GROUP_OPERATOR.md) retain the selected
+  operator; [Between](tests/integration/GRID_BETWEEN_BOUND_ORDER.md) binds paired
+  bounds in named `start`, then `end` order. [LIKE filters](tests/integration/GRID_LIKE_ZERO.md)
+  now apply scalar integer/string zero. [Remote Select/MultipleSelect](tests/integration/GRID_REMOTE_SELECT.md)
+  preserves zero IDs and JSON selection lists; [model-backed Select](tests/integration/GRID_MODEL_SELECT.md)
+  loads zero-ID options. Review Group text/datetime views and custom conditions,
+  presenters and model lookup. Other legacy empty-value handling remains;
+  named Group namespaces and filter defaults are outside these repairs.
+- **Literal field values (#99, #100):** [Listbox remote options](tests/integration/LISTBOX_REMOTE_OPTIONS.md)
+  retain literal IDs/labels and native reset defaults; [Tags separators](tests/integration/TAGS_SEPARATORS.md)
+  are escaped for JavaScript regular expressions. Review HTML/pre-escaped remote
+  labels, custom initializers and separator settings that relied on regex syntax.
+  Reload open forms; existing comma-delimited storage is unchanged.
+- **CI headroom (#104, #107):** all seven lifecycle and fifteen DomCrawler
+  full-suite jobs now have a 40-minute whole-job limit. The uniform setting
+  supersedes the earlier PHP 8.5-only adjustment; test selection, matrices and
+  dependency/platform checks are unchanged. See the
+  [measurements and limits](tests/integration/README.md#ci-full-suite-timeout-headroom--ci-全件テストのタイムアウト余裕).
+  A timeout allowance is not a speedup or a runtime-support claim.
+
+日本語: Grid のインライン Checkbox は整数 ID、Checkbox 絞り込みは単一値 URL に
+対応します。名前なしの Group は選択中の演算子を保持し、Between は `start`・`end`
+の名前順で範囲を適用します。LIKE 系は整数・文字列のゼロを検索条件に使い、
+リモート選択肢はゼロと選択配列、モデル選択肢はゼロ ID を保持します。Checkbox と
+Group の上書きビュー、独自の条件生成・Presenter・モデル取得を確認してください。
+他の空値の扱い、名前付き Group や既定条件の問題を一括で修正するものではありません。
+Listbox の HTML・エスケープ済みラベルや独自初期化、Tags の正規表現依存の設定も
+確認し、古いコンパイル済みビューを更新して画面を再読み込みしてください。
+全件テスト CI の上限は全 22 構成で 40 分です。テスト範囲や依存関係の検査は維持し、
+高速化や対応範囲の拡大は主張しません。各ガイドの検証範囲を確認し、利用先の
+Laravel アプリとの連携は個別に検証してください。
+
+These changes do not alter dependencies, minimum versions, schemas or require
+JavaScript asset republishing. View overrides still need the updates linked above.
+Offline widget/DOM and in-process HTTP/SQLite evidence does not certify live
+browsers, network/PJAX, external databases or arbitrary consuming applications.
+The [DBAL 2/3 boundary](#doctrine-dbal-support-boundary) remains unchanged.
 
 ### Recent merged changes: PRs #87–#95
 
@@ -801,14 +846,16 @@ CI のキャッシュはジョブ内だけで使い、V8 カバレッジ時は�
 
 The linked guides distinguish offline DOM/widget execution and in-process
 HTTP/SQLite checks from live-browser, network/PJAX, cookies/CSRF, external-database
-and downstream-override coverage. PR #78 also raised the full integration and
-DomCrawler workflow timeouts to 30 minutes; that CI configuration is not evidence
-of broader runtime support. No new runtime validation is claimed by this
+and downstream-override coverage. PR #78 originally raised the full integration
+and DomCrawler job timeouts to 30 minutes; the [current CI limit](tests/integration/README.md#ci-full-suite-timeout-headroom--ci-全件テストのタイムアウト余裕)
+is 40 minutes after PR #107. Neither setting is evidence of broader runtime
+support. No new runtime validation is claimed by this
 documentation refresh, and historical test totals below keep their original scope.
 
 日本語: 検証範囲は各ガイドを参照してください。offline DOM とプロセス内 HTTP/SQLite の
 確認は、実ブラウザー・実通信/PJAX・cookie/CSRF・他の DB・独自上書きの保証ではありません。
-PR #78 の統合・DomCrawler CI の制限時間延長（30 分）も対応範囲を広げるものではなく、
+PR #78 の統合・DomCrawler CI の上限 30 分は、PR #107 で 40 分になりました。
+いずれも対応範囲を広げるものではなく、
 今回の文書更新による新たなランタイム検証や、他の Laravel アプリとの一律の互換性は主張しません。
 
 Disabled-collection support and changes to Embeds replacement semantics remain
