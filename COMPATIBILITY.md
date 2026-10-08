@@ -21,6 +21,24 @@ Composer の制約変更だけでは既存 PDO アダプターやスキーマ AP
 通常の Composer 検査を有効にしたまま宣言範囲内で解決してください。Laravel 12/13
 全体では DBAL 3 を使用し、DBAL 2 の限定的な検証は全組み合わせの保証ではありません。
 
+## Grid Checkbox scalar links (2026-10-08)
+
+Grid `in()->checkbox()` and `notIn()->checkbox()` now render scalar query links
+such as `?code=1` without a PHP type error. SQL already accepted these as
+one-item arrays; the shipped view now normalizes its selected-value input too.
+Array queries, loose membership, form names and SQL semantics are unchanged.
+Reconcile published/overridden `admin::filter.checkbox` views and refresh stale
+compiled views as needed. No dependency/minimum-version change, schema/data
+migration or asset rebuild is required. See the [regression scope and upgrade
+notes](tests/integration/GRID_CHECKBOX_FILTER.md); verify each consuming Laravel
+application independently.
+
+日本語: Grid の Checkbox 絞り込みで、単一値 URL を表示すると型エラーになる
+不具合を修正します。SQL 側と同様にビューの選択値を配列化し、既存の配列入力・
+緩い比較・送信名・検索条件は維持します。公開済み・独自ビューとコンパイル済み
+ビューを確認してください。依存関係・最低要件の変更、移行やアセット再構築は
+不要です。検証範囲と更新上の注意は上記ガイドを参照してください。
+
 ## Remote Grid filter selection lists (2026-10-08)
 
 URL-backed Grid filter Select/MultipleSelect presenters retain integer/string

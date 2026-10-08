@@ -87,6 +87,10 @@ The dated results below are historical snapshots, not the current suite totals.
 
 ## What this covers
 
+- Scalar Grid Checkbox filter links through In/NotIn, shipped iCheck, native
+  resubmission and HTTP/SQLite; [view upgrade and query compatibility limits](GRID_CHECKBOX_FILTER.md)
+  - 日本語: 単一値 URL の表示、再送信、ビュー更新と既存クエリ仕様の境界
+
 - Remote Grid Select/MultipleSelect zero IDs and sparse query arrays through shipped
   Select2, native resubmission and HTTP/SQLite; [selection contract and limits](GRID_REMOTE_SELECT.md)
   - 日本語: リモート選択肢のゼロ・疎な配列の保持、再送信・検索結果と検証範囲
