@@ -1169,6 +1169,19 @@ sections intentionally retain the dependencies and results of their revisions.
 
 <a id="current-verified-coverage-2026-10-03-after-pr-25"></a>
 
+## Interactive administrator role selection (2026-10-24)
+
+`admin:create-user` now prompts when roles exist and attaches only the selected
+roles, using strict comparison of `Name [ID]` choices so numeric names cannot
+shadow selection indexes. Previously it skipped that prompt and
+attached every available role; an empty role list failed instead of creating an
+unassigned user. Existing accounts are unchanged. Review previously created
+users and update interactive automation to answer the restored role question.
+See [the command contract and regression results](tests/integration/CREATE_USER_ROLES.md).
+
+日本語: ユーザー作成コマンドが全ロールを付与していた問題を修正します。既存ユーザー
+のロールは変更しないため、過去の作成結果と対話入力の自動化を確認してください。
+
 ## Native factories in the historical test runner (2026-10-23)
 
 The isolated BrowserKit consumer now uses Laravel's native class-based factories

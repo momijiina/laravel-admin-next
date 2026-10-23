@@ -188,6 +188,8 @@ The dated results below are historical snapshots, not the current suite totals.
   including source precedence, null/array values, JSON and absent input; real
   remember cookies/tokens for accepted and rejected credentials
 - Real Artisan blank-controller generation and rejection of model-less `--output`
+- Interactive administrator creation attaches only explicitly selected roles;
+  [role selection, existing-account review and automation changes](CREATE_USER_ROLES.md)
 - Generated model-backed controllers executing index/create/store/show/edit/update/delete
   through the real HTTP kernel; [CRUD regression scope](GENERATED_CONTROLLER_CRUD.md)
 - DateMultiple native flatpickr options, actual calendar selections and HTTP/SQLite saves;
