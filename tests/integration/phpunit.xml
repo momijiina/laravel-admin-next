@@ -45,6 +45,7 @@
             <file>DefaultExporterTest.php</file>
             <file>ExporterDriverTest.php</file>
             <file>GridRequestInputTest.php</file>
+            <file>PermissionMiddlewareTest.php</file>
             <file>GridQuickSearchKeyTest.php</file>
             <file>ModernAttributeDispatchTest.php</file>
             <file>FormAttributeMutatorTest.php</file>

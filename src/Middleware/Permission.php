@@ -5,7 +5,6 @@ namespace Encore\Admin\Middleware;
 use Encore\Admin\Auth\Permission as Checker;
 use Encore\Admin\Facades\Admin;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 
 class Permission
 {
@@ -29,7 +28,7 @@ class Permission
             return $next($request);
         }
 
-        if (!Admin::user() || !empty($args) || $this->shouldPassThrough($request)) {
+        if (!Admin::user() || $this->shouldPassThrough($request)) {
             return $next($request);
         }
 
@@ -47,8 +46,7 @@ class Permission
     }
 
     /**
-     * If the route of current request contains a middleware prefixed with 'admin.permission:',
-     * then it has a manually set permission middleware, we need to handle it first.
+     * Check every explicit permission rule before the default path permissions.
      *
      * @param Request $request
      *
@@ -56,23 +54,33 @@ class Permission
      */
     public function checkRoutePermission(Request $request)
     {
-        if (!$middleware = collect($request->route()->middleware())->first(function ($middleware) {
-            return Str::startsWith($middleware, $this->middlewarePrefix);
-        })) {
-            return false;
+        $router = app('router');
+        $permissionMiddleware = $router->getMiddleware()[rtrim($this->middlewarePrefix, ':')] ?? static::class;
+        $hasExplicitPermission = false;
+
+        foreach ($router->gatherRouteMiddleware($request->route()) as $middleware) {
+            if (!is_string($middleware) || strpos($middleware, ':') === false) {
+                continue;
+            }
+
+            [$class, $parameters] = explode(':', $middleware, 2);
+
+            if ($class !== $permissionMiddleware && !is_a($class, self::class, true)) {
+                continue;
+            }
+
+            $args = explode(',', $parameters);
+            $method = array_shift($args);
+
+            if (!method_exists(Checker::class, $method)) {
+                throw new \InvalidArgumentException("Invalid permission method [$method].");
+            }
+
+            call_user_func_array([Checker::class, $method], [$args]);
+            $hasExplicitPermission = true;
         }
 
-        $args = explode(',', str_replace($this->middlewarePrefix, '', $middleware));
-
-        $method = array_shift($args);
-
-        if (!method_exists(Checker::class, $method)) {
-            throw new \InvalidArgumentException("Invalid permission method [$method].");
-        }
-
-        call_user_func_array([Checker::class, $method], [$args]);
-
-        return true;
+        return $hasExplicitPermission;
     }
 
     /**

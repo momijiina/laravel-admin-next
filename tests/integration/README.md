@@ -212,6 +212,8 @@ The dated results below are historical snapshots, not the current suite totals.
   [parser behavior and custom-view cautions](ACTION_TEXTAREA_NEWLINES.md)
 - Real request-input parity for grid, row/batch actions and controller dispatch;
   DomCrawler compatibility and multiple-select null handling
+- Every explicit route permission rule, including aliases, groups and controller
+  middleware; [conjunction, override and denial-response boundaries](PERMISSION_MIDDLEWARE.md)
 - Modern native Eloquent `Attribute` dispatch for explicit Grid columns and
   Grid/Show shorthand through HTTP/SQLite, with legacy getter, macro and single
   relation controls; [attribute scope, serialization and fallback limits](MODERN_ATTRIBUTE_DISPATCH.md)
