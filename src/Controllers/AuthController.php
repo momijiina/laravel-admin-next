@@ -9,8 +9,11 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Lang;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
@@ -42,7 +45,27 @@ class AuthController extends Controller
      */
     public function postLogin(Request $request)
     {
-        $this->loginValidator($request->all())->validate();
+        try {
+            $this->loginValidator($request->all())->validate();
+        } catch (ValidationException $exception) {
+            if ($exception->response === null && !$request->expectsJson()) {
+                $exception->response = redirect($exception->redirectTo ?? url()->previous())
+                    ->withInput($this->loginOldInput($request))
+                    ->withErrors($exception->validator, $exception->errorBag);
+            }
+
+            throw $exception;
+        }
+
+        $throttleKey = config('admin.auth.login_throttle.enabled', true) ? $this->loginThrottleKey($request) : null;
+        $maxAttempts = config('admin.auth.login_throttle.max_attempts', 5);
+        $maxAttempts = is_int($maxAttempts) && $maxAttempts > 0 ? $maxAttempts : 5;
+
+        if ($throttleKey !== null && RateLimiter::tooManyAttempts($throttleKey, $maxAttempts)) {
+            return back()->withInput($this->loginOldInput($request))->withErrors([
+                $this->username() => $this->getLoginThrottleMessage(RateLimiter::availableIn($throttleKey)),
+            ]);
+        }
 
         $credentials = $request->only([$this->username(), 'password']);
         // Preserve Request::get() precedence and values without its deprecation.
@@ -58,12 +81,69 @@ class AuthController extends Controller
         }
 
         if ($this->guard()->attempt($credentials, $remember)) {
+            if ($throttleKey !== null) {
+                RateLimiter::clear($throttleKey);
+            }
+
             return $this->sendLoginResponse($request);
         }
 
-        return back()->withInput()->withErrors([
+        if ($throttleKey !== null) {
+            $decaySeconds = config('admin.auth.login_throttle.decay_seconds', 60);
+            $decaySeconds = is_int($decaySeconds) && $decaySeconds > 0 ? $decaySeconds : 60;
+            RateLimiter::hit($throttleKey, $decaySeconds);
+        }
+
+        return back()->withInput($this->loginOldInput($request))->withErrors([
             $this->username() => $this->getFailedLoginMessage(),
         ]);
+    }
+
+    /**
+     * Keep only the identity and checkbox state when redisplaying the login form.
+     *
+     * @param Request $request
+     *
+     * @return array
+     */
+    protected function loginOldInput(Request $request)
+    {
+        $input = is_string($request->input($this->username())) ? $request->only($this->username()) : [];
+
+        if ($request->has('remember')) {
+            $input['remember'] = (bool) $request->input('remember');
+        }
+
+        return $input;
+    }
+
+    /**
+     * Separate guard identities, usernames and IPs without putting them in cache keys.
+     *
+     * @param Request $request
+     *
+     * @return string
+     */
+    protected function loginThrottleKey(Request $request)
+    {
+        $guard = $this->guard();
+        $guardName = method_exists($guard, 'getName') ? $guard->getName() : (config('admin.auth.guard') ?: 'admin');
+
+        return 'admin-login:'.hash('sha256', serialize([
+            get_class($guard), $guardName, $this->username(), Str::lower($request->input($this->username())), $request->ip(),
+        ]));
+    }
+
+    /**
+     * @param int $seconds
+     *
+     * @return string
+     */
+    protected function getLoginThrottleMessage($seconds)
+    {
+        return Lang::has('auth.throttle')
+            ? trans('auth.throttle', ['seconds' => $seconds, 'minutes' => (int) ceil($seconds / 60)])
+            : "Too many login attempts. Please try again in {$seconds} seconds.";
     }
 
     /**
@@ -76,8 +156,8 @@ class AuthController extends Controller
     protected function loginValidator(array $data)
     {
         return Validator::make($data, [
-            $this->username()   => 'required',
-            'password'          => 'required',
+            $this->username()   => 'required|string',
+            'password'          => 'required|string',
         ]);
     }
 

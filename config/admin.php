@@ -131,6 +131,14 @@ return [
         // Add "remember me" to login form
         'remember' => true,
 
+        // Failed login attempts per username, IP and guard. Set enabled to false to disable.
+        // Positive integers are required; invalid limits fall back to 5 attempts / 60 seconds.
+        'login_throttle' => [
+            'enabled' => true,
+            'max_attempts' => 5,
+            'decay_seconds' => 60,
+        ],
+
         // Redirect to the specified URI when user is not authorized.
         'redirect_to' => 'auth/login',
 
