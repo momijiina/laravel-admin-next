@@ -327,6 +327,8 @@ The dated results below are historical snapshots, not the current suite totals.
 - Actual HTTP-kernel middleware lifecycle, including consumer bootstrap execution
 - SQLite-persisted operation logs, recursive redaction, preserved controller input,
   validation failures, custom redaction fields, logging disablement and exclusions
+- Rendered operation logs with literal metadata/JSON text, persisted redaction,
+  and malformed or scalar historical input; [display contract and historical-data limits](OPERATION_LOG_RENDERING.md)
 
 No package/framework classes are replaced with stubs. Small fixture routes return
 JSON or validate input to observe the real middleware before/after a controller.
