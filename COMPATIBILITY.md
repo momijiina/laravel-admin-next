@@ -157,6 +157,18 @@ and verify the change in each consuming Laravel application.
 変更せず、アセット更新・DB 移行も不要です。利用先の Laravel アプリごとに
 確認してください。
 
+## Numeric zero IDs in AJAX Select results (2026-10-23)
+
+Form/Grid filter AJAX Select and MultipleSelect now normalize numeric `0` to
+string `'0'` before handing results to Select2. This prevents the native option
+from losing its value and selection. Existing string IDs and nonzero numeric
+IDs retain their behavior; custom response-key mappings are covered. See the
+[native selection and HTTP/SQLite regression](tests/integration/AJAX_SELECT_ZERO.md).
+
+日本語: AJAX 応答の数値 `0` を Select2 に渡す前に文字列へ揃え、選択値が
+失われる問題を修正します。他の ID の処理は維持します。独自の初期化処理を
+確認し、開いたままの画面は再読み込みしてください。
+
 ## AJAX Select label escaping (2026-10-23)
 
 Form/Grid filter `Select::ajax()` and their MultipleSelect variants now use

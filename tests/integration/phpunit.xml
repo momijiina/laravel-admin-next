@@ -18,6 +18,7 @@
             <file>ListboxRemoteOptionsTest.php</file>
             <file>SelectLoadsIsolationTest.php</file>
             <file>AjaxSelectEscapingTest.php</file>
+            <file>AjaxSelectZeroTest.php</file>
             <file>CheckboxZeroTest.php</file>
             <file>StyledCheckboxZeroTest.php</file>
             <file>SliderRangeTest.php</file>

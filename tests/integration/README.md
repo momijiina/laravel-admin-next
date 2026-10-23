@@ -284,6 +284,9 @@ The dated results below are historical snapshots, not the current suite totals.
 - AJAX Form/Grid Select and MultipleSelect literal result/selection labels,
   native pagination/submission and explicit DOM/jQuery templates;
   [escaping behavior and HTML-label migration](AJAX_SELECT_ESCAPING.md)
+- Numeric zero IDs returned by AJAX Select/MultipleSelect endpoints through native
+  selection, submission and Form/Grid HTTP/SQLite replay;
+  [zero normalization and remaining ID boundaries](AJAX_SELECT_ZERO.md)
 - Ordinary Switch localized labels, shipped native/plugin clicks and HTTP/SQLite saves;
   [literal strings, HTML labels and override cautions](SWITCH_LABELS.md)
 - Ordinary double Slider saved/old-input integer pairs, shipped widget initialization and HTTP/SQLite round trips;

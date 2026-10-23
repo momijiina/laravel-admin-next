@@ -354,7 +354,8 @@ $("{$this->getElementClassSelector()}").select2({
 
       return {
         results: $.map(data.data, function (d) {
-                   d.id = d.$idField;
+                   // Select2 sets the option value before normalizing numeric IDs.
+                   d.id = d.$idField === 0 ? '0' : d.$idField;
                    d.text = d.$textField;
                    return d;
                 }),
