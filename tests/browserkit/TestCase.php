@@ -30,7 +30,7 @@ class HistoricalBrowserKitApplication extends TestbenchApplication
 
     protected function getPackageProviders($app)
     {
-        return [AdminServiceProvider::class, \Illuminate\Database\Eloquent\LegacyFactoryServiceProvider::class];
+        return [AdminServiceProvider::class];
     }
 
     protected function getPackageAliases($app)
@@ -75,7 +75,6 @@ abstract class TestCase extends BrowserKitTestCase
             (new CreateTestTables())->up();
             require admin_path('routes.php');
             require __DIR__.'/../routes.php';
-            require __DIR__.'/../seeds/factory.php';
             // Replaces the laravel/laravel skeleton welcome page used by LaravelTest.
             $this->app['router']->get('/', static fn () => 'Laravel');
         } catch (\Throwable $exception) {

@@ -3,6 +3,7 @@
 $loader = require (getenv('BROWSERKIT_AUTOLOAD') ?: __DIR__.'/vendor/autoload.php');
 $loader->addPsr4('Tests\\Models\\', __DIR__.'/../models');
 $loader->addPsr4('Tests\\Controllers\\', __DIR__.'/../controllers');
+$loader->addPsr4('Tests\\Factories\\', __DIR__.'/../factories');
 
 // admin:install generates these consumer controllers inside the disposable app.
 spl_autoload_register(static function ($class) {

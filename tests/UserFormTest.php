@@ -1,6 +1,9 @@
 <?php
 
 use Encore\Admin\Auth\Database\Administrator;
+use Tests\Factories\ProfileFactory;
+use Tests\Factories\TagFactory;
+use Tests\Factories\UserFactory;
 use Tests\Models\User as UserModel;
 
 class UserFormTest extends TestCase
@@ -101,11 +104,11 @@ class UserFormTest extends TestCase
 
     protected function seedsTable($count = 100)
     {
-        factory(\Tests\Models\User::class, $count)
+        UserFactory::new()->count($count)
             ->create()
             ->each(function ($u) {
-                $u->profile()->save(factory(\Tests\Models\Profile::class)->make());
-                $u->tags()->saveMany(factory(\Tests\Models\Tag::class, 5)->make());
+                $u->profile()->save(ProfileFactory::new()->make());
+                $u->tags()->saveMany(TagFactory::new()->count(5)->make());
             });
     }
 

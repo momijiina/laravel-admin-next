@@ -35,7 +35,7 @@ DBAL 4 is not supported.
 - [x] Rebuild the package-test harness on supported BrowserKit/PHPUnit versions
       ([isolated SQLite runner](tests/browserkit/README.md)); retain 73 historical
       methods and add four package-state isolation regressions
-- [x] Isolate FakerPHP, legacy factories and disposable application setup in the
+- [x] Isolate FakerPHP and disposable application setup in the
       modern runner, separate from the root historical development graph
 - [x] Allow BrowserKit `^6.0 || ^7.0` in root development dependencies (PR #85);
       the isolated runner already requires `^7.2.8`. This resolves the v6-only
@@ -44,8 +44,11 @@ DBAL 4 is not supported.
       framework's PHP minimum; record exact tested dependency floors separately
 - [x] Exercise shipped configuration through the real integration consumer and
       publish/install through the historical runner (with documented fixture overlays)
-- [ ] Replace legacy factory APIs and decide whether to retire the root legacy
-      development dependencies/configuration; the isolated runner still uses factories
+- [x] Replace the isolated runner's legacy factory API/provider/package with
+      native class-based factories, preserving historical assertions and relations;
+      see the [runner and historical-root boundaries](tests/browserkit/README.md)
+- [ ] Decide whether to retire the root legacy development dependencies/configuration;
+      the isolated runner does not validate that historical dependency graph
 - [ ] Extend install/login/CRUD/upload/menu/export coverage to fresh applications
       and real browsers, including JavaScript, cookies and CSRF
 - [ ] Establish a comprehensive lowest/latest dependency policy; the existing
@@ -146,9 +149,13 @@ and application checks; do not silently remove or claim support for them.
 - [x] Preserve registered structured fields during Form creation without a leading
       scalar workaround, including native JSON casts/Attribute setters and sparse
       MultipleSelect input; see the [insert preparation scope and limits](tests/integration/STRUCTURED_FORM_INSERTS.md)
-- [ ] Add real password-change and rendered-operation-log coverage
+- [x] Add real password-change and rendered-operation-log coverage; review the
+      [password-form migration](tests/integration/ADMIN_PASSWORD_FORMS.md) and
+      [literal log display and historical-data boundaries](tests/integration/OPERATION_LOG_RENDERING.md)
+- [x] Restore native escaping for AJAX Select/MultipleSelect result and selection
+      labels; review [explicit template migration](tests/integration/AJAX_SELECT_ESCAPING.md)
 - [ ] Review remaining deprecations, default credentials, login throttling,
-      upload previews and AJAX-option escaping; these tests are not a penetration test
+      upload previews and custom AJAX templates; these tests are not a penetration test
 - [ ] Extend driver-specific PDO lifecycle checks beyond SQLite and decide whether
       live SQL Server and additional historical framework combinations are required
 - [ ] Decide supported dependency ranges and package publication/install path
