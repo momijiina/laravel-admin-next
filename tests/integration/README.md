@@ -134,6 +134,11 @@ The dated results below are historical snapshots, not the current suite totals.
 
 ## What this covers
 
+- Numeric column-header ranges retaining zero bounds through native FormData,
+  repeated HTTP/SQLite submissions, clear/reset and reselection;
+  [bound handling, strict-operator preservation and limits](GRID_COLUMN_RANGE_ZERO.md)
+  - 日本語: 数値範囲のゼロ境界、SQL・有効表示の一致、既存の日時範囲と検証範囲
+
 - Column-header equal/LIKE zero searches, active indicators, native FormData and
   HTTP/SQLite; [text-mode contract and unchanged temporal behavior](GRID_COLUMN_INPUT_ZERO.md)
   - 日本語: 列ヘッダーのゼロ検索・有効表示・再送信と日時モードの既存仕様
