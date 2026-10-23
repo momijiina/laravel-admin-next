@@ -927,7 +927,18 @@ class Form implements Renderable
     protected function prepareInsert($inserts): array
     {
         if ($this->isHasOneRelation($inserts)) {
-            $inserts = Arr::dot($inserts);
+            $flattened = [];
+
+            foreach ($inserts as $column => $value) {
+                // Registered fields prepare their entire value, including arrays.
+                if ($this->getFieldByColumn($column) !== null) {
+                    $flattened[$column] = $value;
+                } else {
+                    $flattened = array_merge($flattened, Arr::dot([$column => $value]));
+                }
+            }
+
+            $inserts = $flattened;
         }
 
         foreach ($inserts as $column => $value) {

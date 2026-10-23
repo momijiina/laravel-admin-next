@@ -362,6 +362,20 @@ asset/view republish, schema or data migration is needed. See the
 複数 Grid の DOM ID を変更するものではありません。他の Laravel アプリとの
 互換性はアプリごとに検証してください。
 
+## Structured Form inserts (2026-10-23)
+
+Form insert preparation now preserves complete values for registered fields
+instead of flattening and discarding associative arrays. Embedded-only forms and
+sparse MultipleSelect inputs no longer need an unrelated scalar to precede them.
+Normal field preparation, native casts/setters and relation saving remain in use;
+unmatched roots keep the existing dotted-field fallback. Review custom Form and
+field preparation. There are no dependency, view, asset or schema changes. See
+the [HTTP/SQLite checks and input-normalization limits](tests/integration/STRUCTURED_FORM_INSERTS.md).
+
+日本語: 作成時に登録済みの配列入力を平坦化して捨てる問題を修正します。
+先頭のダミー文字列フィールドは不要になります。値は本来のフィールドと
+Eloquent の処理へ渡し、未登録の入力やリレーションの従来の扱いは維持します。
+
 ## Modern Eloquent attributes in Form (2026-10-23)
 
 Form now excludes native Eloquent Attribute methods from relation discovery and
@@ -376,7 +390,8 @@ HTTP/SQLite tests and structured-input limits](tests/integration/FORM_ATTRIBUTE_
 日本語: Form が新形式の Eloquent Attribute をリレーションと誤認し、編集・保存に
 失敗する問題を修正します。値の準備と Eloquent 本来の getter/setter、従来の属性・
 実際のリレーションの動作は維持します。独自 Form の判定を確認してください。
-計算属性の appends・可視性はアプリ側で設定し、配列入力の既存制約は別件です。
+計算属性の appends・可視性はアプリ側で設定してください。
+当初残した配列入力の制約は、上記の作成時修正で別途対応しています。
 
 ## Modern Eloquent Attribute dispatch (2026-10-06)
 

@@ -141,8 +141,11 @@ and application checks; do not silently remove or claim support for them.
       and [separator-setting cautions](tests/integration/TAGS_SEPARATORS.md)
 - [x] Extend native Eloquent Attribute detection to Form edit/save, preserving
       native setters, legacy mutators and real relations; see the
-      [Form contract and structured-input limits](tests/integration/FORM_ATTRIBUTE_MUTATORS.md).
+      [Form Attribute contract](tests/integration/FORM_ATTRIBUTE_MUTATORS.md).
       Earlier Grid/Show coverage remains a separate historical result
+- [x] Preserve registered structured fields during Form creation without a leading
+      scalar workaround, including native JSON casts/Attribute setters and sparse
+      MultipleSelect input; see the [insert preparation scope and limits](tests/integration/STRUCTURED_FORM_INSERTS.md)
 - [ ] Add real password-change and rendered-operation-log coverage
 - [ ] Review remaining deprecations, default credentials, login throttling,
       upload previews and AJAX-option escaping; these tests are not a penetration test
