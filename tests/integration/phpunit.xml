@@ -8,6 +8,7 @@
     <testsuites>
         <testsuite name="real Laravel integration">
             <file>AdminLifecycleTest.php</file>
+            <file>AdminPasswordFormTest.php</file>
             <file>DomCrawlerCompatibilityTest.php</file>
             <file>MultipleSelectTest.php</file>
             <file>MultipleSelectNullOldInputTest.php</file>
