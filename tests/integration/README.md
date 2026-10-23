@@ -279,6 +279,9 @@ The dated results below are historical snapshots, not the current suite totals.
   [loader isolation and unchanged AJAX boundaries](SELECT_LOADS_ISOLATION.md)
 - Ordinary nullable Select zero/NULL rendering and serialized HTTP persistence;
   [selection contract, defaults, and upgrade notes](NULLABLE_SELECT.md)
+- AJAX Form/Grid Select and MultipleSelect literal result/selection labels,
+  native pagination/submission and explicit DOM/jQuery templates;
+  [escaping behavior and HTML-label migration](AJAX_SELECT_ESCAPING.md)
 - Ordinary Switch localized labels, shipped native/plugin clicks and HTTP/SQLite saves;
   [literal strings, HTML labels and override cautions](SWITCH_LABELS.md)
 - Ordinary double Slider saved/old-input integer pairs, shipped widget initialization and HTTP/SQLite round trips;

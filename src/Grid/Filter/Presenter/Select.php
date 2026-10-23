@@ -236,10 +236,7 @@ $(".{$this->getElementClass()}").select2({
     },
     cache: true
   },
-  $configs,
-  escapeMarkup: function (markup) {
-      return markup;
-  }
+  $configs
 });
 
 EOT;

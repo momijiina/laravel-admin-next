@@ -365,10 +365,7 @@ $("{$this->getElementClassSelector()}").select2({
     },
     cache: true
   },
-  $configs,
-  escapeMarkup: function (markup) {
-      return markup;
-  }
+  $configs
 });
 
 EOT;
