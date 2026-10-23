@@ -29,19 +29,30 @@ class LogController extends AdminController
         $grid->column('user.name', 'User');
         $grid->column('method')->display(function ($method) {
             $color = Arr::get(OperationLog::$methodColors, $method, 'grey');
+            $method = e($method);
 
             return "<span class=\"badge bg-$color\">$method</span>";
         });
-        $grid->column('path')->label('info');
-        $grid->column('ip')->label('primary');
+        $grid->column('path')->display(function ($path) {
+            return e($path);
+        })->label('info');
+        $grid->column('ip')->display(function ($ip) {
+            return e($ip);
+        })->label('primary');
         $grid->column('input')->display(function ($input) {
-            $input = json_decode($input, true);
-            $input = Arr::except($input, ['_pjax', '_token', '_method', '_previous_']);
-            if (empty($input)) {
-                return '<code>{}</code>';
+            $decoded = json_decode($input, true);
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                return '<pre>'.e($input).'</pre>';
             }
 
-            return '<pre>'.json_encode($input, JSON_PRETTY_PRINT | JSON_HEX_TAG).'</pre>';
+            if (is_array($decoded)) {
+                $decoded = Arr::except($decoded, ['_pjax', '_token', '_method', '_previous_']);
+                if (empty($decoded)) {
+                    return '<code>{}</code>';
+                }
+            }
+
+            return '<pre>'.e(json_encode($decoded, JSON_PRETTY_PRINT | JSON_HEX_TAG)).'</pre>';
         });
 
         $grid->column('created_at', trans('admin.created_at'));

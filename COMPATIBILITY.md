@@ -489,6 +489,18 @@ unchanged, and no NULL clearing protocol is added. See the
 不要ですが、独自表示クラスは確認してください。初期選択・緩い比較・保存形式は変更
 せず、NULL クリア用 API は追加しません。他の Laravel アプリとの連携は個別に検証してください。
 
+## Operation-log rendering (2026-10-23)
+
+The built-in log page now escapes method/path/IP labels and serialized JSON at
+the HTML boundary. Entity-like text remains literal, and malformed or scalar
+historical input no longer breaks the entire page. Request logging, recursive
+redaction and stored rows retain their existing behavior. See the
+[rendering regression and historical-data limits](tests/integration/OPERATION_LOG_RENDERING.md).
+
+日本語: 操作ログのメタデータと JSON を文字どおり表示し、壊れた JSON や
+スカラー値を含む過去ログでも一覧を表示できるようにします。過去の機密情報を
+削除・秘匿する処理ではありません。独自 LogController の表示処理は上記を確認してください。
+
 ## Current maintenance summary
 
 Numeric column-header `filter('range')` / `filter('range', 'equal')` now retain
