@@ -16,6 +16,7 @@
             <file>RemoteSelectOldInputTest.php</file>
             <file>ListboxRemoteOptionsTest.php</file>
             <file>SelectLoadsIsolationTest.php</file>
+            <file>AjaxSelectEscapingTest.php</file>
             <file>CheckboxZeroTest.php</file>
             <file>StyledCheckboxZeroTest.php</file>
             <file>SliderRangeTest.php</file>

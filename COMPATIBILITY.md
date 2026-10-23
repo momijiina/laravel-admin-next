@@ -157,6 +157,19 @@ and verify the change in each consuming Laravel application.
 変更せず、アセット更新・DB 移行も不要です。利用先の Laravel アプリごとに
 確認してください。
 
+## AJAX Select label escaping (2026-10-23)
+
+Form/Grid filter `Select::ajax()` and their MultipleSelect variants now use
+Select2's native string escaping for search results and selected labels. Custom
+DOM/jQuery templates remain available. Consumers that relied on raw HTML labels
+must use explicit templates; review pre-encoded labels and copied initializers.
+No assets or views need republishing. See the [native-widget regressions and
+upgrade guidance](tests/integration/AJAX_SELECT_ESCAPING.md).
+
+日本語: AJAX 選択肢の文字列を HTML として解釈せず、Select2 標準の処理で
+表示します。HTML 文字列で装飾していた場合は明示的なテンプレートへ移行し、
+事前エンコードの回避策と独自初期化処理を確認してください。
+
 ## Listbox remote literal options (2026-10-07)
 
 URL-option Listbox fields now create native options with literal IDs and labels,
