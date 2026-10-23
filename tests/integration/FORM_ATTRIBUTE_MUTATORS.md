@@ -28,10 +28,9 @@ previous relation logic; this is not runtime certification of older Laravel.
 Review Form subclasses overriding `getRelations()` or `getRelationInputs()`.
 No dependency/minimum-version change, asset build, view republishing or schema
 migration is required. This change does not add arbitrary custom-cast or nested
-relation support. Existing structured-input preparation remains unchanged,
-including `prepareInsert()`'s single-array-input flattening heuristic; the
-embedded-attribute lifecycle test uses a normal scalar field before the embedded
-input rather than claiming a fix for that separate limitation.
+relation support. The initial Attribute-dispatch fix left structured-input
+preparation unchanged. The separate [structured insert fix](STRUCTURED_FORM_INSERTS.md)
+now preserves registered array inputs; its tests and limits are documented there.
 
 Run from `tests/integration` after its normal setup:
 
@@ -61,7 +60,7 @@ snake_case の入力名、getter/setter・getter のみ・setter のみを対象
 従来形式の getter/setter と実際のリレーションは維持します。
 
 独自 Form の属性・リレーション判定を確認してください。最低要件・依存関係の
-変更や、アセット・ビュー・データの移行はありません。配列入力の準備方法は
-変更せず、単独の配列入力を平坦化する既存の制約も別件として残ります。
+変更や、アセット・ビュー・データの移行はありません。初回の属性判定修正で
+残した配列入力の制約は、[別の作成時修正](STRUCTURED_FORM_INSERTS.md)で対応しています。
 HTTP/SQLite の検証であり、実ブラウザー・外部 DB・任意のアプリ全体の対応を
 保証するものではありません。

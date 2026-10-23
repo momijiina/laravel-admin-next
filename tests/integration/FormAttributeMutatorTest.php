@@ -94,7 +94,6 @@ class FormAttributeMutatorTest extends TestCase
         $form = new Form(new FormAttributeRecord());
         $form->setAction('/form-attributes/'.$column);
         if ($column === 'preferences') {
-            $form->text('plain');
             $form->embeds('preferences', function ($form) {
                 $form->text('theme')->rules('required');
             });
@@ -170,7 +169,7 @@ class FormAttributeMutatorTest extends TestCase
 
     public function test_embedded_attribute_and_real_has_one_relation_can_be_edited_and_saved_together(): void
     {
-        $this->post('/form-attributes/preferences', ['plain' => 'Original', 'preferences' => ['theme' => 'dark']])->assertRedirect();
+        $this->post('/form-attributes/preferences', ['preferences' => ['theme' => 'dark']])->assertRedirect();
         $record = FormAttributeRecord::firstOrFail();
         $this->assertSame(['theme' => 'dark'], $record->preferences);
         $this->put('/form-attributes/preferences/'.$record->id, ['preferences' => ['theme' => 'light']])->assertRedirect();
