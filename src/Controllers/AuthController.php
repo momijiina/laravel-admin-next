@@ -142,18 +142,21 @@ class AuthController extends Controller
         $form->display('username', trans('admin.username'));
         $form->text('name', trans('admin.name'))->rules('required');
         $form->image('avatar', trans('admin.avatar'));
-        $form->password('password', trans('admin.password'))->rules('confirmed|required');
-        $form->password('password_confirmation', trans('admin.password_confirmation'))->rules('required')
-            ->default(function ($form) {
-                return $form->model()->password;
-            });
+        $form->password('password', trans('admin.password'))
+            ->rules('nullable|string|confirmed')
+            ->attribute('value', '');
+        $form->password('password_confirmation', trans('admin.password_confirmation'))
+            ->rules('nullable|string|same:password')
+            ->attribute('value', '');
 
         $form->setAction(admin_url('auth/setting'));
 
         $form->ignore(['password_confirmation']);
 
         $form->saving(function (Form $form) {
-            if ($form->password && $form->model()->password != $form->password) {
+            if ($form->password === null || $form->password === '') {
+                $form->password = $form->model()->password;
+            } else {
                 $form->password = Hash::make($form->password);
             }
         });

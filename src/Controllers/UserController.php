@@ -101,11 +101,19 @@ class UserController extends AdminController
 
         $form->text('name', trans('admin.name'))->rules('required');
         $form->image('avatar', trans('admin.avatar'));
-        $form->password('password', trans('admin.password'))->rules('required|confirmed');
-        $form->password('password_confirmation', trans('admin.password_confirmation'))->rules('required')
-            ->default(function ($form) {
-                return $form->model()->password;
+        $form->password('password', trans('admin.password'))
+            ->rules('nullable|string|confirmed')
+            ->creationRules('required|string|confirmed')
+            ->attribute('value', '')
+            ->validator(function (array $input) {
+                // A required password must also be validated when omitted on creation.
+                return validator($input, ['password' => $this->getRules()], $this->getValidationMessages(), [
+                    'password' => $this->label(),
+                ]);
             });
+        $form->password('password_confirmation', trans('admin.password_confirmation'))
+            ->rules('nullable|string|same:password')
+            ->attribute('value', '');
 
         $form->ignore(['password_confirmation']);
 
@@ -116,7 +124,9 @@ class UserController extends AdminController
         $form->display('updated_at', trans('admin.updated_at'));
 
         $form->saving(function (Form $form) {
-            if ($form->password && $form->model()->password != $form->password) {
+            if ($form->password === null || $form->password === '') {
+                $form->password = $form->model()->password;
+            } else {
                 $form->password = Hash::make($form->password);
             }
         });

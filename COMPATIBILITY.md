@@ -375,6 +375,20 @@ asset/view republish, schema or data migration is needed. See the
 複数 Grid の DOM ID を変更するものではありません。他の Laravel アプリとの
 互換性はアプリごとに検証してください。
 
+## Built-in administrator password forms (2026-10-23)
+
+Settings and administrator forms now render empty password controls, preserve
+the stored password on blank/omitted updates, and hash every confirmed nonempty
+replacement, including `"0"`. Creation validates a missing password before saving.
+Integrations that previously submitted the stored hash to preserve it must use
+blank or omitted password fields. See the [HTTP/authentication regressions and
+controller-override notes](tests/integration/ADMIN_PASSWORD_FORMS.md).
+
+日本語: 標準のパスワード欄に保存済みハッシュを埋め込まず、空欄・省略での
+プロフィール更新では既存値を維持します。変更値は確認入力を検証して必ず
+ハッシュ化し、作成時の省略も検証します。従来ハッシュを再送していた連携は
+空欄・省略へ切り替えてください。
+
 ## Structured Form inserts (2026-10-23)
 
 Form insert preparation now preserves complete values for registered fields
