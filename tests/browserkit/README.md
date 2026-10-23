@@ -50,11 +50,33 @@ It is useful for testing several framework versions without replacing vendors.
   This suite does not claim coverage of the newer dropdown action renderer.
 - SQLite coverage is **not MySQL equivalence**. Keep the dedicated native schema
   parity workflow for actual MySQL/MariaDB coverage.
-- Legacy factories, FakerPHP, BrowserKit, Testbench, PHPUnit and Intervention
+- FakerPHP, BrowserKit, Testbench, PHPUnit and Intervention
   Image `^3.11.9` are isolated development dependencies. Intervention remains
   optional for production consumers, but transformations/thumbnails now require
   v3. The bounded field adapter retains the historical rotation/flip calls; this
   is not full v2 compatibility. See the [migration guide](../../IMAGE_MIGRATION.md).
+- User, profile and tag fixtures use Laravel's class-based factories in
+  `tests/factories`, invoked explicitly with `UserFactory::new()` and its peers.
+  Their Faker fields, password hash, avatar URL pattern and per-user relations
+  are preserved. The runner requires no `laravel/legacy-factories` package,
+  legacy provider or global `factory()` helper. Removing that package also
+  removes its older Symfony Finder constraint; the framework selects Finder.
+
+## Native factory verification
+
+The native-factory migration was verified on 2026-10-23 with PHP 8.4.27:
+Laravel 12.70.1 / PHPUnit 11.5.57 and Laravel 13.38.0 / PHPUnit 12.5.40 each
+passed all 125 tests with 1,230 assertions. Both consumers were re-resolved and
+verified to contain no legacy factory package, provider or global `factory()`
+helper. The Laravel 13 graph selected Symfony Finder 8.1.8; Laravel 12 retained
+7.4.20. Platform checks and locked dependency audits passed. Other PHP versions
+remain covered by the existing CI matrix, not this local run.
+
+日本語: テスト用データを Laravel 標準のクラス形式 Factory へ移行し、旧互換
+パッケージを依存から削除しました。既存の生成値・件数・リレーションと検証を
+維持し、旧パッケージ・プロバイダー・グローバル関数が存在しない環境で上記の
+全 125 テストが成功しています。本番依存は変更せず、古いルート開発環境全体の
+更新・動作確認を意味するものではありません。
 
 ## Necessary assertion corrections
 
@@ -85,9 +107,13 @@ No methods or assertions are removed. Five historical test files are updated:
    The harness now separately checks and restores the package state described
    below; tree-scoped assertions remain necessary within each test's requests.
 
-The original `tests/TestCase.php` and root PHPUnit configuration are left as
-historical references. Run this suite through its own configuration; recursively
-collecting the entire `tests/` tree mixes incompatible harnesses.
+The original `tests/TestCase.php` and root PHPUnit configuration remain historical
+references. The obsolete factory-definition include was removed from that harness,
+and root `autoload-dev` now maps the shared factory classes; the old root development
+dependencies were not modernized or validated. Shared fixtures now require the
+modern factory API, so this change does not preserve a Laravel 5–7 test runner.
+Run this suite through its own configuration; recursively collecting the entire
+`tests/` tree mixes incompatible harnesses.
 
 ## Package state between test methods
 

@@ -1144,6 +1144,19 @@ sections intentionally retain the dependencies and results of their revisions.
 
 <a id="current-verified-coverage-2026-10-03-after-pr-25"></a>
 
+## Native factories in the historical test runner (2026-10-23)
+
+The isolated BrowserKit consumer now uses Laravel's native class-based factories
+and no longer installs `laravel/legacy-factories` or registers its provider.
+Fixture fields, per-user relations and historical assertions are retained.
+Removing the legacy package also releases its Symfony Finder 7 ceiling; actual
+versions remain determined by the selected framework and PHP runtime. See the
+[runner instructions and historical-root limits](tests/browserkit/README.md).
+
+日本語: 独立した BrowserKit テスト環境を Laravel 標準のクラス形式 Factory に
+移行し、旧互換パッケージを外します。既存の検証内容とリレーションは維持します。
+本番依存や API の変更はなく、ルートの古い開発環境全体を更新したものではありません。
+
 ## Historical verified coverage (2026-10-03, PR #25)
 
 This snapshot records checks for the code merged in
