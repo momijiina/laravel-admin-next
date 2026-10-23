@@ -207,8 +207,13 @@ class MultipleFile extends Field
     protected function preview()
     {
         $files = $this->value ?: [];
+        $preview = [];
 
-        return array_values(array_map([$this, 'objectUrl'], $files));
+        foreach ($files as $file) {
+            $preview[] = $this->formatPreviewUrl($this->objectUrl($file), count($preview));
+        }
+
+        return $preview;
     }
 
     /**
@@ -356,8 +361,8 @@ EOT;
         $this->setupDefaultOptions();
 
         if (!empty($this->value)) {
-            $this->options(['initialPreview' => $this->preview()]);
             $this->setupPreviewOptions();
+            $this->options(['initialPreview' => $this->preview()]);
         }
 
         $options = json_encode($this->options);

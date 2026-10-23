@@ -1088,6 +1088,19 @@ for separate in-process historical and image-output coverage. Local results,
 configured CI matrices and hosted results for an exact commit are distinct
 forms of evidence; none substitutes for the others.
 
+## Literal saved-upload previews (2026-10-23)
+
+Generated file/image preview captions and download URLs are escaped at the
+fileinput HTML boundary. Preview URLs follow the effective template type so
+native text previews are not double-escaped. Quotes, entity-looking strings and
+markup-like filename characters retain their literal values in the preview and
+zoom UI. Stored paths, public storage URLs and delete keys retain their values.
+Review [custom options, hook ordering and remaining plugin limits](tests/integration/UPLOAD_PREVIEW_TEXT.md).
+
+日本語: 保存済みファイル名の引用符や HTML に似た文字でプレビュー・ダウンロード先が
+崩れる問題を修正します。ファイル本体や保存パスは変更しません。独自のプレビュー
+設定・上書きメソッドは上記ガイドを確認し、更新後は画面を再読み込みしてください。
+
 <a id="image-processing-dependency-change-after-pr-25"></a>
 
 ## Image-processing dependency change (PR #35)

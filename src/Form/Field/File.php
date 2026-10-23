@@ -138,7 +138,7 @@ class File extends Field
      */
     protected function preview()
     {
-        return $this->objectUrl($this->value);
+        return $this->formatPreviewUrl($this->objectUrl($this->value));
     }
 
     /**
@@ -162,7 +162,7 @@ class File extends Field
      */
     protected function initialCaption($caption)
     {
-        return basename($caption);
+        return e(basename($caption));
     }
 
     /**
@@ -236,10 +236,11 @@ EOT;
         $this->setupDefaultOptions();
 
         if (!empty($this->value)) {
+            $this->setupPreviewOptions();
+
             $this->attribute('data-initial-preview', $this->preview());
             $this->attribute('data-initial-caption', $this->initialCaption($this->value));
 
-            $this->setupPreviewOptions();
             /*
              * If has original value, means the form is in edit mode,
              * then remove required rule from rules.
