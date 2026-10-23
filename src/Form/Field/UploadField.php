@@ -147,7 +147,35 @@ trait UploadField
     {
         $initialPreviewConfig = $this->initialPreviewConfig();
 
+        foreach ($initialPreviewConfig as &$config) {
+            foreach (['caption', 'downloadUrl'] as $name) {
+                if (isset($config[$name]) && is_string($config[$name])) {
+                    $config[$name] = e($config[$name]);
+                }
+            }
+        }
+        unset($config);
+
         $this->options(compact('initialPreviewConfig'));
+    }
+
+    /**
+     * Format a generated URL for the effective fileinput preview template.
+     *
+     * Text data is already escaped by fileinput; other templates insert HTML.
+     *
+     * @param string $url
+     * @param int    $index
+     *
+     * @return string
+     */
+    protected function formatPreviewUrl($url, $index = 0)
+    {
+        $config = Arr::get($this->options, 'initialPreviewConfig.'.$index, []);
+        $type = Arr::get($config, 'type', Arr::get($this->options, 'initialPreviewFileType', 'image'));
+        $asData = Arr::get($config, 'previewAsData', Arr::get($this->options, 'initialPreviewAsData', true));
+
+        return $type === 'text' && $asData ? $url : e($url);
     }
 
     /**

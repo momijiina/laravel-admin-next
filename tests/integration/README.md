@@ -329,6 +329,9 @@ The dated results below are historical snapshots, not the current suite totals.
   identities, real Bootstrap tab behavior and HTTP/SQLite saves;
   [regression scope](HASMANY_MODES_REINITIALIZATION.md)
 - Main-file upload failure preservation and successful replacement
+- Saved upload captions, preview/download URLs and native zoom preserving literal
+  filename characters across File/Image/Multiple variants;
+  [plugin-boundary escaping and custom-template limits](UPLOAD_PREVIEW_TEXT.md)
 - Ordinary sortable MultipleFile saves, validated sort-and-append uploads, and
   raw hook/custom-validator input compatibility;
   [sorting contract and coverage limits](MULTIPLE_FILE_SORT.md)

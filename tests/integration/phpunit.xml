@@ -81,6 +81,7 @@
             <file>HandleControllerRequestTest.php</file>
             <file>OperationLogRenderingTest.php</file>
             <file>FileUploadFailureTest.php</file>
+            <file>UploadPreviewTextTest.php</file>
             <file>MultipleFileSortTest.php</file>
             <file>ResourceGeneratorTest.php</file>
             <file>GeneratedControllerCrudTest.php</file>
