@@ -362,6 +362,22 @@ asset/view republish, schema or data migration is needed. See the
 複数 Grid の DOM ID を変更するものではありません。他の Laravel アプリとの
 互換性はアプリごとに検証してください。
 
+## Modern Eloquent attributes in Form (2026-10-23)
+
+Form now excludes native Eloquent Attribute methods from relation discovery and
+relation-input extraction. This fixes protected-method errors during saving and
+attempts to eager-load public Attribute objects during editing. Field preparation,
+native Eloquent reads/setters, legacy mutators and real relations retain their
+existing behavior. Review custom Form relation-detection overrides; computed
+edit values still need normal Eloquent appends/visibility settings. No dependency,
+asset, view or schema migration is required. See the [Form attribute contract,
+HTTP/SQLite tests and structured-input limits](tests/integration/FORM_ATTRIBUTE_MUTATORS.md).
+
+日本語: Form が新形式の Eloquent Attribute をリレーションと誤認し、編集・保存に
+失敗する問題を修正します。値の準備と Eloquent 本来の getter/setter、従来の属性・
+実際のリレーションの動作は維持します。独自 Form の判定を確認してください。
+計算属性の appends・可視性はアプリ側で設定し、配列入力の既存制約は別件です。
+
 ## Modern Eloquent Attribute dispatch (2026-10-06)
 
 Grid `column()` and Grid/Show shorthand now recognize native Eloquent

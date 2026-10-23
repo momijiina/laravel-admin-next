@@ -128,7 +128,8 @@ and application checks; do not silently remove or claim support for them.
 - [x] Recognize modern Eloquent Attributes in Grid/Show dispatch and repair named
       Grid range inputs, configured quick-search keys and single-prefix removal;
       review [dispatch/query boundaries](COMPATIBILITY.md#recent-merged-changes-prs-8795).
-      Form Attribute discovery/saving and existing string-zero search behavior are unchanged
+      That Grid/Show change left Form Attribute discovery/saving unchanged;
+      the Form follow-up is listed below
 - [x] Preserve nullable styled Radio selections and literal Copyable text, and escape
       Editable Select callback-source JSON; review [view/attribute upgrades and offline verification limits](COMPATIBILITY.md#recent-merged-changes-prs-8795).
       OS clipboard writes, live-browser transport and full PJAX remain unverified
@@ -138,6 +139,10 @@ and application checks; do not silently remove or claim support for them.
 - [x] Preserve literal Listbox remote options and Tags separator characters;
       review [endpoint/initializer](tests/integration/LISTBOX_REMOTE_OPTIONS.md)
       and [separator-setting cautions](tests/integration/TAGS_SEPARATORS.md)
+- [x] Extend native Eloquent Attribute detection to Form edit/save, preserving
+      native setters, legacy mutators and real relations; see the
+      [Form contract and structured-input limits](tests/integration/FORM_ATTRIBUTE_MUTATORS.md).
+      Earlier Grid/Show coverage remains a separate historical result
 - [ ] Add real password-change and rendered-operation-log coverage
 - [ ] Review remaining deprecations, default credentials, login throttling,
       upload previews and AJAX-option escaping; these tests are not a penetration test
