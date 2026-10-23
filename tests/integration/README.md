@@ -251,6 +251,8 @@ The dated results below are historical snapshots, not the current suite totals.
 - Ordinary Grid `gt()` / `lt()` inclusive labels, SQL bindings and HTTP/SQLite
   boundaries, including zero, negative values, blanks and reset;
   [query compatibility and overridden-view cautions](GRID_INEQUALITY_FILTERS.md)
+- Restricted-user permission paths, zero slugs and per-line HTTP method rules;
+  [prefix parsing, literal zero checks and existing empty-permission semantics](PERMISSION_EVALUATION.md)
 - Explicit per-grid sort keys configured before sortable columns, with applied
   named filters and follow-up rendered links; [sort regression scope](GRID_EXPLICIT_SORT.md)
 - Nullable Grid inline Select/Radio labels, mixed rows and dynamic options, shipped
