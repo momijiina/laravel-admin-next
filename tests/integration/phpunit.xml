@@ -44,6 +44,7 @@
             <file>GridRequestInputTest.php</file>
             <file>GridQuickSearchKeyTest.php</file>
             <file>ModernAttributeDispatchTest.php</file>
+            <file>FormAttributeMutatorTest.php</file>
             <file>GridPaginationTest.php</file>
             <file>GridInequalityFilterTest.php</file>
             <file>GridGroupOperatorTest.php</file>

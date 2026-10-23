@@ -215,6 +215,9 @@ The dated results below are historical snapshots, not the current suite totals.
   relation controls; [attribute scope, serialization and fallback limits](MODERN_ATTRIBUTE_DISPATCH.md)
   - 日本語: Grid/Show の標準 `Attribute` 判定、既存動作との互換性、
     appends 設定と旧フレームワークに関する検証の限界
+- Modern Eloquent Attribute-backed Form fields through create/edit/update and
+  HTTP/SQLite; [native value semantics, relation detection and limits](FORM_ATTRIBUTE_MUTATORS.md)
+  - 日本語: 新形式の属性の編集・保存、Eloquent 本来の値とリレーション判定の維持
 - Named grid pagination with configured sizes, independent links and explicit
   Eloquent arguments; [pagination regression scope](GRID_PAGINATION.md)
 - Configured Grid quick-search keys through shipped header tools, native FormData,
