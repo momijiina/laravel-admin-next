@@ -13,6 +13,8 @@ failed validation, and validation retries could redisplay submitted passwords.
 The save hook also left `"0"` unhashed and treated a submitted existing hash as
 an instruction to preserve it. Integrations that submitted that hash to leave a
 password unchanged must now submit blank controls or omit them instead.
+After updating, reload any already-open edit forms before saving: their old
+embedded hash would otherwise be treated as a new password and hashed again.
 
 This change uses field attributes, validation rules and save hooks in the two
 built-in controllers. The creation validator deliberately checks omitted input,
@@ -56,6 +58,8 @@ Testbench bypasses CSRF validation in its testing environment.
 パスワードを再表示していました。また `"0"` をハッシュ化せず、保存済みハッシュと
 同じ値を特別扱いしていました。パスワードを維持するためにハッシュを送っていた
 連携処理は、空欄または項目の省略に切り替えてください。
+更新前から開いている編集フォームは、保存前に再読み込みしてください。古い画面に
+埋め込まれたハッシュを再送すると、新しいパスワードとして再ハッシュ化されます。
 
 修正は標準の 2 つのコントローラー内のフィールド設定・検証・保存処理に限定します。
 独自フォームの Password ウィジェット、汎用フォームのセッションへの旧入力保存、
