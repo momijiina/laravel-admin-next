@@ -400,6 +400,27 @@ asset/view republish, schema or data migration is needed. See the
 複数 Grid の DOM ID を変更するものではありません。他の Laravel アプリとの
 互換性はアプリごとに検証してください。
 
+## Notifications with JSON sessions (2026-10-24)
+
+Fresh Laravel 13 applications use JSON session serialization. A successful admin
+login previously redirected to an HTTP 500 because the toastr view expected a
+`MessageBag` object, while the next request loaded an array. Toastr and the four
+alert views now read that array correctly, retaining the existing helpers and
+PHP-session behavior. Applications keep their chosen session driver/serializer.
+Merge the changes into overridden notification partials and refresh compiled
+views; see [the view migration and persisted-session regressions](tests/integration/JSON_SESSION_FLASH.md).
+
+The separate [fresh-application browser runner](tests/fresh-app/README.md) installs
+the package in pinned official Laravel 12/13 skeletons with independently resolved
+dependencies, database sessions/cache and cached config/routes/views. Chromium
+checks real cookies/CSRF, login notifications, generated pages, role create/edit
+and logout. Its scope does not include uploads, other browsers or external DBs.
+
+日本語: Laravel 13 の新規アプリでログイン後に 500 になる、JSON セッションの通知
+表示を修正します。セッション設定は変えません。独自の toastr/alerts ビューを
+更新し、`view:clear`（必要なら `view:cache`）を実行してください。公式雛形からの
+導入と実ブラウザーの検証も追加し、手順と対象範囲を上記ガイドに記載しています。
+
 ## Built-in login failure limits (2026-10-24)
 
 The built-in login controller now limits failed attempts to five per 60 seconds

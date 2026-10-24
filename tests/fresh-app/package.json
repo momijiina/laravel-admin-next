@@ -1,0 +1,11 @@
+{
+  "name": "laravel-admin-next-fresh-app-smoke",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "test": "node browser.cjs"
+  },
+  "devDependencies": {
+    "playwright": "1.62.1"
+  }
+}

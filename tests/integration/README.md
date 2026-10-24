@@ -192,6 +192,10 @@ The dated results below are historical snapshots, not the current suite totals.
   validation retries and real old/new login results; [password form contract and upgrade notes](ADMIN_PASSWORD_FORMS.md)
 - Login failure limits, expiry/reset, guard/IP separation and sanitized retry input;
   [default-enabled policy, cache deployment and custom-controller boundaries](LOGIN_THROTTLE.md)
+- Flash notifications after real database-session and encrypted-cookie round trips
+  with PHP/JSON serialization; [Laravel 13 defaults and view overrides](JSON_SESSION_FLASH.md).
+  Separate [fresh-application Chromium checks](../fresh-app/README.md) exercise
+  official skeletons, real CSRF, cached applications and browser navigation.
 - Remember-input parity with the legacy getter across 1,334 real request shapes,
   including source precedence, null/array values, JSON and absent input; real
   remember cookies/tokens for accepted and rejected credentials

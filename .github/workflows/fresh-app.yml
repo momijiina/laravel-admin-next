@@ -1,0 +1,56 @@
+name: Fresh Laravel applications
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  browser:
+    name: Laravel ${{ matrix.laravel }} / PHP 8.4 / Chromium
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        laravel: ['12', '13']
+    env:
+      FRESH_APP_ARTIFACTS: ${{ github.workspace }}/tests/fresh-app/artifacts
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2
+        with:
+          php-version: '8.4'
+          extensions: mbstring, dom, xml, fileinfo, pdo_sqlite
+          coverage: none
+          tools: composer:v2
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: tests/fresh-app/package-lock.json
+      - name: Install browser runner
+        working-directory: tests/fresh-app
+        run: |
+          npm ci --ignore-scripts
+          npx playwright install --with-deps chromium
+      - name: Install and cache an official fresh application
+        run: php tests/fresh-app/provision.php '${{ matrix.laravel }}' "$RUNNER_TEMP/fresh-laravel-${{ matrix.laravel }}"
+      - name: Exercise real browser sessions and generated forms
+        working-directory: tests/fresh-app
+        env:
+          FRESH_APP_PATH: ${{ runner.temp }}/fresh-laravel-${{ matrix.laravel }}
+        run: npm test
+      - name: Keep local application diagnostics on failure
+        if: failure()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: fresh-laravel-${{ matrix.laravel }}
+          path: tests/fresh-app/artifacts/
+          if-no-files-found: ignore
+          retention-days: 7
