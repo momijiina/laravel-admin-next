@@ -53,6 +53,10 @@ applied. The browser then checks:
 - The normal missing-upload-disk alert across a request boundary.
 - Role creation and editing through the generated form/PJAX, persisted values
   after a full page load, and logout followed by protected-route redirection.
+- Menu creation using authenticated browser requests with a real CSRF token;
+  literal title/icon/URI rendering after full and PJAX loads, plus the seeded
+  parent's icon, child link and expand/collapse controls. See the
+  [menu rendering scope and URL-scheme boundary](../integration/MENU_TREE_RENDERING.md).
 - No JavaScript exceptions or unsuccessful page/asset responses.
 
 The seeded `admin` / `admin` credentials and all role records are disposable local
@@ -80,5 +84,14 @@ with Laravel 12.70.1 / 13.38.0, PHP 8.4.27, Node 24.19.0, Playwright 1.62.1,
 and installed Chromium 154.0.8037.57. Restoring the old toast view only inside a
 disposable Laravel 13 application made this runner fail at the explicit
 dashboard `500 !== 200` assertion; its failure screenshot and application log
-were captured and its HTTP server stopped. These are local results, not a claim
-that the new GitHub Actions workflow has already run.
+were captured and its HTTP server stopped. GitHub subsequently reported all
+63 checks successful for merged PR #127, including both fresh-application
+browser jobs, as checked on 2026-10-24. That hosted result covers the PR #127
+revision; later browser additions need their own CI run.
+
+The menu-rendering extension also passed locally on both of those framework
+versions and the same browser/tool versions on 2026-10-24. It waits for the real
+`pjax:end` event and replacement of a marked DOM node before checking the
+refreshed tree. Preloading the original `MenuController` only in the disposable
+Laravel 13 server made the runner fail at its explicit literal-title assertion;
+the working checkout stayed fixed and failure artifacts were retained.

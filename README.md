@@ -10,15 +10,17 @@ Dots から引き継いだ調査・修正を Codex で継続しています。�
 
 **画像処理の破壊的変更:** 画像変換・サムネイルは任意依存の Intervention Image `^3.11.9` に移行しました。v2 の全 API との互換性はありません。型付きコールバックや既存設定を [画像処理の移行ガイド](IMAGE_MIGRATION.md) で確認してください。画像処理を行わない通常のアップロードには不要です。PHP の最低要件は 8.2 です。
 
-2026-10-24 更新（マージ済み PR #124 まで）: Laravel 12・13 用のテストを標準 Factory へ移行し、Form の新形式アクセサー・配列入力、AJAX のゼロ ID、ファイルのプレビュー表示を修正しました。ログインの失敗回数制限、パスワード・操作ログの表示、ユーザー作成時のロール選択と権限判定も改良しています。Doctrine DBAL は引き続き `^2.13.9 || ^3.10.6` が対象で、DBAL 4 には対応していません。
+2026-10-24 更新（マージ済み PR #127 まで）: Laravel 12・13 用のテストを標準 Factory へ移行し、Form の新形式アクセサー・配列入力、AJAX のゼロ ID、ファイルのプレビュー表示を修正しました。ログイン制限・権限判定に加え、Laravel 13 の JSON セッションでログイン後にエラーになる問題と、インストール失敗時の終了コードも修正しています。公式雛形への導入・実ブラウザ操作を CI で確認します。Doctrine DBAL は引き続き `^2.13.9 || ^3.10.6` が対象で、DBAL 4 には対応していません。
 
 **更新時の注意:** Grid の Checkbox・Group の上書きビュー、独自の絞り込み処理、Listbox のリモート API・初期化処理、Tags の区切り文字設定を確認し、古いコンパイル済みビューを更新して管理画面をページ全体で再読み込みしてください。以前の RadioButton/RadioCard ビュー、Copyable/Editable 属性、インラインエディターの同時ビュー更新、アップロードフック、Number アセットと画像・日付・通貨の注意事項も含む [変更点・移行時の注意事項と検証範囲](COMPATIBILITY.md#current-maintenance-summary) を参照してください。
 
 標準ログインの失敗制限は、既存の公開済み設定でも既定で 60 秒・5 回となります。[キャッシュの準備と独自認証への影響](tests/integration/LOGIN_THROTTLE.md) を確認してください。過去に `admin:create-user` で作成したユーザーのロールは自動修正されません。
 
+通知ビューを上書きしている場合は、[JSON セッション対応の差分](tests/integration/JSON_SESSION_FLASH.md)を取り込み、コンパイル済みビューを更新してください。開発・テストの実行方法は [現行のセットアップ手順](CONTRIBUTING.md#laravel-test-setup)、公式雛形での確認は [実ブラウザテスト](tests/fresh-app/README.md) を参照してください。
+
 - [ロードマップ](ROADMAP.md)
 - [互換性方針](COMPATIBILITY.md)
-- [最近の変更点・アップグレード時の注意事項と検証範囲（マージ済み PR #124 まで）](COMPATIBILITY.md#current-maintenance-summary)
+- [最近の変更点・アップグレード時の注意事項と検証範囲（マージ済み PR #127 まで）](COMPATIBILITY.md#current-maintenance-summary)
 - [開発環境・テストの実行方法](CONTRIBUTING.md#laravel-test-setup)
 - [元プロジェクトについて](UPSTREAM.md)
 
@@ -34,15 +36,20 @@ The project aims to support modern PHP and Laravel while prioritizing existing A
 
 **Breaking image-processing change:** transformations and thumbnails now use optional Intervention Image `^3.11.9`, with a bounded legacy API rather than full v2 compatibility. Review callbacks and settings in the [image migration guide](IMAGE_MIGRATION.md). Ordinary uploads without processing do not need it. The PHP floor remains 8.2.
 
-Updated 2026-10-24 (merged changes through PR #124): Laravel 12/13 tests use native factories. Recent fixes cover modern Form attributes and structured inserts, AJAX zero IDs, saved-file previews, password and operation-log rendering, login limits, role selection and permission evaluation. Doctrine DBAL remains limited to `^2.13.9 || ^3.10.6`; DBAL 4 is not supported.
+Updated 2026-10-24 (merged changes through PR #127): Laravel 12/13 tests use native factories. Recent fixes cover modern Form attributes and structured inserts, AJAX zero IDs, saved-file previews, authentication and permissions, installer failure statuses, and post-login notifications with Laravel 13 JSON sessions. CI also exercises installation and real browser navigation on official skeletons. Doctrine DBAL remains limited to `^2.13.9 || ^3.10.6`; DBAL 4 is not supported.
 
 **Upgrade cautions:** review overridden Grid Checkbox/Group views, custom filter implementations, Listbox remote endpoints/initializers and Tags separator settings. Refresh stale compiled views and fully reload admin pages. See [changes, upgrade cautions and verification limits](COMPATIBILITY.md#current-maintenance-summary), including earlier RadioButton/RadioCard views, Copyable/Editable attributes, paired inline-editor views, upload hooks, Number assets and image/date/currency cautions.
 
 Built-in login limits default to five failures per 60 seconds even with previously published configuration. Review [cache requirements and custom authentication](tests/integration/LOGIN_THROTTLE.md). Role assignments on accounts previously created by `admin:create-user` are not automatically repaired.
 
+Merge the [JSON-session notification changes](tests/integration/JSON_SESSION_FLASH.md)
+into overridden notification views and refresh compiled views. Follow the
+[current development setup](CONTRIBUTING.md#laravel-test-setup) and the
+[official-skeleton browser runner](tests/fresh-app/README.md) for verification.
+
 - [Roadmap](ROADMAP.md)
 - [Compatibility policy](COMPATIBILITY.md)
-- [Recent changes, upgrade cautions and verification limits (merged through PR #124)](COMPATIBILITY.md#current-maintenance-summary)
+- [Recent changes, upgrade cautions and verification limits (merged through PR #127)](COMPATIBILITY.md#current-maintenance-summary)
 - [Development setup and test commands](CONTRIBUTING.md#laravel-test-setup)
 - [Upstream attribution](UPSTREAM.md)
 
