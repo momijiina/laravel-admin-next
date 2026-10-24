@@ -41,6 +41,10 @@ It is useful for testing several framework versions without replacing vendors.
 - Each test gets a fresh SQLite `:memory:` database and disposable application
   files under a random process-specific temporary path. Cleanup deletes only
   that fixture tree. It never reads an application's `.env` or database config.
+- Sessions, the default cache and the login limiter use per-application array
+  stores. The fixture does not install framework cache tables or use an external
+  cache service; this is not persistent/shared-cache coverage. See the separate
+  [login limiter regression and deployment requirements](../integration/LOGIN_THROTTLE.md).
 - The real `vendor:publish` and `admin:install` commands generate the app assets,
   migration and controllers. The runner supplies the consumer base controller,
   valid encryption key and a minimal root welcome response for `LaravelTest`.

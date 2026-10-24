@@ -25,6 +25,9 @@ class HistoricalBrowserKitApplication extends TestbenchApplication
         // Original grid assertions exercise the supported legacy action renderer.
         $app['config']->set('admin.grid_action_class', \Encore\Admin\Grid\Displayers\Actions::class);
         $app['config']->set('session.driver', 'array');
+        // The disposable application has no framework cache tables or external service.
+        $app['config']->set('cache.default', 'array');
+        $app['config']->set('cache.limiter', 'array');
         $app['config']->set('hashing.bcrypt.rounds', 4);
     }
 

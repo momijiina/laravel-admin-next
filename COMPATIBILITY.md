@@ -387,6 +387,21 @@ asset/view republish, schema or data migration is needed. See the
 複数 Grid の DOM ID を変更するものではありません。他の Laravel アプリとの
 互換性はアプリごとに検証してください。
 
+## Built-in login failure limits (2026-10-24)
+
+The built-in login controller now limits failed attempts to five per 60 seconds
+for each guard/username/IP combination. This is enabled even when an existing
+published configuration omits the new keys. Successful authentication clears the
+counter; blocked requests keep the existing redirect/error response. Credentials
+must be strings, and newly flashed input contains only the username and remember
+state. Review [configuration, shared caches and custom authentication](tests/integration/LOGIN_THROTTLE.md)
+before deployment, including configuration-cache and long-lived worker refreshes.
+
+日本語: 標準ログインに 60 秒・5 回の認証失敗制限を追加します。公開済み設定に
+項目がない場合も有効になります。共有キャッシュや独自ログイン処理の注意、無効化・
+変更方法は上記ガイドを確認してください。パスワードを再表示用の旧入力へ保存する
+処理も修正します。DB・ビュー・アセットの変更はありません。
+
 ## Built-in administrator password forms (2026-10-23)
 
 Settings and administrator forms now render empty password controls, preserve

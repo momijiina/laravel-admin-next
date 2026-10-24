@@ -154,8 +154,14 @@ and application checks; do not silently remove or claim support for them.
       [literal log display and historical-data boundaries](tests/integration/OPERATION_LOG_RENDERING.md)
 - [x] Restore native escaping for AJAX Select/MultipleSelect result and selection
       labels; review [explicit template migration](tests/integration/AJAX_SELECT_ESCAPING.md)
-- [ ] Review remaining deprecations, default credentials, login throttling,
-      upload previews and custom AJAX templates; these tests are not a penetration test
+- [x] Preserve numeric zero IDs in AJAX Select responses; review
+      [normalization and event-value boundaries](tests/integration/AJAX_SELECT_ZERO.md)
+- [x] Escape generated saved-file preview captions and URL attributes; review
+      [custom preview hooks and remaining plugin limits](tests/integration/UPLOAD_PREVIEW_TEXT.md)
+- [x] Add configurable failed-login limits and sanitized retry input to the built-in
+      controller; review [default adoption, cache and override boundaries](tests/integration/LOGIN_THROTTLE.md)
+- [ ] Review remaining deprecations, default credentials, new-upload previews and
+      custom AJAX templates; these tests are not a penetration test
 - [ ] Extend driver-specific PDO lifecycle checks beyond SQLite and decide whether
       live SQL Server and additional historical framework combinations are required
 - [ ] Decide supported dependency ranges and package publication/install path
