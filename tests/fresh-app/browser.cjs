@@ -138,6 +138,70 @@ async function main() {
     await page.locator('tr').filter({hasText: roleName + ' updated'}).waitFor();
     console.log('PASS role edit and persistence after a full page load');
 
+    await visit('/admin/auth/menu');
+    const menuToken = await page.locator('form input[name="_token"]').first().inputValue();
+    const menus = [
+      {title: 'Menu R ' + suffix + ' &amp;<svg/onload=window.mt=1>', uri: 'auth/roles?label=" onmouseover="window.mu=1 &amp;<b>'},
+      {title: 'Menu E ' + suffix + ' &amp;<svg/onload=window.mt=1>', uri: 'https://example.invalid/" onmouseover="window.mu=1 &amp;<b>'},
+    ];
+    const menuIcon = "fa-bars' onmouseover='window.mi=1";
+    for (const menu of menus) {
+      assert.ok([...menu.title].length <= 50 && menuIcon.length <= 50 && menu.uri.length <= 255, 'Fixture fits the shipped schema');
+      const created = await context.request.post(base + '/admin/auth/menu', {
+        form: {_token: menuToken, parent_id: '0', title: menu.title, icon: menuIcon, uri: menu.uri},
+        maxRedirects: 0,
+      });
+      assert.equal(created.status(), 302, 'Save menu with browser cookies and real CSRF token');
+      assert.equal(new URL(created.headers().location, base).pathname, '/admin/auth/menu');
+    }
+
+    async function checkLiteralMenus() {
+      for (const menu of menus) {
+        const title = page.locator('.dd-handle > strong').filter({hasText: menu.title});
+        assert.equal(await title.count(), 1, 'Saved menu title stays literal');
+        assert.equal(await title.textContent(), menu.title);
+        assert.equal(await title.locator('*').count(), 0, 'Title does not create SVG or other elements');
+        const branch = title.locator('..');
+        const icon = branch.locator(':scope > i');
+        assert.equal(await icon.getAttribute('class'), 'fa ' + menuIcon);
+        assert.equal(await icon.getAttribute('onmouseover'), null);
+        const link = branch.locator(':scope > a.dd-nodrag');
+        const expectedUri = menu.uri.startsWith('https://') ? menu.uri : base + '/admin/' + menu.uri;
+        assert.equal(await link.getAttribute('href'), expectedUri);
+        assert.equal(await link.textContent(), expectedUri);
+        assert.equal(await link.locator('*').count(), 0);
+        assert.equal(await link.getAttribute('onmouseover'), null);
+        await icon.dispatchEvent('mouseover');
+        await link.dispatchEvent('mouseover');
+      }
+      assert.deepEqual(await page.evaluate(() => [window.mt || 0, window.mi || 0, window.mu || 0]), [0, 0, 0], 'Stored menu values do not create event handlers');
+    }
+
+    await visit('/admin/auth/menu');
+    await checkLiteralMenus();
+    const defaultParent = page.locator('.dd-item[data-id="2"]');
+    assert.equal(await defaultParent.locator(':scope > .dd-handle > i').getAttribute('class'), 'fa fa-tasks');
+    assert.equal(await defaultParent.locator(':scope > .dd-handle > a.dd-nodrag').count(), 0);
+    assert.equal(await page.locator('.dd-item[data-id="4"] > .dd-handle > a.dd-nodrag').getAttribute('href'), base + '/admin/auth/roles');
+    await defaultParent.locator(':scope > button[data-action="collapse"]').click();
+    assert.equal(await defaultParent.locator(':scope > ol.dd-list').isVisible(), false);
+    await defaultParent.locator(':scope > button[data-action="expand"]').click();
+    assert.equal(await defaultParent.locator(':scope > ol.dd-list').isVisible(), true);
+    await page.evaluate(() => {
+      document.querySelector('.dd').dataset.menuSmokeOldDom = 'true';
+      window.menuSmokePjaxEnded = false;
+      $(document).one('pjax:end.menuSmoke', () => { window.menuSmokePjaxEnded = true; });
+    });
+    const [menuRefresh] = await Promise.all([
+      page.waitForResponse(response => new URL(response.url()).pathname === '/admin/auth/menu' && response.request().headers()['x-pjax'] === 'true'),
+      page.locator('a[class*="tree-"][class*="-refresh"]').click(),
+    ]);
+    assert.equal(menuRefresh.status(), 200);
+    await page.waitForFunction(() => window.menuSmokePjaxEnded && !document.querySelector('.dd[data-menu-smoke-old-dom]'));
+    await page.waitForLoadState('networkidle');
+    await checkLiteralMenus();
+    console.log('PASS literal menu title, icon and URI after full page and PJAX loads');
+
     await page.locator('.user-menu > a').click();
     await Promise.all([
       page.waitForURL(base + '/admin/auth/login'),

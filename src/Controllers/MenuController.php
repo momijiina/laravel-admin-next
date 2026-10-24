@@ -76,7 +76,9 @@ class MenuController extends Controller
         $tree->disableCreate();
 
         $tree->branch(function ($branch) {
-            $payload = "<i class='fa {$branch['icon']}'></i>&nbsp;<strong>{$branch['title']}</strong>";
+            $icon = e($branch['icon']);
+            $title = e($branch['title']);
+            $payload = "<i class='fa {$icon}'></i>&nbsp;<strong>{$title}</strong>";
 
             if (!isset($branch['children'])) {
                 if (url()->isValidUrl($branch['uri'])) {
@@ -85,6 +87,7 @@ class MenuController extends Controller
                     $uri = admin_url($branch['uri']);
                 }
 
+                $uri = e($uri);
                 $payload .= "&nbsp;&nbsp;&nbsp;<a href=\"$uri\" class=\"dd-nodrag\">$uri</a>";
             }
 
