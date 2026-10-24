@@ -595,12 +595,63 @@ for the narrow default-assignment change, unchanged matching rules and upgrade
 cautions. 日本語: 別の既定スコープがあってもゼロの明示選択を保持します。
 既存の比較仕様と独自実装の注意事項は上記ガイドを確認してください。
 
-Updated 2026-10-08. This index describes the changes merged through
-[PR #107](https://github.com/momijiina/laravel-admin-next/pull/107), at
-[`f342662`](https://github.com/momijiina/laravel-admin-next/commit/f342662a88db28b5faf1132e4210658977ff9489).
+Updated 2026-10-24. This index describes the changes merged through
+[PR #124](https://github.com/momijiina/laravel-admin-next/pull/124), at
+[`57c4ec8`](https://github.com/momijiina/laravel-admin-next/commit/57c4ec8).
 Use the linked guides for upgrade steps and each regression's precise boundary.
 Historical test totals below remain evidence for their own revisions, not
 current suite totals or validation of subsequent changes.
+
+### Recent merged changes: PRs #108–#124
+
+- **Grid zero values (#108, #110–#112):** [Radio defaults](tests/integration/GRID_RADIO_INTEGER_DEFAULTS.md),
+  [explicit scopes](tests/integration/GRID_SCOPE_ZERO_DEFAULT.md),
+  [column searches](tests/integration/GRID_COLUMN_INPUT_ZERO.md) and
+  [column ranges](tests/integration/GRID_COLUMN_RANGE_ZERO.md) preserve their
+  documented zero values. Other legacy empty-value and operator behavior remains.
+- **Form preparation (#113–#114):** [modern Eloquent attributes](tests/integration/FORM_ATTRIBUTE_MUTATORS.md)
+  work through Form edit/save; [structured inserts](tests/integration/STRUCTURED_FORM_INSERTS.md)
+  no longer require a leading scalar field. Review custom mutators and preparation hooks.
+- **Log/password screens (#115–#116):** [operation logs](tests/integration/OPERATION_LOG_RENDERING.md)
+  render metadata and JSON as text; [password forms](tests/integration/ADMIN_PASSWORD_FORMS.md)
+  render blank controls, preserve blank profile updates and require confirmed replacements.
+  Historical log contents are not scrubbed by these display changes.
+- **AJAX choices (#117, #119):** [label escaping](tests/integration/AJAX_SELECT_ESCAPING.md)
+  uses native Select2 handling; [numeric zero IDs](tests/integration/AJAX_SELECT_ZERO.md)
+  become string `"0"` in selection callbacks. Review custom templates and reload forms.
+- **Test factories (#118):** the [historical runner](tests/browserkit/README.md)
+  uses native Laravel factories without the legacy compatibility package.
+- **Saved-file previews (#120):** [captions and URLs](tests/integration/UPLOAD_PREVIEW_TEXT.md)
+  retain literal filename characters. Review overridden preview hooks and plugin limits.
+- **Role and permission checks (#121–#122, #124):** [user creation](tests/integration/CREATE_USER_ROLES.md)
+  attaches only selected roles; [explicit route rules](tests/integration/PERMISSION_MIDDLEWARE.md)
+  all apply; [zero values and method-qualified paths](tests/integration/PERMISSION_EVALUATION.md)
+  are evaluated literally. Existing account assignments are not rewritten. Review
+  stored rules and custom middleware; AJAX denial tests do not cover HTML/PJAX behavior.
+- **Login attempts (#123):** [failed-login limits](tests/integration/LOGIN_THROTTLE.md)
+  default to five per 60 seconds even with older published configuration. Prepare
+  the configured cache, refresh configuration/workers, and review custom controllers.
+  Newly flashed input excludes passwords; previous sessions are not scrubbed.
+
+日本語: この期間の変更は、Grid のゼロ値、Form の新形式属性・配列保存、操作ログ・
+パスワード画面、AJAX 選択肢、保存済みファイル表示、認証・権限の判定を対象とします。
+ログイン制限は既存設定でも有効になります。キャッシュ、過去のユーザーロール、
+保存済み権限、独自フック・ビュー・テンプレートの注意事項を各ガイドで確認してください。
+テスト用 Factory の移行は本番の依存条件や対応 Laravel 全体の保証を変えません。
+
+### Current developer entrypoints
+
+The obsolete root development dependency graph, bootstrap and recursive PHPUnit
+configuration are retired. Install the isolated consumer dependencies, then run
+root `composer test` for BrowserKit or `composer test:integration` for the Laravel
+integration suite. All historical test methods and assertions remain; the upload
+fixture now references the active BrowserKit bootstrap. Production requirements,
+autoload/discovery and optional-image requirements are unchanged. See
+[setup and argument forwarding](CONTRIBUTING.md#laravel-test-setup).
+
+日本語: 古いルート開発環境を廃止し、専用テスト環境をルートの Composer コマンドから
+実行します。本番の依存条件は変えず、既存テストも維持します。旧 `tests/TestCase.php`
+やルートの PHPUnit 設定を直接使う独自手順は、上記の現行手順へ移行してください。
 
 ### Recent merged changes: PRs #97–#107
 

@@ -4,8 +4,9 @@ This isolated runner executes all 73 historical methods in `tests/*Test.php`
 and four harness-isolation regressions against supported Laravel 12/13 releases.
 A separate `Image processing output` suite adds focused Intervention v3 GD
 geometry, encoding, callback and storage regressions; see the
-[migration guide and coverage limits](../../IMAGE_MIGRATION.md#focused-verification). It does not use the obsolete root
-`require-dev` graph or an installed `laravel/laravel` application.
+[migration guide and coverage limits](../../IMAGE_MIGRATION.md#focused-verification).
+Its dependencies belong to this consumer; the obsolete root development graph
+and `laravel/laravel` application bootstrap have been removed.
 
 ## Run
 
@@ -20,6 +21,13 @@ composer check-platform-reqs
 composer audit --locked
 composer test
 ```
+
+After installing this consumer, the repository-root `composer test` command runs
+the same suites with this consumer's PHPUnit and configuration. No root `vendor`
+directory or root `composer install` is required. From the repository root, run
+only the historical methods with
+`composer test -- --testsuite 'Historical BrowserKit (SQLite)'`, or add
+`--filter 'AuthTest::testLoginPage$'` after the suite argument to select one method.
 
 For Laravel 13, select Testbench `^11.0` and PHPUnit `^12.0` instead.
 Do not use `--ignore-platform-reqs`, disable advisory blocking, or skip the
@@ -111,13 +119,14 @@ No methods or assertions are removed. Five historical test files are updated:
    The harness now separately checks and restores the package state described
    below; tree-scoped assertions remain necessary within each test's requests.
 
-The original `tests/TestCase.php` and root PHPUnit configuration remain historical
-references. The obsolete factory-definition include was removed from that harness,
-and root `autoload-dev` now maps the shared factory classes; the old root development
-dependencies were not modernized or validated. Shared fixtures now require the
-modern factory API, so this change does not preserve a Laravel 5–7 test runner.
-Run this suite through its own configuration; recursively collecting the entire
-`tests/` tree mixes incompatible harnesses.
+The obsolete `tests/TestCase.php`, root PHPUnit configuration and root
+`autoload-dev` mapping have been removed. This consumer's bootstrap loads the
+shared models, controllers and native factory classes. The historical test cases
+run through `tests/browserkit/TestCase.php` and this consumer's explicit
+configuration. `FileUploadTest` now uploads that active `TestCase.php` as its
+replacement fixture, preserving the uploaded basename and every assertion.
+The root `composer test` shortcut selects this configuration, keeping the
+separate harnesses out of recursive test discovery.
 
 ## Package state between test methods
 

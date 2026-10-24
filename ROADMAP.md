@@ -13,18 +13,18 @@ The [original PR candidate inventory](docs/pr-candidates-2026-10-01.md) is a
 historical snapshot. Current completed coverage and its limits are recorded in
 [the current maintenance summary](COMPATIBILITY.md#current-maintenance-summary).
 
-Updated through merged PR #107 (2026-10-08): the summary now indexes Grid
-integer/zero selections, unchanged filter resubmission, scalar Checkbox links,
-zero-valued LIKE searches, literal Listbox remote options and Tags separators.
-Review the linked override, view-cache and reload cautions alongside earlier
-upgrade guidance. Full-suite CI now has a [40-minute job limit](tests/integration/README.md#ci-full-suite-timeout-headroom--ci-全件テストのタイムアウト余裕),
+Updated through merged PR #124 (2026-10-24): the summary indexes Form attributes
+and structured inserts, native test factories, AJAX zero IDs, saved-upload previews,
+password/log rendering, login limits, role selection and permission evaluation.
+Review cache requirements, custom controllers, middleware and existing role assignments
+alongside the earlier view/asset upgrade guidance. Full-suite CI retains its
+[40-minute job limit](tests/integration/README.md#ci-full-suite-timeout-headroom--ci-全件テストのタイムアウト余裕),
 without broader runtime-support claims. The
 [DBAL 2/3 support boundary](COMPATIBILITY.md#doctrine-dbal-support-boundary) remains;
 DBAL 4 is not supported.
-日本語: マージ済み PR #107 までの Grid 選択・絞り込みと Listbox・Tags の修正を
-上記のまとめから確認できます。独自実装・上書きビュー・再読み込みの注意と、
-以前の更新手順も確認してください。全件テスト CI の上限は 40 分ですが、
-対応範囲の拡大を示すものではありません。DBAL 4 は引き続き非対応です。
+日本語: マージ済み PR #124 までのフォーム・表示・認証・権限の修正を上記の
+まとめから確認できます。キャッシュ、独自実装、過去のロール割り当てと、以前の
+ビュー・アセット更新手順を確認してください。DBAL 4 は引き続き非対応です。
 
 ## Phase 1: Establish a verified baseline
 
@@ -36,19 +36,19 @@ DBAL 4 is not supported.
       ([isolated SQLite runner](tests/browserkit/README.md)); retain 73 historical
       methods and add four package-state isolation regressions
 - [x] Isolate FakerPHP and disposable application setup in the
-      modern runner, separate from the root historical development graph
-- [x] Allow BrowserKit `^6.0 || ^7.0` in root development dependencies (PR #85);
-      the isolated runner already requires `^7.2.8`. This resolves the v6-only
-      constraint conflict without retiring the remaining legacy development setup
+      modern runner; the obsolete root development graph is now retired
+- [x] Resolve the historical root BrowserKit v6-only constraint in PR #85;
+      that root graph has since been retired. The isolated runner requires `^7.2.8`
 - [x] Add selected Laravel 12/13 and PHP 8.2–8.5 CI combinations, respecting each
       framework's PHP minimum; record exact tested dependency floors separately
 - [x] Exercise shipped configuration through the real integration consumer and
       publish/install through the historical runner (with documented fixture overlays)
 - [x] Replace the isolated runner's legacy factory API/provider/package with
       native class-based factories, preserving historical assertions and relations;
-      see the [runner and historical-root boundaries](tests/browserkit/README.md)
-- [ ] Decide whether to retire the root legacy development dependencies/configuration;
-      the isolated runner does not validate that historical dependency graph
+      see the [runner and retired-root boundaries](tests/browserkit/README.md)
+- [x] Retire the root legacy development dependencies/bootstrap/configuration and
+      expose the isolated runners through root Composer commands; follow the
+      [current development setup](CONTRIBUTING.md#laravel-test-setup)
 - [ ] Extend install/login/CRUD/upload/menu/export coverage to fresh applications
       and real browsers, including JavaScript, cookies and CSRF
 - [ ] Establish a comprehensive lowest/latest dependency policy; the existing
@@ -160,6 +160,11 @@ and application checks; do not silently remove or claim support for them.
       [custom preview hooks and remaining plugin limits](tests/integration/UPLOAD_PREVIEW_TEXT.md)
 - [x] Add configurable failed-login limits and sanitized retry input to the built-in
       controller; review [default adoption, cache and override boundaries](tests/integration/LOGIN_THROTTLE.md)
+- [x] Restore explicit role selection during administrator creation; review
+      [existing-account and automation changes](tests/integration/CREATE_USER_ROLES.md)
+- [x] Enforce every explicit route permission rule and literal zero permission values;
+      review [middleware overrides](tests/integration/PERMISSION_MIDDLEWARE.md) and
+      [stored path/method/slug rules](tests/integration/PERMISSION_EVALUATION.md)
 - [ ] Review remaining deprecations, default credentials, new-upload previews and
       custom AJAX templates; these tests are not a penetration test
 - [ ] Extend driver-specific PDO lifecycle checks beyond SQLite and decide whether

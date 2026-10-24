@@ -19,6 +19,37 @@ Working on your first Pull Request? You can learn how from this *free* series, [
 
 Any code change should be submitted as a pull request. The description should explain what the code does and give steps to execute it. The pull request should also contain tests.
 
+## Laravel test setup
+
+Install test dependencies in the isolated [historical BrowserKit consumer](tests/browserkit/README.md)
+and [Laravel integration consumer](tests/integration/README.md), following their
+PHP, extension and Node.js requirements. Each consumer supports Laravel 12 and
+13 through its own Composer manifest. A root `composer install` is unnecessary
+for these suites and does not install test tooling.
+
+After installing the relevant consumer, run from the repository root:
+
+```sh
+# All historical BrowserKit, harness-isolation and image-output tests
+composer test
+composer test -- --testsuite 'Historical BrowserKit (SQLite)'
+
+# Real Laravel integration tests, or one focused class
+composer test:integration
+composer test:integration -- --filter AdminLifecycleTest
+```
+
+These commands use each consumer's installed PHPUnit and explicit configuration.
+Arguments after `--` are passed to PHPUnit. Install the consumer dependencies first;
+a missing runner or a failing test returns a nonzero exit status. The obsolete
+root development dependencies, test bootstrap and recursive PHPUnit configuration
+have been removed; the historical test cases and shared fixtures remain in `tests/`.
+
+日本語: テスト依存は各専用ディレクトリで導入します。ルートでの
+`composer install` は不要です。導入後はルートの `composer test` と
+`composer test:integration` を利用でき、絞り込みは `--` の後に指定します。
+旧ルート開発環境を廃止しても、既存のテスト・共有フィクスチャは保持しています。
+
 ## PHP compatibility checks
 
 Use PHP 8.2+ (PHP 8.x), preferably 8.3 or newer. Run the dependency-free focused
@@ -33,8 +64,6 @@ done
 The source-lint regression treats all compile-time diagnostics as failures;
 run it on PHP 8.4+ to detect implicit nullable declarations. For real Laravel
 12/13 coverage, follow [the isolated integration instructions](tests/integration/README.md).
-The root legacy development dependencies are not the modern test harness and
-are not upgraded by the PHP baseline migration.
 
 ## Code review process
 
