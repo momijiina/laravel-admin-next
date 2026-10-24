@@ -58,7 +58,7 @@ class CsvHeadersFixture extends TestCase
         });
         if (($options['empty'] ?? '') !== 'table') {
             for ($id = 1; $id <= (($options['large'] ?? false) ? 212 : 12); $id++) {
-                CsvHeadersRecord::create(['id' => $id, 'category' => $id % 2, 'text' => self::TEXT, 'zero' => 0]);
+                CsvHeadersRecord::create(['id' => $id, 'category' => $id % 2, 'text' => $options['text'] ?? self::TEXT, 'zero' => 0]);
             }
         }
         $trace = [];
@@ -96,9 +96,9 @@ class CsvHeadersFixture extends TestCase
             if (!($options['no_columns'] ?? false)) {
                 $grid->column('id', 'ID')->sortable();
                 $grid->column('category', 'Category');
-                $grid->column('text', 'Text')->display(function ($value) use (&$trace) {
+                $grid->column('text', 'Text')->display(function ($value) use ($options, &$trace) {
                     $trace[] = ['display', $this->id];
-                    return $value;
+                    return $options['display_text'] ?? $value;
                 });
                 $grid->column('zero', 'Zero');
             }
@@ -113,6 +113,9 @@ class CsvHeadersFixture extends TestCase
                     }
                     if (array_key_exists('except', $options)) {
                         $exporter->except($options['except']);
+                    }
+                    if (array_key_exists('original', $options)) {
+                        $exporter->originalValue($options['original']);
                     }
                     $exporter->title('text', function ($title) use ($grid, $options, &$trace) {
                         $trace[] = ['title', $title, $grid->columnNames];

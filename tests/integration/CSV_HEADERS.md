@@ -19,9 +19,12 @@ callbacks still run before the first title callback; empty results do not run
 row display or exporter column callbacks. Title callbacks now run once for an
 empty result when their column is visible to the grid, even if exporter
 `only()` / `except()` later excludes it, matching the nonempty API order.
-Existing delimiters, enclosure, escape, BOM, queries and scope handling are
-unchanged. `title()` callback results such as `"0"` and the empty string are
-retained; ordinary grid-label normalization is unchanged.
+The header repair preserves the delimiter, enclosure, BOM, queries and scope
+handling. The later [literal-backslash repair](CSV_BACKSLASH_EXPORT.md) changes
+the CSV escape to an empty string for standard quote doubling; PHP readers
+should use the same explicit empty escape. `title()` callback results such as
+`"0"` and the empty string are retained; ordinary grid-label normalization is
+unchanged.
 
 `CsvHeadersTest.php` executes the actual HTTP kernel and exporter stream/exit
 in child processes with in-memory SQLite. CSV parse-back covers named/unnamed

@@ -192,7 +192,7 @@ class ObjectDisplayTest extends ObjectDisplayFixture
             fwrite($handle, substr($output, 3));
             rewind($handle);
             $rows = [];
-            while (($row = fgetcsv($handle, null, ',', '"', '\\')) !== false) { $rows[] = $row; }
+            while (($row = fgetcsv($handle, null, ',', '"', '')) !== false) { $rows[] = $row; }
             fclose($handle);
             $this->assertSame($scenario === 'custom' ? ['ID', 'Custom payload'] : ['ID', 'Payload', 'Text'], array_shift($rows));
             $ids = ['filtered' => ['3'], 'page' => ['3', '4'], 'selected' => ['2', '4']][$scenario] ?? ['1', '2', '3', '4', '5'];
@@ -218,13 +218,13 @@ class ObjectDisplayTest extends ObjectDisplayFixture
             $handle = fopen('php://memory', 'r+');
             fwrite($handle, substr($process->getOutput(), 3));
             rewind($handle);
-            fgetcsv($handle, null, ',', '"', '\\');
+            fgetcsv($handle, null, ',', '"', '');
             for ($id = 1; $id <= 5; $id++) {
-                $row = fgetcsv($handle, null, ',', '"', '\\');
+                $row = fgetcsv($handle, null, ',', '"', '');
                 $this->assertSame((string) $id, $row[0]);
                 $this->assertSame($expected, $row[1]);
             }
-            $this->assertFalse(fgetcsv($handle, null, ',', '"', '\\'));
+            $this->assertFalse(fgetcsv($handle, null, ',', '"', ''));
             fclose($handle);
         }
     }

@@ -28,7 +28,7 @@ class CsvHeadersTest extends TestCase
             fwrite($handle, substr($output, 3));
             rewind($handle);
             $rows = [];
-            while (($row = fgetcsv($handle, null, ',', '"', '\\')) !== false) {
+            while (($row = fgetcsv($handle, null, ',', '"', '')) !== false) {
                 $rows[] = $row;
             }
             fclose($handle);

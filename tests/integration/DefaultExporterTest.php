@@ -34,7 +34,7 @@ class DefaultExporterTest extends TestCase
         $handle = fopen('php://memory', 'r+');
         fwrite($handle, "\xEF\xBB\xBF");
         foreach ($rows as $row) {
-            fputcsv($handle, $row, ',', '"', '\\');
+            fputcsv($handle, $row, ',', '"', '');
         }
         rewind($handle);
         $bytes = stream_get_contents($handle);
