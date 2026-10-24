@@ -63,22 +63,25 @@ class Permission extends Model
      */
     public function shouldPassThrough(Request $request): bool
     {
-        if (empty($this->http_method) && empty($this->http_path)) {
+        $method = $this->http_method;
+        $httpPath = $this->http_path;
+
+        if (empty($method) && empty($httpPath) && $httpPath !== 0 && $httpPath !== '0') {
             return true;
         }
 
-        $method = $this->http_method;
-
         $matches = array_map(function ($path) use ($method) {
-            $path = trim(config('admin.route.prefix'), '/').$path;
+            $parts = explode(':', $path, 2);
 
-            if (Str::contains($path, ':')) {
-                list($method, $path) = explode(':', $path);
-                $method = explode(',', $method);
+            if (count($parts) === 2 && !Str::contains($parts[0], '/')) {
+                $method = explode(',', $parts[0]);
+                $path = $parts[1];
             }
 
+            $path = trim(config('admin.route.prefix'), '/').$path;
+
             return compact('method', 'path');
-        }, explode("\n", $this->http_path));
+        }, explode("\n", $httpPath));
 
         foreach ($matches as $match) {
             if ($this->matchRequest($match, $request)) {
@@ -98,7 +101,7 @@ class Permission extends Model
      */
     public function getHttpPathAttribute($path)
     {
-        return str_replace("\r\n", "\n", $path);
+        return str_replace("\r\n", "\n", $path ?? '');
     }
 
     /**
@@ -121,11 +124,13 @@ class Permission extends Model
             return false;
         }
 
-        $method = collect($match['method'])->filter()->map(function ($method) {
+        $method = collect($match['method'])->filter(function ($method) {
+            return !empty($method) || $method === 0 || $method === '0';
+        })->map(function ($method) {
             return strtoupper($method);
         });
 
-        return $method->isEmpty() || $method->contains($request->method());
+        return $method->isEmpty() || $method->containsStrict($request->method());
     }
 
     /**
@@ -146,7 +151,9 @@ class Permission extends Model
     public function getHttpMethodAttribute($method)
     {
         if (is_string($method)) {
-            return array_filter(explode(',', $method));
+            return array_filter(explode(',', $method), function ($method) {
+                return $method !== '';
+            });
         }
 
         return $method;

@@ -26,12 +26,17 @@ trait HasPermissions
      */
     public function can($ability, $arguments = []): bool
     {
-        if (empty($ability)) {
+        if (empty($ability) && $ability !== 0 && $ability !== '0') {
             return true;
         }
 
         if ($this->isAdministrator()) {
             return true;
+        }
+
+        if ($ability === 0 || $ability === '0') {
+            return $this->permissions->pluck('slug')->containsStrict('0')
+                || $this->roles->pluck('permissions')->flatten()->pluck('slug')->containsStrict('0');
         }
 
         if ($this->permissions->pluck('slug')->contains($ability)) {

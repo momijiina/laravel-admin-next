@@ -21,6 +21,19 @@ Composer の制約変更だけでは既存 PDO アダプターやスキーマ AP
 通常の Composer 検査を有効にしたまま宣言範囲内で解決してください。Laravel 12/13
 全体では DBAL 3 を使用し、DBAL 2 の限定的な検証は全組み合わせの保証ではありません。
 
+## Permission values and method-qualified paths (2026-10-24)
+
+Zero-valued permission paths and slugs no longer mean unrestricted access.
+Ability `0` / `"0"` requires the exact assigned string slug `"0"`; numeric-looking
+alternatives do not match. Method-qualified paths are parsed before the admin
+prefix is added, literal path colons are preserved, and HTTP method `"0"` stays
+literal. Nullable paths avoid PHP diagnostics. Existing blank-permission and
+administrator behavior remains. Review [stored rules, custom overrides and HTTP response limits](tests/integration/PERMISSION_EVALUATION.md).
+
+日本語: 権限のパス・slug・HTTP メソッドのゼロを「指定なし」と扱わないように
+修正します。行単位のメソッド指定と管理画面の接頭辞の組み合わせも修正します。
+既存の空指定の意味は維持します。独自設定と検証範囲は上記ガイドを確認してください。
+
 ## Grid column-header zero searches (2026-10-08)
 
 Column-header `filter()` / `filter('equal')` and `filter('like')` now apply
