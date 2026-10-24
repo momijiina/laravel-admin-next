@@ -1,4 +1,5 @@
 @if($error = session()->get('error'))
+    @php($error = is_array($error) ? collect($error) : $error)
     <div class="alert alert-danger alert-dismissable">
         <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
         <h4><i class="icon fa fa-ban"></i>{{ \Illuminate\Support\Arr::get($error->get('title'), 0) }}</h4>
@@ -17,6 +18,7 @@
 @endif
 
 @if($success = session()->get('success'))
+    @php($success = is_array($success) ? collect($success) : $success)
     <div class="alert alert-success alert-dismissable">
         <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
         <h4><i class="icon fa fa-check"></i>{{ \Illuminate\Support\Arr::get($success->get('title'), 0) }}</h4>
@@ -25,6 +27,7 @@
 @endif
 
 @if($info = session()->get('info'))
+    @php($info = is_array($info) ? collect($info) : $info)
     <div class="alert alert-info alert-dismissable">
         <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
         <h4><i class="icon fa fa-info"></i>{{ \Illuminate\Support\Arr::get($info->get('title'), 0) }}</h4>
@@ -33,6 +36,7 @@
 @endif
 
 @if($warning = session()->get('warning'))
+    @php($warning = is_array($warning) ? collect($warning) : $warning)
     <div class="alert alert-warning alert-dismissable">
         <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
         <h4><i class="icon fa fa-warning"></i>{{ \Illuminate\Support\Arr::get($warning->get('title'), 0) }}</h4>
