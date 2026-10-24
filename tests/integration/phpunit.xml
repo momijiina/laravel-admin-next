@@ -84,6 +84,7 @@
             <file>UploadPreviewTextTest.php</file>
             <file>MultipleFileSortTest.php</file>
             <file>ResourceGeneratorTest.php</file>
+            <file>CreateUserCommandTest.php</file>
             <file>GeneratedControllerCrudTest.php</file>
             <file>DateCastPresentationTest.php</file>
             <file>DateRangeCastPresentationTest.php</file>

@@ -38,13 +38,16 @@ class CreateUserCommand extends Command
         $roles = $roleModel::all();
 
         /** @var array $selected */
-        $selectedOption = $roles->pluck('name')->toArray();
+        // Include the identity so numeric names cannot be mistaken for choice indexes.
+        $selectedOption = $roles->map(function ($role) {
+            return $role->name.' ['.$role->getKey().']';
+        })->all();
 
-        if (empty($selectedOption)) {
+        if (!empty($selectedOption)) {
             $selected = $this->choice('Please choose a role for the user', $selectedOption, null, null, true);
 
-            $roles = $roles->filter(function ($role) use ($selected) {
-                return in_array($role->name, $selected);
+            $roles = $roles->filter(function ($role, $index) use ($selected, $selectedOption) {
+                return in_array($selectedOption[$index], $selected, true);
             });
         }
 
