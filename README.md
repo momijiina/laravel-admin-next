@@ -1,43 +1,49 @@
 # Laravel Admin Next
 
-## 日本語: OpenAI Dots による定期自動更新（計画）
+## 日本語: Laravel Admin Next の保守方針
 
-Laravel Admin Next は、[z-song/laravel-admin](https://github.com/z-song/laravel-admin) をもとに、メンテナーが OpenAI Dots を活用して保守・改善する独立したプロジェクトです。
+Laravel Admin Next は、[z-song/laravel-admin](https://github.com/z-song/laravel-admin) をもとに、最新の PHP / Laravel での利用に向けて保守・改善する独立したプロジェクトです。
 
-OpenAI Dots による定期的な自動更新支援を計画しています。変更点や互換性への影響の調査、必要な修正、テスト、Pull Request の作成までを支援し、レビューとマージの判断はメンテナーが行います。定期実行のスケジュールは未設定で、自動マージや自動デプロイは行いません。
+Dots から引き継いだ調査・修正を Codex で継続しています。変更点や互換性への影響を調べ、必要な修正・テストを Pull Request にまとめ、メンテナーがレビューとマージを判断します。定期実行のスケジュールは未設定で、自動マージや自動デプロイは行いません。
 
 最新の PHP / Laravel への対応を目指し、既存 API や他の Laravel アプリケーションとの互換性・連携を重視します。対応状況は段階的に検証するため、すべてのバージョンやアプリケーションでの動作を保証するものではありません。
 
 **画像処理の破壊的変更:** 画像変換・サムネイルは任意依存の Intervention Image `^3.11.9` に移行しました。v2 の全 API との互換性はありません。型付きコールバックや既存設定を [画像処理の移行ガイド](IMAGE_MIGRATION.md) で確認してください。画像処理を行わない通常のアップロードには不要です。PHP の最低要件は 8.2 です。
 
-2026-10-08 更新（マージ済み PR #107 まで）: Grid の整数・ゼロ ID の選択、絞り込みの未変更再送信、単一値 Checkbox URL、LIKE 系のゼロ検索を修正しました。Listbox のリモート選択肢と Tags の区切り文字も文字列のまま扱います。全件テスト CI の上限は 40 分ですが、対応範囲の拡大を示すものではありません。Doctrine DBAL は引き続き `^2.13.9 || ^3.10.6` が対象で、DBAL 4 には対応していません。
+2026-10-24 更新（マージ済み PR #124 まで）: Laravel 12・13 用のテストを標準 Factory へ移行し、Form の新形式アクセサー・配列入力、AJAX のゼロ ID、ファイルのプレビュー表示を修正しました。ログインの失敗回数制限、パスワード・操作ログの表示、ユーザー作成時のロール選択と権限判定も改良しています。Doctrine DBAL は引き続き `^2.13.9 || ^3.10.6` が対象で、DBAL 4 には対応していません。
 
 **更新時の注意:** Grid の Checkbox・Group の上書きビュー、独自の絞り込み処理、Listbox のリモート API・初期化処理、Tags の区切り文字設定を確認し、古いコンパイル済みビューを更新して管理画面をページ全体で再読み込みしてください。以前の RadioButton/RadioCard ビュー、Copyable/Editable 属性、インラインエディターの同時ビュー更新、アップロードフック、Number アセットと画像・日付・通貨の注意事項も含む [変更点・移行時の注意事項と検証範囲](COMPATIBILITY.md#current-maintenance-summary) を参照してください。
 
+標準ログインの失敗制限は、既存の公開済み設定でも既定で 60 秒・5 回となります。[キャッシュの準備と独自認証への影響](tests/integration/LOGIN_THROTTLE.md) を確認してください。過去に `admin:create-user` で作成したユーザーのロールは自動修正されません。
+
 - [ロードマップ](ROADMAP.md)
 - [互換性方針](COMPATIBILITY.md)
-- [最近の変更点・アップグレード時の注意事項と検証範囲（マージ済み PR #107 まで）](COMPATIBILITY.md#current-maintenance-summary)
+- [最近の変更点・アップグレード時の注意事項と検証範囲（マージ済み PR #124 まで）](COMPATIBILITY.md#current-maintenance-summary)
+- [開発環境・テストの実行方法](CONTRIBUTING.md#laravel-test-setup)
 - [元プロジェクトについて](UPSTREAM.md)
 
 このプロジェクトは OpenAI の公式プロジェクトではなく、OpenAI による承認・推奨を示すものではありません。
 
-## English: Periodic automated updates with OpenAI Dots (planned)
+## English: Maintenance workflow
 
-Laravel Admin Next is an independent project based on [z-song/laravel-admin](https://github.com/z-song/laravel-admin), maintained and improved by its maintainer with assistance from OpenAI Dots.
+Laravel Admin Next is an independent project based on [z-song/laravel-admin](https://github.com/z-song/laravel-admin), maintained for use with modern PHP and Laravel.
 
-We plan to use OpenAI Dots for periodic automated maintenance assistance: investigating changes and compatibility impact, making necessary fixes, running tests, and preparing pull requests. The maintainer reviews changes and decides whether to merge them. No recurring schedule is configured yet, and changes are not automatically merged or deployed.
+Work started with Dots is continuing with Codex: investigating compatibility, making fixes, running tests and preparing pull requests. The maintainer reviews changes and decides whether to merge them. No recurring schedule is configured, and changes are not automatically merged or deployed.
 
 The project aims to support modern PHP and Laravel while prioritizing existing APIs, compatibility, and integration with other Laravel applications. Compatibility is verified incrementally; support for every version or application is not guaranteed.
 
 **Breaking image-processing change:** transformations and thumbnails now use optional Intervention Image `^3.11.9`, with a bounded legacy API rather than full v2 compatibility. Review callbacks and settings in the [image migration guide](IMAGE_MIGRATION.md). Ordinary uploads without processing do not need it. The PHP floor remains 8.2.
 
-Updated 2026-10-08 (merged changes through PR #107): recent fixes cover Grid integer/zero selections, unchanged filter resubmission, scalar Checkbox links and zero-valued LIKE searches. Listbox remote options and Tags separators retain literal values. Full-suite CI jobs now have a 40-minute limit; this does not expand runtime support. Doctrine DBAL remains limited to `^2.13.9 || ^3.10.6`; DBAL 4 is not supported.
+Updated 2026-10-24 (merged changes through PR #124): Laravel 12/13 tests use native factories. Recent fixes cover modern Form attributes and structured inserts, AJAX zero IDs, saved-file previews, password and operation-log rendering, login limits, role selection and permission evaluation. Doctrine DBAL remains limited to `^2.13.9 || ^3.10.6`; DBAL 4 is not supported.
 
 **Upgrade cautions:** review overridden Grid Checkbox/Group views, custom filter implementations, Listbox remote endpoints/initializers and Tags separator settings. Refresh stale compiled views and fully reload admin pages. See [changes, upgrade cautions and verification limits](COMPATIBILITY.md#current-maintenance-summary), including earlier RadioButton/RadioCard views, Copyable/Editable attributes, paired inline-editor views, upload hooks, Number assets and image/date/currency cautions.
 
+Built-in login limits default to five failures per 60 seconds even with previously published configuration. Review [cache requirements and custom authentication](tests/integration/LOGIN_THROTTLE.md). Role assignments on accounts previously created by `admin:create-user` are not automatically repaired.
+
 - [Roadmap](ROADMAP.md)
 - [Compatibility policy](COMPATIBILITY.md)
-- [Recent changes, upgrade cautions and verification limits (merged through PR #107)](COMPATIBILITY.md#current-maintenance-summary)
+- [Recent changes, upgrade cautions and verification limits (merged through PR #124)](COMPATIBILITY.md#current-maintenance-summary)
+- [Development setup and test commands](CONTRIBUTING.md#laravel-test-setup)
 - [Upstream attribution](UPSTREAM.md)
 
 This is not an official OpenAI project and does not imply OpenAI endorsement.

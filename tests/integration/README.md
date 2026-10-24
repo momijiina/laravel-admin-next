@@ -2,8 +2,9 @@
 
 This is an isolated Composer **consumer** of the repository via a local path
 repository. It uses [Orchestra Testbench](https://github.com/orchestral/testbench)
-to boot real Laravel and SQLite without changing the root legacy development
-dependencies. Both the shipped package and this harness require PHP `^8.2`;
+to boot real Laravel and SQLite. Test dependencies are installed in this consumer;
+the obsolete root development graph has been removed. Both the shipped package
+and this harness require PHP `^8.2`;
 Laravel 13 / Testbench 11 requires PHP 8.3+.
 
 Run from this directory, using a PHP CLI with the required extensions and Node.js
@@ -22,6 +23,11 @@ composer update --with 'orchestra/testbench:^11.0' --with 'phpunit/phpunit:^12.0
 composer check-platform-reqs
 composer test
 ```
+
+After installing this consumer, run `composer test:integration` from the repository
+root to use this consumer's PHPUnit and explicit configuration. A root `vendor`
+directory or root `composer install` is unnecessary. Pass PHPUnit options after
+`--`, for example `composer test:integration -- --filter AdminLifecycleTest`.
 
 Composer's normal security-advisory and platform checks remain enabled. Locks
 and vendor files are local only so CI resolves each selected framework family.
@@ -362,8 +368,8 @@ this is not package-discovery or browser-cookie/CSRF end-to-end coverage.
 
 ## Limits
 
-The root PHPUnit configuration excludes this consumer directory, keeping its
-classes and vendor tree out of legacy test discovery. This suite does not replace
+The root `composer test:integration` shortcut selects this consumer's explicit
+configuration; no root PHPUnit configuration remains. This suite does not replace
 or claim to pass the 73 legacy BrowserKit tests; use the separate
 [historical BrowserKit runner](../browserkit/README.md) for that coverage.
 Main-file upload failures and successful replacement are covered by the

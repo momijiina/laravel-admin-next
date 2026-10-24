@@ -94,7 +94,7 @@ class FileUploadTest extends TestCase
 
         $this->attach(__DIR__.'/RolesTest.php', 'file3')
             ->attach(__DIR__.'/MenuTest.php', 'file4')
-            ->attach(__DIR__.'/TestCase.php', 'file5')
+            ->attach(__DIR__.'/browserkit/TestCase.php', 'file5')
             ->press('Submit');
 
         $new = FileModel::first();

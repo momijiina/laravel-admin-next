@@ -63,4 +63,5 @@ jobs:
       - name: Check optional image dependency boundary
         run: php ../images/optional_dependency.php
       - name: Run all historical BrowserKit and image-output tests
+        working-directory: .
         run: composer test
