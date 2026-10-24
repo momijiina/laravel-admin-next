@@ -30,29 +30,42 @@ class InstallCommand extends Command
     /**
      * Execute the console command.
      *
-     * @return void
+     * @return int
      */
     public function handle()
     {
-        $this->initDatabase();
+        $exitCode = $this->initDatabase();
+
+        // Existing overrides may complete successfully without returning a code.
+        if ($exitCode !== null && $exitCode !== 0) {
+            return $exitCode;
+        }
 
         $this->initAdminDirectory();
+
+        return 0;
     }
 
     /**
      * Create tables and seed it.
      *
-     * @return void
+     * @return int
      */
     public function initDatabase()
     {
-        $this->call('migrate');
+        $exitCode = $this->call('migrate');
+
+        if ($exitCode !== 0) {
+            return $exitCode;
+        }
 
         $userModel = config('admin.database.users_model');
 
         if ($userModel::count() == 0) {
-            $this->call('db:seed', ['--class' => \Encore\Admin\Auth\Database\AdminTablesSeeder::class]);
+            return $this->call('db:seed', ['--class' => \Encore\Admin\Auth\Database\AdminTablesSeeder::class]);
         }
+
+        return 0;
     }
 
     /**

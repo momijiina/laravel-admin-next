@@ -190,6 +190,8 @@ The dated results below are historical snapshots, not the current suite totals.
   including source precedence, null/array values, JSON and absent input; real
   remember cookies/tokens for accepted and rejected credentials
 - Real Artisan blank-controller generation and rejection of model-less `--output`
+- Administrator installation stops on cancelled/failed database commands and
+  propagates their exit status; [retry and initializer-override boundaries](INSTALL_COMMAND_FAILURE.md)
 - Interactive administrator creation attaches only explicitly selected roles;
   [role selection, existing-account review and automation changes](CREATE_USER_ROLES.md)
 - Generated model-backed controllers executing index/create/store/show/edit/update/delete

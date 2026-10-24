@@ -1209,6 +1209,19 @@ sections intentionally retain the dependencies and results of their revisions.
 
 <a id="current-verified-coverage-2026-10-03-after-pr-25"></a>
 
+## Installer database failure status (2026-10-24)
+
+`admin:install` now stops and returns the nonzero status from `migrate` or
+`db:seed`. Cancelled migrations no longer lead to administrator-table queries,
+and failed database setup no longer creates controllers/routes or reports success.
+Successful and ordinary repeat installs keep their behavior. Legacy database
+initializers returning null/void remain accepted; overrides calling the parent
+should propagate its result. See [retry, partial-state and unchanged seeder boundaries](tests/integration/INSTALL_COMMAND_FAILURE.md).
+
+日本語: DB 準備を中止・失敗したのにインストール成功としていた問題を修正します。
+子コマンドの終了コードを呼び出し元へ伝え、後続の生成を止めます。完了済みの DB
+変更を取り消す機能ではないため、再実行と独自初期化処理の注意は上記を確認してください。
+
 ## Interactive administrator role selection (2026-10-24)
 
 `admin:create-user` now prompts when roles exist and attaches only the selected
