@@ -141,19 +141,19 @@ namespace {
         exit(1);
     }
 
-    // Literal expected bytes deliberately do not call fputcsv: changing the
-    // escape to an empty string would alter the slash+quote fields and fail.
+    // Literal expected bytes deliberately do not call fputcsv: quote doubling
+    // preserves backslash+quote fields, and a backslash alone needs no enclosure.
     $expected = "\xEF\xBB\xBF".<<<'CSV'
-plain,"comma,title","quote""title","slash\"title","line
+plain,"comma,title","quote""title","slash\""title","line
 title",日本語,empty,null
-value,"comma,value","quote""value","slash\"value","line
+value,"comma,value","quote""value","slash\""value","line
 value",日本語☕,,
-0,"comma,again","""""","C:\tmp\file",
+0,"comma,again","""""",C:\tmp\file,
 CSV
     ."\"\r\n\",é,,\n";
 
     $header = "\xEF\xBB\xBF".<<<'CSV'
-plain,"comma,title","quote""title","slash\"title","line
+plain,"comma,title","quote""title","slash\""title","line
 title",日本語,empty,null
 CSV
     ."\n";
