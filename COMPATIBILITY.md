@@ -528,6 +528,18 @@ unchanged, and no NULL clearing protocol is added. See the
 不要ですが、独自表示クラスは確認してください。初期選択・緩い比較・保存形式は変更
 せず、NULL クリア用 API は追加しません。他の Laravel アプリとの連携は個別に検証してください。
 
+## Explicit route permission rules (2026-10-24)
+
+All explicit permission rules on a route are now required. Previously only the
+first rule ran, so `allow,editor` could bypass a later `check,edit-records`.
+Resolved aliases, groups, controller middleware and exclusions follow Laravel's
+route configuration. Explicit rules still replace the default HTTP path check.
+Review [custom hooks and unchanged denial-response behavior](tests/integration/PERMISSION_MIDDLEWARE.md).
+
+日本語: ルートに複数の権限条件を設定した場合、すべてを確認します。以前は最初の
+条件だけで許可されていました。独自ミドルウェアや上書きフックは上記ガイドを
+確認してください。DB・ビュー・アセットの変更はありません。
+
 ## Operation-log rendering (2026-10-23)
 
 The built-in log page now escapes method/path/IP labels and serialized JSON at
