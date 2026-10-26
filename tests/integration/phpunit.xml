@@ -84,6 +84,7 @@
             <file>ActionModalRetryTest.php</file>
             <file>HandleControllerRequestTest.php</file>
             <file>PermissionEvaluationTest.php</file>
+            <file>MenuTreeRenderingTest.php</file>
             <file>OperationLogRenderingTest.php</file>
             <file>FileUploadFailureTest.php</file>
             <file>UploadPreviewTextTest.php</file>

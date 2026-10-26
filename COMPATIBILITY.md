@@ -413,6 +413,20 @@ asset/view republish, schema or data migration is needed. See the
 複数 Grid の DOM ID を変更するものではありません。他の Laravel アプリとの
 互換性はアプリごとに検証してください。
 
+## Literal menu-management tree values (2026-10-24)
+
+The built-in menu tree escapes stored titles, icon classes and resolved URI
+attributes/labels. Quotes and HTML-like text no longer create elements or
+event-handler attributes on the management page. Parent/child controls and
+custom `Tree::branch()` HTML callbacks retain their contracts. Review copied
+`MenuController::treeView()` implementations and reload open pages; stored data,
+assets and views need no migration. URL-scheme acceptance remains a separate
+policy shared with the sidebar. See [HTTP, PJAX and Chromium evidence](tests/integration/MENU_TREE_RENDERING.md).
+
+日本語: 標準メニュー管理ツリーの文字列をエスケープし、保存値が要素やイベント
+属性になることを防ぎます。独自コールバックとコピーした実装を確認してください。
+URL スキームの許可方針は変更しません。検証範囲は上記ガイドを参照してください。
+
 ## Notifications with JSON sessions (2026-10-24)
 
 Fresh Laravel 13 applications use JSON session serialization. A successful admin
@@ -630,11 +644,31 @@ cautions. 日本語: 別の既定スコープがあってもゼロの明示選�
 既存の比較仕様と独自実装の注意事項は上記ガイドを確認してください。
 
 Updated 2026-10-24. This index describes the changes merged through
-[PR #124](https://github.com/momijiina/laravel-admin-next/pull/124), at
-[`57c4ec8`](https://github.com/momijiina/laravel-admin-next/commit/57c4ec8).
+[PR #127](https://github.com/momijiina/laravel-admin-next/pull/127), at
+[`cadb3df`](https://github.com/momijiina/laravel-admin-next/commit/cadb3df).
 Use the linked guides for upgrade steps and each regression's precise boundary.
 Historical test totals below remain evidence for their own revisions, not
 current suite totals or validation of subsequent changes.
+
+### Recent merged changes: PRs #125–#127
+
+- **Development setup (#125):** the obsolete root development graph is retired;
+  [root Composer commands](CONTRIBUTING.md#laravel-test-setup) use isolated consumers.
+- **Installer failure status (#126):** cancelled/failed database commands stop
+  scaffolding and return their status; see [retry and override behavior](tests/integration/INSTALL_COMMAND_FAILURE.md).
+- **JSON sessions and fresh applications (#127):** notifications render after
+  Laravel 13 JSON-session round trips. Merge the [notification-view changes](tests/integration/JSON_SESSION_FLASH.md)
+  into overrides and refresh compiled views. The [official-skeleton Chromium runner](tests/fresh-app/README.md)
+  checks installation, real cookies/CSRF, generated screens and role creation/editing.
+
+On 2026-10-24, GitHub reported all checks successful for the merged PR heads:
+#125 and #126 each had 61 successful checks; #127 had 63, including both new
+fresh-application browser jobs. This is evidence for those revisions, not
+validation of subsequent changes or every admitted dependency version.
+
+日本語: 開発用依存を整理し、DB 準備失敗時の処理と Laravel 13 の通知表示を修正
+しました。公式雛形の実ブラウザ CI も導入済みです。上記 3 件のマージ前 CI は
+全件成功を確認しています。独自ビューと導入手順の変更点は各ガイドを参照してください。
 
 ### Recent merged changes: PRs #108–#124
 
