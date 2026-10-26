@@ -173,13 +173,14 @@ class CsvExporter extends AbstractExporter
 
                 // Write title
                 if (!$headerWritten) {
-                    fputcsv($handle, $this->getVisiableTitles(), ',', '"', '\\');
+                    // Use CSV quote doubling; backslashes are literal field data.
+                    fputcsv($handle, $this->getVisiableTitles(), ',', '"', '');
                     $headerWritten = true;
                 }
 
                 // Write rows
                 foreach ($current as $index => $record) {
-                    fputcsv($handle, $this->getVisiableFields($record, $original[$index]), ',', '"', '\\');
+                    fputcsv($handle, $this->getVisiableFields($record, $original[$index]), ',', '"', '');
                 }
             });
             // Empty queries never invoke the chunk callback; titles still describe the export.
@@ -188,7 +189,7 @@ class CsvExporter extends AbstractExporter
                     $this->grid->columnNames[] = $column->getName();
                 });
 
-                fputcsv($handle, $this->getVisiableTitles(), ',', '"', '\\');
+                fputcsv($handle, $this->getVisiableTitles(), ',', '"', '');
             }
             fclose($handle);
         };

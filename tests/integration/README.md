@@ -335,6 +335,8 @@ The dated results below are historical snapshots, not the current suite totals.
   registry/cache compatibility, and actual unconfigured HTTP export scopes
 - Headers for empty actual CSV exports and cross-chunk header-once controls;
   [CSV schema and compatibility notes](CSV_HEADERS.md)
+- Literal backslashes and quotes in streamed CSV headers, cells and raw JSON;
+  [PHP reader migration and quoting boundaries](CSV_BACKSLASH_EXPORT.md)
 - Explicit native-object grid display callbacks and actual streamed CSV round trips;
   [scalar/null result contract and boundaries](OBJECT_DISPLAY.md)
 - Native object/array casts in configured embedded forms;

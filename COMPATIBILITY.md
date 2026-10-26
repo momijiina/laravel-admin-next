@@ -34,6 +34,19 @@ administrator behavior remains. Review [stored rules, custom overrides and HTTP 
 修正します。行単位のメソッド指定と管理画面の接頭辞の組み合わせも修正します。
 既存の空指定の意味は維持します。独自設定と検証範囲は上記ガイドを確認してください。
 
+## Literal backslashes in CSV exports (2026-10-24)
+
+The built-in CSV exporter doubles embedded quotes and treats backslashes as
+literal data. This prevents backslash/quote and trailing-backslash values from
+changing field or record boundaries. Headers, empty exports and raw JSON values
+use the same quoting. PHP consumers should read with an explicit empty escape
+argument; review exact-byte comparisons and custom exporters. See the
+[reader migration and round-trip evidence](tests/integration/CSV_BACKSLASH_EXPORT.md).
+
+日本語: CSV のバックスラッシュと引用符によって列や改行の境界が壊れる問題を
+修正します。PHP 側の `fgetcsv()` も escape 引数を空文字にしてください。
+バイト列比較、過去の出力、独自 exporter への影響は上記ガイドを参照してください。
+
 ## Grid column-header zero searches (2026-10-08)
 
 Column-header `filter()` / `filter('equal')` and `filter('like')` now apply
