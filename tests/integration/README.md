@@ -206,8 +206,8 @@ The dated results below are historical snapshots, not the current suite totals.
   [role selection, existing-account review and automation changes](CREATE_USER_ROLES.md)
 - Generated model-backed controllers executing index/create/store/show/edit/update/delete
   through the real HTTP kernel; [CRUD regression scope](GENERATED_CONTROLLER_CRUD.md)
-- Built-in menu titles, icon classes and URI labels/attributes stay literal in
-  full/PJAX responses; [browser coverage and custom-HTML/URL boundaries](MENU_TREE_RENDERING.md)
+- Built-in menu text and attributes preserve their values and HTML boundaries,
+  including native-parser PJAX URI encoding; [browser coverage and custom-HTML/URL boundaries](MENU_TREE_RENDERING.md)
 - DateMultiple native flatpickr options, actual calendar selections and HTTP/SQLite saves;
   [format precedence, JSON-only scope and upgrade cautions](DATE_MULTIPLE_OPTIONS.md)
 - Native mutable/immutable Date/Datetime edit/save round trips with shipped Moment;

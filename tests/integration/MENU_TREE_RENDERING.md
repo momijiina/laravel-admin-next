@@ -61,6 +61,34 @@ Preloading the original controller in the disposable Laravel 13 browser app
 makes the smoke fail at its literal-title assertion and captures failure
 artifacts; its own HTTP server is stopped normally.
 
+### DomCrawler 5.4 and PJAX serialization (2026-10-26)
+
+PR #130's original test assumed that PJAX preserves the exact `href` spelling
+of a full-page response. The five DomCrawler 5.4 CI configurations failed,
+including on rerun, while the 6.4 configurations and both Chromium jobs passed.
+With DomCrawler 5.4.52 and no optional `masterminds/html5` dependency, both
+Laravel 12/13 reproduce five failures in the seven original tests.
+
+The native `DOMDocument::saveHTML()` serializer used by that configuration
+percent-encodes raw quotes and spaces in URI attributes during PJAX filtering.
+For example, `reports/" text` becomes `reports/%22%20text` in `href`; its visible
+label remains unchanged. Masterminds HTML5, required by DomCrawler 6.4, preserves
+the attribute spelling. This is the existing PJAX serializer behavior.
+
+The regression now expects that exact transformation only for native-parser
+PJAX responses. Full-page attributes and all labels retain exact comparisons,
+and element/attribute injection checks remain. A mixed raw/percent-encoded URI
+ensures existing `%22`, `%20`, `%2522`, `%2F`, plus signs and other delimiters are
+neither decoded nor double-encoded. The test also requires `X-PJAX-URL` to prove
+that PJAX filtering ran rather than silently returning the full page.
+
+The corrected suite passes **8 tests / 246 assertions** in each of four local
+PHP 8.4.27 combinations: Laravel 12.70.1 and 13.38.0, each with DomCrawler
+5.4.52 (without Masterminds) and 6.4.44 (with Masterminds). Production code,
+supported dependency ranges and the existing full-suite CI matrix are unchanged.
+The DomCrawler workflow now runs this focused test before JavaScript setup and
+the full integration suite, so this failure is reported early.
+
 ## Upgrade and limits
 
 Review application overrides of `MenuController::treeView()` that copy its
@@ -99,3 +127,12 @@ URL 判定・解決の方針は変更しません。HTML エスケープは URL 
 親の開閉を確認します。上記の Laravel 12/13 では各 7 テスト・194 アサーション
 が成功しています。他の DB・ブラウザー・独自実装・任意のバイナリ文字列や、
 メニュー削除全体の互換性を保証するものではありません。
+
+2026-10-26 追記: DomCrawler 5.4 のネイティブパーサーでは、PJAX 処理時に URI
+属性内の引用符・空白を `%22`・`%20` に変換します。従来のテストがこの表記差を
+考慮していなかったため、再実行しても失敗していました。PJAX の場合だけ正確な
+変換結果を期待し、通常画面・表示文字列・HTML 注入防止の検証は維持しました。
+既存のパーセント表記を壊さないケースと PJAX 実行確認も追加しています。
+Laravel 12/13 × DomCrawler 5.4.52/6.4.44 の各構成で 8 テスト・246 アサーション
+が成功しました。製品コードや依存条件は変更せず、CI の冒頭にも対象テストを
+追加しています。

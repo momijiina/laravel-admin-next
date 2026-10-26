@@ -104,6 +104,7 @@ class MenuTreeRenderingTest extends TestCase
         yield 'protocol relative' => ['//example.test/path?x="&amp;<b>'];
         yield 'fragment' => ['#literal-&amp;-<b>-"'];
         yield 'mailto' => ['mailto:fixture@example.test?subject="&amp;<b>'];
+        yield 'mixed percent escapes' => ['reports/%22%20%2522%2520%2F?keep=%26+%2B&raw=" literal'];
     }
 
     #[DataProvider('uris')]
@@ -121,6 +122,17 @@ class MenuTreeRenderingTest extends TestCase
 
         foreach ([[], ['X-PJAX' => 'true', 'X-PJAX-CONTAINER' => '#pjax-container']] as $headers) {
             $response = $this->get('/admin/auth/menu', $headers)->assertOk();
+            $expectedHref = $resolvedUri;
+            if ($headers) {
+                // Prove the PJAX middleware filtered the page rather than falling back.
+                $response->assertHeader('X-PJAX-URL', '/admin/auth/menu');
+                if (!class_exists(\Masterminds\HTML5::class)) {
+                    // Native DOM serialization encodes raw quotes/spaces in href only.
+                    $expectedHref = strtr($resolvedUri, ['"' => '%22', ' ' => '%20']);
+                }
+            } else {
+                $response->assertHeaderMissing('X-PJAX-URL');
+            }
             $tree = new Crawler($response->getContent());
             $branch = $this->branch($tree, $menu->id);
             $title = $branch->filter('strong');
@@ -131,7 +143,7 @@ class MenuTreeRenderingTest extends TestCase
             $this->assertFalse($icon->getNode(0)->hasAttribute('data-menu-icon'));
             $link = $branch->filter('a.dd-nodrag');
             $this->assertCount(1, $link);
-            $this->assertSame($resolvedUri, $link->attr('href'));
+            $this->assertSame($expectedHref, $link->attr('href'));
             $this->assertSame($resolvedUri, $link->text(null, false));
             $this->assertCount(0, $link->children());
             $this->assertFalse($link->getNode(0)->hasAttribute('data-menu-uri'));
