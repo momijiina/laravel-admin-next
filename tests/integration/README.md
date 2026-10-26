@@ -202,6 +202,8 @@ The dated results below are historical snapshots, not the current suite totals.
 - Real Artisan blank-controller generation and rejection of model-less `--output`
 - Administrator installation stops on cancelled/failed database commands and
   propagates their exit status; [retry and initializer-override boundaries](INSTALL_COMMAND_FAILURE.md)
+- Administrator installation refuses to seed over surviving administrator data;
+  [partial-install recovery and configured-model boundaries](INSTALL_COMMAND_PRESERVATION.md)
 - Interactive administrator creation attaches only explicitly selected roles;
   [role selection, existing-account review and automation changes](CREATE_USER_ROLES.md)
 - Generated model-backed controllers executing index/create/store/show/edit/update/delete

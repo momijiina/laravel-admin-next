@@ -37,12 +37,11 @@ This is limited to database command statuses in `admin:install`. Exceptions
 continue through Laravel's normal command handling. Filesystem write failures,
 `admin:publish`, replacements of the installer's `handle()` method and older
 Laravel releases have separate behavior. The existing seeder's `admin` / `admin`
-default credentials and destructive table resets are unchanged. In particular,
-an existing admin directory does not prevent database initialization: an empty
-user table can still cause the legacy seeder to reset surviving roles,
-permissions and menus.
-Changing credential setup and making that initialization non-destructive need
-their own migration contract.
+default credentials and direct destructive table resets are unchanged. A later
+[partial-install preservation guard](INSTALL_COMMAND_PRESERVATION.md) prevents
+`admin:install` from invoking that seeder when administrator data survives.
+An existing admin directory alone still does not prevent database initialization.
+Changing credential setup or invoking the seeder directly remains a separate concern.
 
 ## Regression coverage
 
@@ -88,6 +87,7 @@ framework version admitted by the package's dependency constraint.
 維持されます。すでに完了したデータベース変更を自動的に取り消す機能はありません。
 
 既定の `admin` / `admin` 認証情報、既存ディレクトリの確認順序、旧シーダーによる
-テーブル初期化はこの変更の対象外です。管理者が存在しない状態での再実行は、
-残っているロールやメニューを初期化する可能性があります。認証情報と初期データの
-安全な導入方法は、別の互換性検討が必要です。
+テーブル初期化は終了コード修正の対象外です。後続の
+[既存データ保護](INSTALL_COMMAND_PRESERVATION.md)により、データが残る状態では
+`admin:install` がシーダーを呼び出す前に停止します。認証情報の変更とシーダーの
+直接実行は、別の対応範囲です。

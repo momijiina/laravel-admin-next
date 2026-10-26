@@ -1281,6 +1281,20 @@ sections intentionally retain the dependencies and results of their revisions.
 
 <a id="current-verified-coverage-2026-10-03-after-pr-25"></a>
 
+## Preserving partial administrator installations (2026-10-24)
+
+`admin:install` refuses to run its default seeder when administrator accounts
+are absent but roles, permissions, menus, relationships or operation logs remain.
+It returns a nonzero status before seeding or scaffolding. The check covers
+configured table and model locations without hiding rows behind global scopes.
+Fresh installations and ordinary repeat installations retain their behavior.
+See [recovery steps, custom models and concurrency limits](tests/integration/INSTALL_COMMAND_PRESERVATION.md).
+
+日本語: 管理者がいない一方でロール・権限・メニュー等が残る状態では、
+`admin:install` が初期データを上書きせずに停止します。残存データを確認し、
+必要なら `admin:create-user` で管理者を作成してください。直接シーダーを実行する
+操作や既定の認証情報は変更しません。復旧と独自実装の注意は上記を参照してください。
+
 ## Installer database failure status (2026-10-24)
 
 `admin:install` now stops and returns the nonzero status from `migrate` or

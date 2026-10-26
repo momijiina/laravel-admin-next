@@ -90,6 +90,7 @@
             <file>ResourceGeneratorTest.php</file>
             <file>CreateUserCommandTest.php</file>
             <file>InstallCommandFailureTest.php</file>
+            <file>InstallCommandPreservationTest.php</file>
             <file>GeneratedControllerCrudTest.php</file>
             <file>DateCastPresentationTest.php</file>
             <file>DateRangeCastPresentationTest.php</file>

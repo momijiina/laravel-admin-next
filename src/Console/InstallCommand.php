@@ -2,6 +2,9 @@
 
 namespace Encore\Admin\Console;
 
+use Encore\Admin\Auth\Database\Administrator;
+use Encore\Admin\Auth\Database\Menu;
+use Encore\Admin\Auth\Database\Role;
 use Illuminate\Console\Command;
 
 class InstallCommand extends Command
@@ -60,12 +63,57 @@ class InstallCommand extends Command
         }
 
         $userModel = config('admin.database.users_model');
+        $user = new $userModel();
 
-        if ($userModel::count() == 0) {
-            return $this->call('db:seed', ['--class' => \Encore\Admin\Auth\Database\AdminTablesSeeder::class]);
+        // Scopes and stale read replicas must not hide accounts from this check.
+        if ($user->getConnection()->table($user->getTable())->useWritePdo()->exists()) {
+            return 0;
         }
 
-        return 0;
+        if ($this->hasExistingAdminData()) {
+            $this->error('Cannot seed: existing admin data was found without an account in the configured user table.');
+            $this->line('Restore an administrator account or use admin:create-user with the appropriate existing roles, then retry admin:install.');
+
+            return 1;
+        }
+
+        return $this->call('db:seed', ['--class' => \Encore\Admin\Auth\Database\AdminTablesSeeder::class]);
+    }
+
+    /**
+     * Only run the legacy seeder against an unused admin database.
+     *
+     * @return bool
+     */
+    protected function hasExistingAdminData()
+    {
+        $connection = $this->laravel['db']->connection(config('admin.database.connection') ?: null);
+
+        // The seeder uses built-in models, even when different models are configured.
+        // Surviving pivots and logs must not become associated with new default IDs.
+        foreach (['users', 'roles', 'permissions', 'menu', 'role_users', 'role_permissions', 'user_permissions', 'role_menu', 'operation_log'] as $table) {
+            if ($connection->table(config('admin.database.'.$table.'_table'))->useWritePdo()->exists()) {
+                return true;
+            }
+        }
+
+        foreach (['roles', 'permissions', 'menu'] as $name) {
+            $class = config('admin.database.'.$name.'_model');
+            $model = new $class();
+
+            if ($model->getConnection()->table($model->getTable())->useWritePdo()->exists()) {
+                return true;
+            }
+        }
+
+        // Related configured models can put these pivots on another connection.
+        foreach ([(new Administrator())->roles(), (new Administrator())->permissions(), (new Role())->permissions(), (new Menu())->roles()] as $relation) {
+            if ($relation->newPivotStatement()->useWritePdo()->exists()) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
