@@ -105,10 +105,11 @@ class MenuTreeRenderingTest extends TestCase
         yield 'fragment' => ['#literal-&amp;-<b>-"'];
         yield 'mailto' => ['mailto:fixture@example.test?subject="&amp;<b>'];
         yield 'mixed percent escapes' => ['reports/%22%20%2522%2520%2F?keep=%26+%2B&raw=" literal'];
+        yield 'percent escapes only' => ['reports/%22%20%2522%2520%2F?keep=%26+%2B', true];
     }
 
     #[DataProvider('uris')]
-    public function test_saved_menu_values_remain_literal_on_full_and_pjax_pages(string $uri): void
+    public function test_saved_menu_values_remain_literal_on_full_and_pjax_pages(string $uri, bool $alreadyEncoded = false): void
     {
         $values = [
             'parent_id' => 0,
@@ -127,8 +128,12 @@ class MenuTreeRenderingTest extends TestCase
                 // Prove the PJAX middleware filtered the page rather than falling back.
                 $response->assertHeader('X-PJAX-URL', '/admin/auth/menu');
                 if (!class_exists(\Masterminds\HTML5::class)) {
-                    // Native DOM serialization encodes raw quotes/spaces in href only.
-                    $expectedHref = strtr($resolvedUri, ['"' => '%22', ' ' => '%20']);
+                    // A safely constructed control captures this libxml's URI spelling.
+                    // It does not interpolate or reuse the controller's HTML escaping.
+                    $document = new \DOMDocument('1.0', 'UTF-8');
+                    $control = $document->appendChild($document->createElement('a'));
+                    $control->setAttribute('href', $resolvedUri);
+                    $expectedHref = (new Crawler($document->saveHTML($control)))->filter('a')->attr('href');
                 }
             } else {
                 $response->assertHeaderMissing('X-PJAX-URL');
@@ -144,6 +149,10 @@ class MenuTreeRenderingTest extends TestCase
             $link = $branch->filter('a.dd-nodrag');
             $this->assertCount(1, $link);
             $this->assertSame($expectedHref, $link->attr('href'));
+            if ($alreadyEncoded) {
+                // Already encoded delimiters must also match without a serialization oracle.
+                $this->assertSame($resolvedUri, $link->attr('href'));
+            }
             $this->assertSame($resolvedUri, $link->text(null, false));
             $this->assertCount(0, $link->children());
             $this->assertFalse($link->getNode(0)->hasAttribute('data-menu-uri'));

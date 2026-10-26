@@ -54,7 +54,22 @@ jobs:
       - name: Check actual runtime requirements
         run: composer check-platform-reqs
       - name: Check menu rendering with the selected Crawler
-        run: composer test -- --filter MenuTreeRenderingTest
+        run: |
+          php -r 'require "vendor/autoload.php"; printf("::notice title=Crawler runtime::PHP %s; libxml build %s, loaded %s; DomCrawler %s; Masterminds %s\n", PHP_VERSION, LIBXML_DOTTED_VERSION, LIBXML_LOADED_VERSION, Composer\InstalledVersions::getPrettyVersion("symfony/dom-crawler"), class_exists(Masterminds\HTML5::class) ? "available" : "absent");'
+          composer test -- --filter MenuTreeRenderingTest --log-junit "$RUNNER_TEMP/menu-rendering.xml" || {
+            php -r '
+              $file = getenv("RUNNER_TEMP")."/menu-rendering.xml";
+              if (is_file($file)) {
+                  $document = new DOMDocument();
+                  $document->load($file);
+                  foreach ((new DOMXPath($document))->query("//failure | //error") as $failure) {
+                      $message = str_replace(["%", "\r", "\n"], ["%25", "%0D", "%0A"], $failure->textContent);
+                      echo "::error title=Menu rendering regression::".$message.PHP_EOL;
+                  }
+              }
+            '
+            exit 1
+          }
       - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
         with:
           node-version: '24'
