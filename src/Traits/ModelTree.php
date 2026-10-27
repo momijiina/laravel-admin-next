@@ -4,6 +4,7 @@ namespace Encore\Admin\Traits;
 
 use Encore\Admin\Tree;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Request;
@@ -14,6 +15,13 @@ trait ModelTree
      * @var array
      */
     protected static $branchOrder = [];
+
+    /**
+     * Nodes currently being deleted, including recursive model callbacks.
+     *
+     * @var array
+     */
+    protected static $deletingTreeNodes = [];
 
     /**
      * @var string
@@ -287,9 +295,62 @@ trait ModelTree
      */
     public function delete()
     {
-        $this->where($this->parentColumn, $this->getKey())->delete();
+        if (!$this->exists) {
+            return parent::delete();
+        }
 
-        return parent::delete();
+        $connection = $this->getConnection();
+        $key = $this->getKey();
+        $identity = serialize([spl_object_id($connection), $this->getTable(), $key === null ? null : (string) $key]);
+
+        if (isset(static::$deletingTreeNodes[$identity])) {
+            throw new \LogicException('A cycle was detected while deleting a tree node.');
+        }
+
+        static::$deletingTreeNodes[$identity] = true;
+        $transactionLevel = $connection->transactionLevel();
+
+        try {
+            $connection->beginTransaction();
+
+            // A projected model without its key must not match NULL-parent rows.
+            if ($key !== null) {
+                $force = in_array(SoftDeletes::class, class_uses_recursive(static::class), true)
+                    && $this->isForceDeleting();
+                $children = $this->newQuery()->where($this->getParentColumn(), $key);
+
+                if ($force) {
+                    $children->withTrashed();
+                }
+
+                foreach ($children->get() as $child) {
+                    $child->setParentColumn($this->getParentColumn());
+                    $deleted = $force ? $child->forceDelete() : $child->delete();
+
+                    if ($deleted === false) {
+                        $connection->rollBack($transactionLevel);
+
+                        return false;
+                    }
+                }
+            }
+
+            $deleted = parent::delete();
+
+            if ($deleted === false) {
+                $connection->rollBack($transactionLevel);
+            } else {
+                $connection->commit();
+            }
+
+            return $deleted;
+        } catch (\Throwable $exception) {
+            $connection->rollBack($transactionLevel);
+
+            throw $exception;
+        } finally {
+            unset(static::$deletingTreeNodes[$identity]);
+        }
     }
 
     /**

@@ -264,13 +264,17 @@ class Form implements Renderable
 
                 if ($this->isSoftDeletes && $model->trashed()) {
                     $this->deleteFiles($model, true);
-                    $model->forceDelete();
+                    if ($model->forceDelete() === false) {
+                        throw new \RuntimeException(trans('admin.delete_failed'));
+                    }
 
                     return;
                 }
 
                 $this->deleteFiles($model);
-                $model->delete();
+                if ($model->delete() === false) {
+                    throw new \RuntimeException(trans('admin.delete_failed'));
+                }
             });
 
             if (($ret = $this->callDeleted()) instanceof Response) {

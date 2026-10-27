@@ -413,6 +413,20 @@ asset/view republish, schema or data migration is needed. See the
 複数 Grid の DOM ID を変更するものではありません。他の Laravel アプリとの
 互換性はアプリごとに検証してください。
 
+## Menu subtree deletion (2026-10-27)
+
+ModelTree now invokes each descendant's model deletion before deleting its
+parent, cleaning up built-in menu role pivots and deep descendants. Vetoes and
+exceptions roll back the subtree's same-connection database changes. Form and
+the tree UI report a cancelled deletion as a failure. Review descendant
+observers, copied deletion methods, scoped soft/force deletion and transaction
+limits in [the deletion guide](tests/integration/MENU_DELETION.md). Reload open
+tree pages; there is no schema migration or automatic historical-orphan repair.
+
+日本語: 子孫を各モデルの削除処理で削除し、拒否・例外時には同じ接続の DB 変更を
+巻き戻します。子にもオブザーバーが実行される点、論理削除と外部副作用の境界は
+上記ガイドを確認してください。過去の孤立データの自動修復は含みません。
+
 ## Empty menu URIs (2026-10-27)
 
 Empty menu-form input becomes NULL on modern Laravel. URL helpers and the
@@ -657,13 +671,13 @@ cautions. 日本語: 別の既定スコープがあってもゼロの明示選�
 既存の比較仕様と独自実装の注意事項は上記ガイドを確認してください。
 
 Updated 2026-10-27. This index describes the changes merged through
-[PR #130](https://github.com/momijiina/laravel-admin-next/pull/130), at
-[`186c462`](https://github.com/momijiina/laravel-admin-next/commit/186c462).
+[PR #131](https://github.com/momijiina/laravel-admin-next/pull/131), at
+[`077c67f`](https://github.com/momijiina/laravel-admin-next/commit/077c67f).
 Use the linked guides for upgrade steps and each regression's precise boundary.
 Historical test totals below remain evidence for their own revisions, not
 current suite totals or validation of subsequent changes.
 
-### Recent merged changes: PRs #128–#130
+### Recent merged changes: PRs #128–#131
 
 - **Installer preservation (#128):** rerunning installation preserves existing
   administrator data and scaffold files; see [initialization and retry rules](tests/integration/INSTALL_COMMAND_PRESERVATION.md).
@@ -672,9 +686,14 @@ current suite totals or validation of subsequent changes.
 - **Literal menu values (#130):** stored titles, icon classes and URI text are
   escaped in the built-in management tree. The [regression guide](tests/integration/MENU_TREE_RENDERING.md)
   also explains native libxml URI serialization differences in PJAX tests.
+- **NULL menu URIs (#131):** URL resolution preserves empty paths without PHP
+  deprecation warnings; update [overridden menu partials](tests/integration/MENU_NULL_URI.md).
+  Its pre-merge head `a3ace8c` completed all 63 GitHub checks successfully,
+  verified on 2026-10-27. That result applies to that revision.
 
 日本語: 再インストール時の既存データ・ファイル保持、CSV のバックスラッシュ、
-メニュー文字列の表示を修正しました。適用範囲と更新手順は各ガイドを参照してください。
+メニュー文字列の表示と空 URI の警告を修正しました。適用範囲と更新手順は各ガイドを
+参照してください。#131 のマージ前 CI は 63 件すべて成功を確認済みです。
 
 ### Recent merged changes: PRs #125–#127
 
