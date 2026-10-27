@@ -81,10 +81,9 @@ class MenuController extends Controller
             $payload = "<i class='fa {$icon}'></i>&nbsp;<strong>{$title}</strong>";
 
             if (!isset($branch['children'])) {
-                if (url()->isValidUrl($branch['uri'])) {
-                    $uri = $branch['uri'];
-                } else {
-                    $uri = admin_url($branch['uri']);
+                $uri = $branch['uri'] ?? '';
+                if (!url()->isValidUrl($uri)) {
+                    $uri = admin_url($uri);
                 }
 
                 $uri = e($uri);

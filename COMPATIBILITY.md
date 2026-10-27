@@ -413,6 +413,19 @@ asset/view republish, schema or data migration is needed. See the
 複数 Grid の DOM ID を変更するものではありません。他の Laravel アプリとの
 互換性はアプリごとに検証してください。
 
+## Empty menu URIs (2026-10-27)
+
+Empty menu-form input becomes NULL on modern Laravel. URL helpers and the
+built-in tree/sidebar now resolve it as an empty path, avoiding PHP deprecations
+in tree, sidebar and menu-search rendering. Empty leaves still link to the admin
+root; groups and zero-valued paths retain their behavior. Merge the change into
+published menu partials and refresh compiled views; see
+[the NULL URI contract and regressions](tests/integration/MENU_NULL_URI.md).
+
+日本語: メニュー URI の NULL を URL 解決時に空文字として扱い、PHP 非推奨警告を
+防ぎます。保存値は変更しません。公開済みメニュービューとコンパイル済みビューの
+更新方法は上記ガイドを参照してください。
+
 ## Literal menu-management tree values (2026-10-24)
 
 The built-in menu tree escapes stored titles, icon classes and resolved URI
@@ -643,12 +656,25 @@ for the narrow default-assignment change, unchanged matching rules and upgrade
 cautions. 日本語: 別の既定スコープがあってもゼロの明示選択を保持します。
 既存の比較仕様と独自実装の注意事項は上記ガイドを確認してください。
 
-Updated 2026-10-24. This index describes the changes merged through
-[PR #127](https://github.com/momijiina/laravel-admin-next/pull/127), at
-[`cadb3df`](https://github.com/momijiina/laravel-admin-next/commit/cadb3df).
+Updated 2026-10-27. This index describes the changes merged through
+[PR #130](https://github.com/momijiina/laravel-admin-next/pull/130), at
+[`186c462`](https://github.com/momijiina/laravel-admin-next/commit/186c462).
 Use the linked guides for upgrade steps and each regression's precise boundary.
 Historical test totals below remain evidence for their own revisions, not
 current suite totals or validation of subsequent changes.
+
+### Recent merged changes: PRs #128–#130
+
+- **Installer preservation (#128):** rerunning installation preserves existing
+  administrator data and scaffold files; see [initialization and retry rules](tests/integration/INSTALL_COMMAND_PRESERVATION.md).
+- **CSV backslashes (#129):** exports preserve backslashes beside quotes across
+  CSV round trips; review [reader configuration and existing-export boundaries](tests/integration/CSV_BACKSLASH_EXPORT.md).
+- **Literal menu values (#130):** stored titles, icon classes and URI text are
+  escaped in the built-in management tree. The [regression guide](tests/integration/MENU_TREE_RENDERING.md)
+  also explains native libxml URI serialization differences in PJAX tests.
+
+日本語: 再インストール時の既存データ・ファイル保持、CSV のバックスラッシュ、
+メニュー文字列の表示を修正しました。適用範囲と更新手順は各ガイドを参照してください。
 
 ### Recent merged changes: PRs #125–#127
 

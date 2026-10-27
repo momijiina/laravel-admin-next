@@ -183,6 +183,129 @@ class MenuTreeRenderingTest extends TestCase
         $this->assertSame(admin_url('auth/roles'), $childBranch->filter('a.dd-nodrag')->attr('href'));
     }
 
+    public static function nullableAndCompatibleUris(): iterable
+    {
+        yield 'blank form value' => ['', null, 'http://localhost/admin', false];
+        yield 'explicit null form value' => [null, null, 'http://localhost/admin', false];
+        yield 'whitespace form value' => ['   ', null, 'http://localhost/admin', false];
+        yield 'historical empty string' => ['', '', 'http://localhost/admin', false, true];
+        yield 'root' => ['/', '/', 'http://localhost/admin', false];
+        yield 'zero' => ['0', '0', 'http://localhost/admin/0', false];
+        yield 'relative' => ['reports?filter=active&sort=asc', 'reports?filter=active&sort=asc',
+            'http://localhost/admin/reports?filter=active&sort=asc', false];
+        yield 'absolute' => ['https://example.test/reports?filter=active&sort=asc',
+            'https://example.test/reports?filter=active&sort=asc',
+            'https://example.test/reports?filter=active&sort=asc', true];
+        yield 'protocol relative' => ['//example.test/reports', '//example.test/reports', '//example.test/reports', true];
+        yield 'fragment' => ['#reports', '#reports', '#reports', true];
+        yield 'mailto' => ['mailto:fixture@example.test', 'mailto:fixture@example.test', 'mailto:fixture@example.test', true];
+    }
+
+    #[DataProvider('nullableAndCompatibleUris')]
+    public function test_nullable_menu_uris_keep_tree_sidebar_and_search_links_without_deprecations(
+        ?string $submittedUri,
+        ?string $storedUri,
+        string $expectedHref,
+        bool $opensNewWindow,
+        bool $historical = false
+    ): void
+    {
+        $this->assertWithoutDeprecations(function () use ($submittedUri, $storedUri, $expectedHref, $opensNewWindow, $historical) {
+            $values = ['parent_id' => 0, 'title' => 'URI compatibility leaf', 'icon' => 'fa-bars', 'uri' => $submittedUri];
+            if ($historical) {
+                // Normal form middleware converts blanks to NULL; retain a legacy stored blank separately.
+                $menu = Menu::create($values)->fresh();
+            } else {
+                $this->post('/admin/auth/menu', array_replace($values, ['parent_id' => '0']))
+                    ->assertRedirect('/admin/auth/menu');
+                $menu = Menu::orderByDesc('id')->firstOrFail();
+            }
+            $this->assertSame($storedUri, $menu->getRawOriginal('uri'));
+            $stored = $menu->getAttributes();
+
+            foreach ([[], ['X-PJAX' => 'true', 'X-PJAX-CONTAINER' => '#pjax-container']] as $headers) {
+                $response = $this->get('/admin/auth/menu', $headers)->assertOk();
+                $page = new Crawler($response->getContent());
+                $link = $this->branch($page, $menu->id)->filter('a.dd-nodrag');
+                $this->assertCount(1, $link);
+                $this->assertSame($expectedHref, $link->attr('href'));
+                $this->assertSame($expectedHref, $link->text(null, false));
+                $this->assertFalse($link->getNode(0)->hasAttribute('target'));
+
+                if ($headers) {
+                    $response->assertHeader('X-PJAX-URL', '/admin/auth/menu');
+                    $this->assertCount(0, $page->filter('.main-sidebar'));
+                } else {
+                    $response->assertHeaderMissing('X-PJAX-URL');
+                    $sidebar = $page->filter('.sidebar-menu a')->reduce(
+                        fn (Crawler $node) => $node->text() === $values['title']
+                    );
+                    $this->assertCount(1, $sidebar);
+                    $this->assertSame($expectedHref, $sidebar->attr('href'));
+                    $this->assertSame($opensNewWindow ? '_blank' : '', $sidebar->getNode(0)->getAttribute('target'));
+
+                    $search = $page->filter('.sidebar-form .dropdown-menu a')->reduce(
+                        fn (Crawler $node) => $node->text() === $values['title']
+                    );
+                    $this->assertCount(1, $search);
+                    $this->assertSame($expectedHref, $search->attr('href'));
+                    $this->assertFalse($search->getNode(0)->hasAttribute('target'));
+                }
+                $this->assertSame($stored, $menu->fresh()->getAttributes());
+            }
+        });
+    }
+
+    public function test_blank_uri_parent_keeps_its_group_and_child_without_deprecations(): void
+    {
+        $this->assertWithoutDeprecations(function () {
+            $this->post('/admin/auth/menu', [
+                'parent_id' => '0', 'title' => 'Blank URI parent', 'icon' => 'fa-folder', 'uri' => '',
+            ])->assertRedirect('/admin/auth/menu');
+            $parent = Menu::orderByDesc('id')->firstOrFail();
+            $this->assertNull($parent->getRawOriginal('uri'));
+            $child = $this->createThroughForm([
+                'parent_id' => $parent->id, 'title' => 'Blank URI group child', 'icon' => 'fa-bars', 'uri' => 'auth/roles',
+            ]);
+
+            foreach ([[], ['X-PJAX' => 'true', 'X-PJAX-CONTAINER' => '#pjax-container']] as $headers) {
+                $response = $this->get('/admin/auth/menu', $headers)->assertOk();
+                $page = new Crawler($response->getContent());
+                $this->assertCount(0, $this->branch($page, $parent->id)->filter('a.dd-nodrag'));
+                $this->assertCount(1, $page->filter('.dd-item[data-id="'.$parent->id.'"] > ol.dd-list > .dd-item[data-id="'.$child->id.'"]'));
+                $this->assertSame('http://localhost/admin/auth/roles',
+                    $this->branch($page, $child->id)->filter('a.dd-nodrag')->attr('href'));
+                if ($headers) {
+                    $response->assertHeader('X-PJAX-URL', '/admin/auth/menu');
+                } else {
+                    $group = $page->filter('.sidebar-menu li.treeview > a')->reduce(
+                        fn (Crawler $node) => $node->text() === $parent->title
+                    );
+                    $this->assertCount(1, $group);
+                    $this->assertSame('#', $group->attr('href'));
+                    $this->assertSame('http://localhost/admin/auth/roles',
+                        $group->ancestors()->first()->filter('ul.treeview-menu > li > a')->attr('href'));
+                }
+                $this->assertNull($parent->fresh()->getRawOriginal('uri'));
+            }
+        });
+    }
+
+    public function test_nullable_url_helpers_preserve_root_zero_and_prefixes_without_deprecations(): void
+    {
+        $this->assertWithoutDeprecations(function () {
+            foreach (['admin' => '/admin', '' => '', '/team/admin/' => '/team/admin'] as $prefix => $expectedPrefix) {
+                config(['admin.route.prefix' => $prefix]);
+                foreach ([[null, ''], ['', ''], ['/', ''], ['0', '/0'], [0, '/0'], ['reports', '/reports'], ['/reports/', '/reports']] as [$path, $suffix]) {
+                    $expectedPath = $expectedPrefix.$suffix;
+                    $this->assertSame($expectedPath ?: '/', admin_base_path($path));
+                    $this->assertSame('http://localhost'.$expectedPath, admin_url($path));
+                }
+                $this->assertSame('https://example.test/reports', admin_url('https://example.test/reports'));
+            }
+        });
+    }
+
     public function test_custom_tree_branch_callbacks_still_render_their_own_html(): void
     {
         $tree = new Tree(new Menu());
@@ -211,5 +334,25 @@ class MenuTreeRenderingTest extends TestCase
         $this->assertCount(1, $branch);
 
         return $branch;
+    }
+
+    private function assertWithoutDeprecations(callable $callback): void
+    {
+        $diagnostics = [];
+        set_error_handler(function ($severity, $message, $file, $line) use (&$diagnostics) {
+            if (in_array($severity, [E_DEPRECATED, E_USER_DEPRECATED], true)) {
+                $diagnostics[] = $message.' at '.$file.':'.$line;
+
+                return true;
+            }
+
+            return false;
+        });
+        try {
+            $callback();
+        } finally {
+            restore_error_handler();
+        }
+        $this->assertSame([], $diagnostics);
     }
 }

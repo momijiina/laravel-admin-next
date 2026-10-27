@@ -21,14 +21,16 @@ if (!function_exists('admin_url')) {
     /**
      * Get admin url.
      *
-     * @param string $path
-     * @param mixed  $parameters
-     * @param bool   $secure
+     * @param string|null $path
+     * @param mixed       $parameters
+     * @param bool        $secure
      *
      * @return string
      */
     function admin_url($path = '', $parameters = [], $secure = null)
     {
+        $path = $path ?? '';
+
         if (\Illuminate\Support\Facades\URL::isValidUrl($path)) {
             return $path;
         }
@@ -43,7 +45,7 @@ if (!function_exists('admin_base_path')) {
     /**
      * Get admin url.
      *
-     * @param string $path
+     * @param string|null $path
      *
      * @return string
      */
@@ -53,9 +55,9 @@ if (!function_exists('admin_base_path')) {
 
         $prefix = ($prefix == '/') ? '' : $prefix;
 
-        $path = trim($path, '/');
+        $path = trim($path ?? '', '/');
 
-        if (is_null($path) || strlen($path) == 0) {
+        if (strlen($path) == 0) {
             return $prefix ?: '/';
         }
 

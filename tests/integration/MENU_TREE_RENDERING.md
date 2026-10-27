@@ -115,8 +115,9 @@ the separate browser flow covers real cookies and CSRF with SQLite, official
 Laravel skeletons and Chromium. Other databases, browsers, custom controllers,
 custom branch callbacks, and arbitrary invalid/binary text are outside these
 checks. Menu deletion and URL-scheme policy are separate concerns; the
-[follow-up audit](../../docs/menu-followups-2026-10-24.md) records these and the
-separate NULL-URI diagnostics for the next changes.
+[follow-up audit](../../docs/menu-followups-2026-10-24.md) records these concerns.
+The separate [NULL URI follow-up](MENU_NULL_URI.md) covers empty menu paths,
+sidebar/search rendering and URL helpers.
 
 ## 日本語
 

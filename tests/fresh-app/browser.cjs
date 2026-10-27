@@ -2,7 +2,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const net = require('node:net');
 const path = require('node:path');
-const {spawn} = require('node:child_process');
+const {execFileSync, spawn} = require('node:child_process');
 const {setTimeout: delay} = require('node:timers/promises');
 const {chromium} = require('playwright');
 
@@ -140,9 +140,11 @@ async function main() {
 
     await visit('/admin/auth/menu');
     const menuToken = await page.locator('form input[name="_token"]').first().inputValue();
+    const emptyMenu = {title: 'Menu N ' + suffix, uri: ''};
     const menus = [
       {title: 'Menu R ' + suffix + ' &amp;<svg/onload=window.mt=1>', uri: 'auth/roles?label=" onmouseover="window.mu=1 &amp;<b>'},
       {title: 'Menu E ' + suffix + ' &amp;<svg/onload=window.mt=1>', uri: 'https://example.invalid/" onmouseover="window.mu=1 &amp;<b>'},
+      emptyMenu,
     ];
     const menuIcon = "fa-bars' onmouseover='window.mi=1";
     for (const menu of menus) {
@@ -154,6 +156,14 @@ async function main() {
       assert.equal(created.status(), 302, 'Save menu with browser cookies and real CSRF token');
       assert.equal(new URL(created.headers().location, base).pathname, '/admin/auth/menu');
     }
+    const savedUri = execFileSync(process.env.PHP_BINARY || 'php', ['-r', String.raw`
+      require 'vendor/autoload.php';
+      $app = require 'bootstrap/app.php';
+      $app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
+      $model = config('admin.database.menu_model');
+      echo json_encode($model::where('title', $argv[1])->sole()->getRawOriginal('uri'), JSON_THROW_ON_ERROR);
+    `, emptyMenu.title], {cwd: app, encoding: 'utf8'});
+    assert.equal(JSON.parse(savedUri), null, 'Web middleware stores the empty URI as database NULL');
 
     async function checkLiteralMenus() {
       for (const menu of menus) {
@@ -166,7 +176,7 @@ async function main() {
         assert.equal(await icon.getAttribute('class'), 'fa ' + menuIcon);
         assert.equal(await icon.getAttribute('onmouseover'), null);
         const link = branch.locator(':scope > a.dd-nodrag');
-        const expectedUri = menu.uri.startsWith('https://') ? menu.uri : base + '/admin/' + menu.uri;
+        const expectedUri = menu.uri.startsWith('https://') ? menu.uri : base + '/admin' + (menu.uri ? '/' + menu.uri : '');
         assert.equal(await link.getAttribute('href'), expectedUri);
         assert.equal(await link.textContent(), expectedUri);
         assert.equal(await link.locator('*').count(), 0);
@@ -179,6 +189,11 @@ async function main() {
 
     await visit('/admin/auth/menu');
     await checkLiteralMenus();
+    for (const selector of ['.sidebar-menu > li > a', '.sidebar-form .dropdown-menu a']) {
+      const rootLink = page.locator(selector).filter({hasText: emptyMenu.title});
+      assert.equal(await rootLink.count(), 1, 'NULL URI menu appears in ' + selector);
+      assert.equal(await rootLink.getAttribute('href'), base + '/admin', 'NULL URI links to the admin root');
+    }
     const defaultParent = page.locator('.dd-item[data-id="2"]');
     assert.equal(await defaultParent.locator(':scope > .dd-handle > i').getAttribute('class'), 'fa fa-tasks');
     assert.equal(await defaultParent.locator(':scope > .dd-handle > a.dd-nodrag').count(), 0);
@@ -200,7 +215,7 @@ async function main() {
     await page.waitForFunction(() => window.menuSmokePjaxEnded && !document.querySelector('.dd[data-menu-smoke-old-dom]'));
     await page.waitForLoadState('networkidle');
     await checkLiteralMenus();
-    console.log('PASS literal menu title, icon and URI after full page and PJAX loads');
+    console.log('PASS literal menu values and NULL URI root links after full page and PJAX loads');
 
     await page.locator('.user-menu > a').click();
     await Promise.all([
