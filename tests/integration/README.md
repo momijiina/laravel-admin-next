@@ -140,6 +140,11 @@ The dated results below are historical snapshots, not the current suite totals.
 
 ## What this covers
 
+- Menu subtree deletion, descendant model events and role-pivot cleanup,
+  veto/exception rollback on the model connection, custom tree models and
+  soft/force deletion; [contracts, UI behavior and transaction boundaries](MENU_DELETION.md)
+  - 日本語: 子孫の削除、ロール関連、拒否・例外時の巻き戻しと独自モデルの互換性
+
 - Numeric column-header ranges retaining zero bounds through native FormData,
   repeated HTTP/SQLite submissions, clear/reset and reselection;
   [bound handling, strict-operator preservation and limits](GRID_COLUMN_RANGE_ZERO.md)

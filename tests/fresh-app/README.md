@@ -60,6 +60,11 @@ applied. The browser then checks:
 - Empty menu URI submission stored as database `NULL`, with admin-root links
   in the management tree after full/PJAX loads and in the full-page sidebar and
   menu-search list.
+- Four-level menu-tree deletion through its trash button and confirmation dialog;
+  all descendants and role links removed from the database after PJAX refresh,
+  while an unrelated menu, its role link, and the role remain.
+- A simulated HTTP 200 deletion response with `status: false` displays its error
+  without a success toast or PJAX refresh and preserves the current tree DOM.
 - No JavaScript exceptions or unsuccessful page/asset responses.
 
 The seeded `admin` / `admin` credentials and all role records are disposable local

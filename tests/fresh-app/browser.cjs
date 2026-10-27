@@ -14,6 +14,14 @@ fs.mkdirSync(artifacts, {recursive: true});
 fs.copyFileSync(path.join(app, 'composer.lock'), path.join(artifacts, 'composer.lock'));
 fs.writeFileSync(path.join(artifacts, 'skeleton.json'), JSON.stringify(metadata, null, 2) + '\n');
 
+function readDatabase(code, ...args) {
+  return JSON.parse(execFileSync(process.env.PHP_BINARY || 'php', ['-r', String.raw`
+    require 'vendor/autoload.php';
+    $app = require 'bootstrap/app.php';
+    $app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
+  ` + code, ...args.map(String)], {cwd: app, encoding: 'utf8'}));
+}
+
 async function availablePort() {
   const socket = net.createServer();
   await new Promise((resolve, reject) => {
@@ -76,6 +84,14 @@ async function main() {
       assert.equal(response.status(), 200, 'GET ' + route);
       await page.waitForLoadState('networkidle');
       return response;
+    }
+
+    async function markMenuRefresh() {
+      await page.evaluate(() => {
+        document.querySelector('.dd').dataset.menuSmokeOldDom = 'true';
+        window.menuSmokePjaxEnded = false;
+        $(document).off('pjax:end.menuSmoke').one('pjax:end.menuSmoke', () => { window.menuSmokePjaxEnded = true; });
+      });
     }
 
     await visit('/admin');
@@ -147,23 +163,27 @@ async function main() {
       emptyMenu,
     ];
     const menuIcon = "fa-bars' onmouseover='window.mi=1";
-    for (const menu of menus) {
-      assert.ok([...menu.title].length <= 50 && menuIcon.length <= 50 && menu.uri.length <= 255, 'Fixture fits the shipped schema');
+    async function createMenu(menu) {
       const created = await context.request.post(base + '/admin/auth/menu', {
-        form: {_token: menuToken, parent_id: '0', title: menu.title, icon: menuIcon, uri: menu.uri},
+        form: {_token: menuToken, parent_id: '0', icon: menuIcon, ...menu},
         maxRedirects: 0,
       });
       assert.equal(created.status(), 302, 'Save menu with browser cookies and real CSRF token');
       assert.equal(new URL(created.headers().location, base).pathname, '/admin/auth/menu');
+      return readDatabase(String.raw`
+        $model = config('admin.database.menu_model');
+        echo json_encode($model::where('title', $argv[1])->sole()->getKey(), JSON_THROW_ON_ERROR);
+      `, menu.title);
     }
-    const savedUri = execFileSync(process.env.PHP_BINARY || 'php', ['-r', String.raw`
-      require 'vendor/autoload.php';
-      $app = require 'bootstrap/app.php';
-      $app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
+    for (const menu of menus) {
+      assert.ok([...menu.title].length <= 50 && menuIcon.length <= 50 && menu.uri.length <= 255, 'Fixture fits the shipped schema');
+      await createMenu(menu);
+    }
+    const savedUri = readDatabase(String.raw`
       $model = config('admin.database.menu_model');
       echo json_encode($model::where('title', $argv[1])->sole()->getRawOriginal('uri'), JSON_THROW_ON_ERROR);
-    `, emptyMenu.title], {cwd: app, encoding: 'utf8'});
-    assert.equal(JSON.parse(savedUri), null, 'Web middleware stores the empty URI as database NULL');
+    `, emptyMenu.title);
+    assert.equal(savedUri, null, 'Web middleware stores the empty URI as database NULL');
 
     async function checkLiteralMenus() {
       for (const menu of menus) {
@@ -202,11 +222,7 @@ async function main() {
     assert.equal(await defaultParent.locator(':scope > ol.dd-list').isVisible(), false);
     await defaultParent.locator(':scope > button[data-action="expand"]').click();
     assert.equal(await defaultParent.locator(':scope > ol.dd-list').isVisible(), true);
-    await page.evaluate(() => {
-      document.querySelector('.dd').dataset.menuSmokeOldDom = 'true';
-      window.menuSmokePjaxEnded = false;
-      $(document).one('pjax:end.menuSmoke', () => { window.menuSmokePjaxEnded = true; });
-    });
+    await markMenuRefresh();
     const [menuRefresh] = await Promise.all([
       page.waitForResponse(response => new URL(response.url()).pathname === '/admin/auth/menu' && response.request().headers()['x-pjax'] === 'true'),
       page.locator('a[class*="tree-"][class*="-refresh"]').click(),
@@ -216,6 +232,87 @@ async function main() {
     await page.waitForLoadState('networkidle');
     await checkLiteralMenus();
     console.log('PASS literal menu values and NULL URI root links after full page and PJAX loads');
+
+    const roleId = Number(new URL(editUrl).pathname.split('/').at(-2));
+    assert.ok(Number.isInteger(roleId) && roleId > 0, 'Use the role created by this browser run');
+    const subtreeIds = [];
+    for (let depth = 0; depth < 4; depth++) {
+      subtreeIds.push(await createMenu({
+        parent_id: subtreeIds.at(-1) || '0', title: 'Delete ' + depth + ' ' + suffix,
+        icon: 'fa-bars', uri: 'auth/roles', 'roles[]': roleId,
+      }));
+    }
+    const controlId = await createMenu({
+      title: 'Keep ' + suffix, icon: 'fa-bars', uri: 'auth/roles', 'roles[]': roleId,
+    });
+    function deletionState() {
+      return readDatabase(String.raw`
+        $ids = json_decode($argv[1], true, 512, JSON_THROW_ON_ERROR);
+        $menu = config('admin.database.menu_model');
+        $role = config('admin.database.roles_model');
+        $db = (new $menu())->getConnection();
+        echo json_encode([
+          'menus' => $menu::whereKey($ids)->orderBy('id')->pluck('id'),
+          'pivots' => $db->table(config('admin.database.role_menu_table'))->whereIn('menu_id', $ids)
+            ->orderBy('menu_id')->get(['menu_id', 'role_id']),
+          'role' => $role::whereKey($argv[2])->exists(),
+        ], JSON_THROW_ON_ERROR);
+      `, JSON.stringify([...subtreeIds, controlId]), roleId);
+    }
+    const expectedState = ids => ({menus: ids, pivots: ids.map(id => ({menu_id: id, role_id: roleId})), role: true});
+    assert.deepEqual(deletionState(), expectedState([...subtreeIds, controlId]), 'Every fixture has its role pivot before deletion');
+    await visit('/admin/auth/menu');
+    for (const id of subtreeIds) assert.equal(await page.locator('.dd-item[data-id="' + id + '"]').count(), 1);
+    const deleteUrl = base + '/admin/auth/menu/' + subtreeIds[0];
+    const refusalMessage = 'Deletion refused ' + suffix;
+    const refuseDelete = route => {
+      const request = route.request();
+      if (request.method() === 'POST' && new URLSearchParams(request.postData()).get('_method') === 'delete') {
+        return route.fulfill({status: 200, contentType: 'application/json', body: JSON.stringify({status: false, message: refusalMessage})});
+      }
+      return route.continue();
+    };
+    let refusedRefreshes = 0;
+    const countRefusedRefresh = request => {
+      if (new URL(request.url()).pathname === '/admin/auth/menu' && request.headers()['x-pjax'] === 'true') refusedRefreshes++;
+    };
+    await page.route(deleteUrl, refuseDelete);
+    page.on('request', countRefusedRefresh);
+    await page.evaluate(() => toastr.remove());
+    await markMenuRefresh();
+    await page.locator('.tree_branch_delete[data-id="' + subtreeIds[0] + '"]').click();
+    await page.locator('.swal2-confirm').click();
+    await page.locator('.swal2-title').filter({hasText: refusalMessage}).waitFor();
+    await page.locator('.swal2-error').waitFor();
+    await page.waitForLoadState('networkidle');
+    assert.equal(refusedRefreshes, 0, 'Rejected deletion does not request a PJAX refresh');
+    assert.equal(await page.locator('.toast-success').count(), 0, 'Rejected deletion does not show a success toast');
+    assert.equal(await page.locator('.dd[data-menu-smoke-old-dom]').count(), 1, 'Rejected deletion preserves the current tree DOM');
+    assert.deepEqual(deletionState(), expectedState([...subtreeIds, controlId]), 'Simulated rejection leaves all menu rows and pivots unchanged');
+    await page.locator('.swal2-confirm').click();
+    await page.unroute(deleteUrl, refuseDelete);
+    page.off('request', countRefusedRefresh);
+    console.log('PASS simulated deletion rejection shows an error without a success toast or PJAX refresh');
+
+    await page.locator('.tree_branch_delete[data-id="' + subtreeIds[0] + '"]').click();
+    await markMenuRefresh();
+    const [deleted, deletionRefresh] = await Promise.all([
+      page.waitForResponse(response => response.url() === deleteUrl && response.request().method() === 'POST'),
+      page.waitForResponse(response => new URL(response.url()).pathname === '/admin/auth/menu' && response.request().headers()['x-pjax'] === 'true'),
+      page.locator('.swal2-confirm').click(),
+    ]);
+    assert.equal(new URLSearchParams(deleted.request().postData()).get('_method'), 'delete');
+    assert.equal(deleted.status(), 200);
+    assert.equal((await deleted.json()).status, true, 'Tree deletion reports success');
+    assert.equal(deletionRefresh.status(), 200);
+    await page.waitForFunction(() => window.menuSmokePjaxEnded && !document.querySelector('.dd[data-menu-smoke-old-dom]'));
+    await page.waitForLoadState('networkidle');
+    assert.deepEqual(deletionState(), expectedState([controlId]), 'Delete every descendant and pivot while preserving the unrelated menu and role');
+    for (const id of subtreeIds) assert.equal(await page.locator('.dd-item[data-id="' + id + '"]').count(), 0);
+    assert.equal(await page.locator('.dd-item[data-id="' + controlId + '"]').count(), 1);
+    await page.locator('.swal2-success').waitFor();
+    await page.locator('.swal2-confirm').click();
+    console.log('PASS four-level menu deletion, descendant/pivot cleanup and unrelated record preservation after PJAX');
 
     await page.locator('.user-menu > a').click();
     await Promise.all([

@@ -13,11 +13,11 @@ The [original PR candidate inventory](docs/pr-candidates-2026-10-01.md) is a
 historical snapshot. Current completed coverage and its limits are recorded in
 [the current maintenance summary](COMPATIBILITY.md#current-maintenance-summary).
 
-Updated through merged PR #130 (2026-10-27): the summary indexes Form attributes
+Updated through merged PR #131 (2026-10-27): the summary indexes Form attributes
 and structured inserts, native test factories, AJAX zero IDs, saved-upload previews,
 password/log rendering, login limits, role selection and permission evaluation,
 plus current test entrypoints, installer preservation/failure statuses, CSV
-backslash round trips, literal menu values and JSON-session notifications.
+backslash round trips, literal/nullable menu values and JSON-session notifications.
 Official Laravel 12/13 applications now have a dedicated Chromium smoke workflow.
 Review cache requirements, custom controllers, middleware and existing role assignments
 alongside the earlier view/asset upgrade guidance. Full-suite CI retains its
@@ -25,7 +25,7 @@ alongside the earlier view/asset upgrade guidance. Full-suite CI retains its
 without broader runtime-support claims. The
 [DBAL 2/3 support boundary](COMPATIBILITY.md#doctrine-dbal-support-boundary) remains;
 DBAL 4 is not supported.
-日本語: マージ済み PR #130 までのフォーム・表示・認証・権限・導入時の修正を上記の
+日本語: マージ済み PR #131 までのフォーム・表示・認証・権限・導入時の修正を上記の
 まとめから確認できます。キャッシュ、独自実装、過去のロール割り当てと、以前の
 ビュー・アセット更新手順を確認してください。DBAL 4 は引き続き非対応です。
 
@@ -175,8 +175,10 @@ and application checks; do not silently remove or claim support for them.
       custom AJAX templates; these tests are not a penetration test
 - [x] Normalize NULL menu URIs in tree/sidebar/search rendering and URL helpers;
       review [published-view updates and preserved root links](tests/integration/MENU_NULL_URI.md)
-- [ ] Resolve [nested-menu deletion and shared URL-scheme
-      policy](docs/menu-followups-2026-10-24.md) with their own behavioral contracts
+- [x] Delete menu descendants through model events and roll back same-connection
+      subtree changes on veto/failure; review [observer, soft-delete and UI behavior](tests/integration/MENU_DELETION.md)
+- [ ] Define the [shared menu URL-scheme policy](docs/menu-followups-2026-10-24.md)
+      with compatibility and real-browser navigation regressions
 - [ ] Extend driver-specific PDO lifecycle checks beyond SQLite and decide whether
       live SQL Server and additional historical framework combinations are required
 - [ ] Decide supported dependency ranges and package publication/install path

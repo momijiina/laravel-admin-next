@@ -263,8 +263,10 @@ class Tree implements Renderable
                                 _token:LA.token,
                             },
                             success: function (data) {
-                                $.pjax.reload('#pjax-container');
-                                toastr.success('{$trans['delete_succeeded']}');
+                                if (data.status) {
+                                    $.pjax.reload('#pjax-container');
+                                    toastr.success('{$trans['delete_succeeded']}');
+                                }
                                 resolve(data);
                             }
                         });

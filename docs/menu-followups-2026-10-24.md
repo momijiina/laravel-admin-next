@@ -12,11 +12,11 @@ HTTP 200 and `status: true`. Database inspection showed that the root and direct
 child were removed, while the grandchild and its role pivot remained, referring
 to the deleted child.
 
-`ModelTree::delete()` deletes direct children through a query builder, bypassing
-their model deletion callbacks. A follow-up needs an explicit descendant,
-model-event and transaction contract, including role-pivot cleanup and other
-models using this trait. The observation establishes persisted orphan records;
-it does not establish the final UI state after PJAX replacement.
+The [subtree-deletion follow-up](../tests/integration/MENU_DELETION.md) replaces
+that direct-child bulk delete with per-model descendant deletion and scoped
+transactions. It covers role pivots, model vetoes/events, soft deletion and the
+real tree/PJAX flow. The original observation above establishes persisted orphan
+records; it does not establish that audit's final UI state after replacement.
 
 ## Empty menu URIs
 
@@ -43,5 +43,5 @@ supplied URI values.
 次の対応候補として、深いメニューを削除した際に孫と中間テーブルが残る問題、
 空 URI が NULL になった際の PHP 非推奨警告、管理ツリーとサイドバーに共通する
 URL スキームの許可方針を記録します。今回の文字列表示修正には含めていません。
-空 URI の警告は上記リンク先の修正で対応します。削除イベントとトランザクション、
-URL スキームの許可方針は、引き続き個別の回帰テストと互換性説明が必要です。
+空 URI の警告と子孫の削除は上記リンク先の個別修正で対応します。
+URL スキームの許可方針は、引き続き回帰テストと互換性説明を伴う対応が必要です。
