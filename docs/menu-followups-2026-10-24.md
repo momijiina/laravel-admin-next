@@ -23,9 +23,9 @@ it does not establish the final UI state after PJAX replacement.
 Posting `uri=''` through the menu form invokes Laravel's normal conversion to
 NULL. Rendering then emits PHP 8.4 null-argument deprecations from
 `UrlGenerator::isValidUrl()` and `admin_url()` in the tree and sidebar paths.
-A normalization change should cover both renderers and preserve the current
-root and relative-link behavior. Empty URI values should remain valid for
-menu groups; requiring a URL would change that contract.
+The [NULL URI follow-up](../tests/integration/MENU_NULL_URI.md) normalizes NULL
+in URL helpers and both renderers, also covering the menu-search links. It keeps
+root/relative-link behavior and valid empty group URIs without rewriting data.
 
 ## Shared URL-scheme policy
 
@@ -43,5 +43,5 @@ supplied URI values.
 次の対応候補として、深いメニューを削除した際に孫と中間テーブルが残る問題、
 空 URI が NULL になった際の PHP 非推奨警告、管理ツリーとサイドバーに共通する
 URL スキームの許可方針を記録します。今回の文字列表示修正には含めていません。
-削除イベントとトランザクション、グループの空 URI、既存リンクの用途を確認し、
-それぞれの回帰テストと互換性説明を伴う変更として進めてください。
+空 URI の警告は上記リンク先の修正で対応します。削除イベントとトランザクション、
+URL スキームの許可方針は、引き続き個別の回帰テストと互換性説明が必要です。

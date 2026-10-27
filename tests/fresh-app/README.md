@@ -57,6 +57,9 @@ applied. The browser then checks:
   literal title/icon/URI rendering after full and PJAX loads, plus the seeded
   parent's icon, child link and expand/collapse controls. See the
   [menu rendering scope and URL-scheme boundary](../integration/MENU_TREE_RENDERING.md).
+- Empty menu URI submission stored as database `NULL`, with admin-root links
+  in the management tree after full/PJAX loads and in the full-page sidebar and
+  menu-search list.
 - No JavaScript exceptions or unsuccessful page/asset responses.
 
 The seeded `admin` / `admin` credentials and all role records are disposable local
