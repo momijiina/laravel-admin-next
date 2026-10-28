@@ -55,8 +55,10 @@ DBAL 4 is not supported.
 - [x] Exercise fresh official Laravel 12/13 installation, cached configuration,
       database sessions, real login/CSRF, generated screens and role create/edit
       through [Chromium](tests/fresh-app/README.md)
-- [ ] Extend fresh-application browser coverage to uploads, exports, restricted
-      users and more CRUD/navigation cases
+- [x] Extend fresh-application browser coverage to restricted-user menu search and
+      navigation; see [visibility and authorization boundaries](tests/integration/MENU_SEARCH_VISIBILITY.md)
+- [ ] Extend fresh-application browser coverage to uploads, exports and more
+      CRUD/navigation cases
 - [ ] Establish a comprehensive lowest/latest dependency policy; the existing
       exact DBAL/DomCrawler floors are targeted checks, not every dependency minimum
 
@@ -177,6 +179,8 @@ and application checks; do not silently remove or claim support for them.
       review [published-view updates and preserved root links](tests/integration/MENU_NULL_URI.md)
 - [x] Delete menu descendants through model events and roll back same-connection
       subtree changes on veto/failure; review [observer, soft-delete and UI behavior](tests/integration/MENU_DELETION.md)
+- [x] Apply sidebar role/permission checks to menu search, including hidden
+      ancestors; review [custom-search compatibility](tests/integration/MENU_SEARCH_VISIBILITY.md)
 - [ ] Define the [shared menu URL-scheme policy](docs/menu-followups-2026-10-24.md)
       with compatibility and real-browser navigation regressions
 - [ ] Extend driver-specific PDO lifecycle checks beyond SQLite and decide whether

@@ -413,6 +413,19 @@ asset/view republish, schema or data migration is needed. See the
 複数 Grid の DOM ID を変更するものではありません。他の Laravel アプリとの
 互換性はアプリごとに検証してください。
 
+## Menu-search visibility (2026-10-28)
+
+Menu search now applies the sidebar's role and permission checks before walking
+each subtree. Hidden parents no longer expose their descendants' titles and URLs
+through search. Review custom search builders and authenticated callers of
+`Admin::menuLinks()`, then fully reload open pages. See the
+[visibility contract and verification](tests/integration/MENU_SEARCH_VISIBILITY.md).
+Route authorization, saved menus and the built-in views are unchanged.
+
+日本語: 親メニューを含むロール・権限の判定を検索にも適用し、非表示項目の名前や
+URL が検索に出る問題を修正します。独自の検索処理を確認し、画面を再読み込みして
+ください。アクセス権限の判定や保存データの変更はありません。
+
 ## Menu subtree deletion (2026-10-27)
 
 ModelTree now invokes each descendant's model deletion before deleting its

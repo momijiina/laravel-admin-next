@@ -5,6 +5,7 @@ const path = require('node:path');
 const {execFileSync, spawn} = require('node:child_process');
 const {setTimeout: delay} = require('node:timers/promises');
 const {chromium} = require('playwright');
+const restrictedUserSmoke = require('./restricted-user.cjs');
 
 const app = fs.realpathSync(process.env.FRESH_APP_PATH || '');
 const metadata = JSON.parse(fs.readFileSync(path.join(app, '.fresh-app-smoke.json'), 'utf8'));
@@ -323,6 +324,7 @@ async function main() {
     assert.equal(new URL(page.url()).pathname, '/admin/auth/login');
     console.log('PASS logout and protected route redirect');
     assert.deepEqual(failures, [], 'No JavaScript errors or failed page/asset requests');
+    await restrictedUserSmoke({browser, base, artifacts, readDatabase});
     console.log('PASS browser smoke on official skeleton ' + metadata.skeleton_tag);
   } catch (error) {
     if (page) await page.screenshot({path: path.join(artifacts, 'failure.png'), fullPage: true}).catch(() => {});

@@ -187,8 +187,14 @@ class Admin
         }
 
         $links = [];
+        $user = $this->user();
 
         foreach ($menu as $item) {
+            // Hidden ancestors must also hide their descendants from search.
+            if ($user && (!$user->visible(Arr::get($item, 'roles', [])) || !$user->can(Arr::get($item, 'permission')))) {
+                continue;
+            }
+
             if (!empty($item['children'])) {
                 $links = array_merge($links, $this->menuLinks($item['children']));
             } else {

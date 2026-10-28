@@ -215,6 +215,8 @@ The dated results below are historical snapshots, not the current suite totals.
   through the real HTTP kernel; [CRUD regression scope](GENERATED_CONTROLLER_CRUD.md)
 - Built-in menu text and attributes preserve their values and HTML boundaries,
   including native-parser PJAX URI encoding; [browser coverage and custom-HTML/URL boundaries](MENU_TREE_RENDERING.md)
+- Menu search respects the sidebar's role and permission checks, including hidden
+  ancestors; [visibility contract and custom-search compatibility](MENU_SEARCH_VISIBILITY.md)
 - DateMultiple native flatpickr options, actual calendar selections and HTTP/SQLite saves;
   [format precedence, JSON-only scope and upgrade cautions](DATE_MULTIPLE_OPTIONS.md)
 - Native mutable/immutable Date/Datetime edit/save round trips with shipped Moment;

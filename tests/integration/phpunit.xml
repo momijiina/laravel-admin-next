@@ -85,6 +85,7 @@
             <file>HandleControllerRequestTest.php</file>
             <file>PermissionEvaluationTest.php</file>
             <file>MenuTreeRenderingTest.php</file>
+            <file>MenuSearchVisibilityTest.php</file>
             <file>MenuDeletionTest.php</file>
             <file>ModelTreeDeletionTest.php</file>
             <file>OperationLogRenderingTest.php</file>

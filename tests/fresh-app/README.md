@@ -65,7 +65,17 @@ applied. The browser then checks:
   while an unrelated menu, its role link, and the role remain.
 - A simulated HTTP 200 deletion response with `status: false` displays its error
   without a success toast or PJAX refresh and preserves the current tree DOM.
-- No JavaScript exceptions or unsuccessful page/asset responses.
+- Restricted-user login in a separate browser context, with only GET dashboard
+  and roles permissions. Hidden role/permission leaves and descendants of hidden
+  parents are absent from sidebar and search, including the seeded Admin group.
+  Typing in the real search input cannot reveal Users; an allowed result opens
+  the roles grid through PJAX and displays a known persisted record.
+- Direct Users navigation and the actual grid Create button produce the existing
+  HTML/PJAX permission-denial pages (HTTP 200), without their grid/form content.
+  Browser AJAX POST/PUT/DELETE requests with valid CSRF tokens receive HTTP 403
+  and preserve roles, permissions and related pivot tables. Each intentional
+  denial is matched by exact method/URL/status; other failures still fail the run.
+- No unexpected JavaScript exceptions or unsuccessful page/asset responses.
 
 The seeded `admin` / `admin` credentials and all role records are disposable local
 test data. This smoke does not change the package's default credential policy.
@@ -80,6 +90,8 @@ for seven days. It does not upload the environment file or SQLite database.
 Provisioning failures remain visible in the workflow's command output.
 Locally these artifacts default to the ignored `tests/fresh-app/artifacts/`
 directory; `FRESH_APP_ARTIFACTS` selects another directory.
+Restricted-user failures also capture `restricted-user-failure.png` before
+closing their isolated browser context.
 
 The initial 2026-10-24 browser run on Laravel 13.38.0 reproduced an HTTP 500 after
 successful login: JSON sessions reloaded the notification `MessageBag` as an
@@ -103,3 +115,18 @@ versions and the same browser/tool versions on 2026-10-24. It waits for the real
 refreshed tree. Preloading the original `MenuController` only in the disposable
 Laravel 13 server made the runner fail at its explicit literal-title assertion;
 the working checkout stayed fixed and failure artifacts were retained.
+
+The restricted-user extension passed locally on 2026-10-28 with Laravel 12.70.1
+and 13.38.0, PHP 8.4.27, Node 24.19.0, Playwright 1.62.1 and Chromium
+154.0.8037.57. These runs reused the disposable official-skeleton fixtures and
+refreshed their cached views; they did not repeat dependency installation.
+The complete existing administrator flow also passed. The browser checks menu
+visibility and representative path/method authorization through separate real
+requests; custom guards/models, explicit middleware rule combinations, permission
+changes in an already-open page and long-lived application workers need separate
+coverage. See the [menu-search contract](../integration/MENU_SEARCH_VISIBILITY.md).
+
+Preloading the original `Admin` class only in the disposable Laravel 13 HTTP
+server made the same runner fail after typing `Users`: the actual search result
+was visible although its parent was restricted. The checkout remained fixed,
+and the restricted-user failure screenshot was retained.
