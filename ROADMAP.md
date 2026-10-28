@@ -168,6 +168,8 @@ and application checks; do not silently remove or claim support for them.
       [custom preview hooks and remaining plugin limits](tests/integration/UPLOAD_PREVIEW_TEXT.md)
 - [x] Add configurable failed-login limits and sanitized retry input to the built-in
       controller; review [default adoption, cache and override boundaries](tests/integration/LOGIN_THROTTLE.md)
+- [x] Apply sidebar role/permission checks to menu search, including hidden
+      ancestors; review [custom-search compatibility](tests/integration/MENU_SEARCH_VISIBILITY.md)
 - [x] Restore explicit role selection during administrator creation; review
       [existing-account and automation changes](tests/integration/CREATE_USER_ROLES.md)
 - [x] Enforce every explicit route permission rule and literal zero permission values;
@@ -179,8 +181,6 @@ and application checks; do not silently remove or claim support for them.
       review [published-view updates and preserved root links](tests/integration/MENU_NULL_URI.md)
 - [x] Delete menu descendants through model events and roll back same-connection
       subtree changes on veto/failure; review [observer, soft-delete and UI behavior](tests/integration/MENU_DELETION.md)
-- [x] Apply sidebar role/permission checks to menu search, including hidden
-      ancestors; review [custom-search compatibility](tests/integration/MENU_SEARCH_VISIBILITY.md)
 - [ ] Define the [shared menu URL-scheme policy](docs/menu-followups-2026-10-24.md)
       with compatibility and real-browser navigation regressions
 - [ ] Extend driver-specific PDO lifecycle checks beyond SQLite and decide whether

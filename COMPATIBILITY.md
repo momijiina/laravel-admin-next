@@ -21,6 +21,19 @@ Composer の制約変更だけでは既存 PDO アダプターやスキーマ AP
 通常の Composer 検査を有効にしたまま宣言範囲内で解決してください。Laravel 12/13
 全体では DBAL 3 を使用し、DBAL 2 の限定的な検証は全組み合わせの保証ではありません。
 
+## Menu-search visibility (2026-10-28)
+
+Menu search now applies the sidebar's role and permission checks before walking
+each subtree. Hidden parents no longer expose their descendants' titles and URLs
+through search. Review custom search builders and authenticated callers of
+`Admin::menuLinks()`, then fully reload open pages. See the
+[visibility contract and verification](tests/integration/MENU_SEARCH_VISIBILITY.md).
+Route authorization, saved menus and the built-in views are unchanged.
+
+日本語: 親メニューを含むロール・権限の判定を検索にも適用し、非表示項目の名前や
+URL が検索に出る問題を修正します。独自の検索処理を確認し、画面を再読み込みして
+ください。アクセス権限の判定や保存データの変更はありません。
+
 ## Permission values and method-qualified paths (2026-10-24)
 
 Zero-valued permission paths and slugs no longer mean unrestricted access.
@@ -412,19 +425,6 @@ asset/view republish, schema or data migration is needed. See the
 アセット・ビューの再公開、スキーマ・データ移行は不要です。日時ピッカーや
 複数 Grid の DOM ID を変更するものではありません。他の Laravel アプリとの
 互換性はアプリごとに検証してください。
-
-## Menu-search visibility (2026-10-28)
-
-Menu search now applies the sidebar's role and permission checks before walking
-each subtree. Hidden parents no longer expose their descendants' titles and URLs
-through search. Review custom search builders and authenticated callers of
-`Admin::menuLinks()`, then fully reload open pages. See the
-[visibility contract and verification](tests/integration/MENU_SEARCH_VISIBILITY.md).
-Route authorization, saved menus and the built-in views are unchanged.
-
-日本語: 親メニューを含むロール・権限の判定を検索にも適用し、非表示項目の名前や
-URL が検索に出る問題を修正します。独自の検索処理を確認し、画面を再読み込みして
-ください。アクセス権限の判定や保存データの変更はありません。
 
 ## Menu subtree deletion (2026-10-27)
 
