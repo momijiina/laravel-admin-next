@@ -1,10 +1,13 @@
 @if(Admin::user()->visible(\Illuminate\Support\Arr::get($item, 'roles', [])) && Admin::user()->can(\Illuminate\Support\Arr::get($item, 'permission')))
     @if(!isset($item['children']))
+        @php($link = \Encore\Admin\MenuUrl::resolve($item['uri'] ?? ''))
         <li>
-            @if(url()->isValidUrl($item['uri'] ?? ''))
-                <a href="{{ $item['uri'] }}" target="_blank">
+            @if($link['href'] === null)
+                <a aria-disabled="true">
+            @elseif($link['target'] !== null)
+                <a href="{!! e($link['href'], true) !!}" target="{{ $link['target'] }}">
             @else
-                 <a href="{{ admin_url($item['uri']) }}">
+                <a href="{!! e($link['href'], true) !!}">
             @endif
                 <i class="fa {{$item['icon']}}"></i>
                 @if (Lang::has($titleTranslation = 'admin.menu_titles.' . trim(str_replace(' ', '_', strtolower($item['title'])))))

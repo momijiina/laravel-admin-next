@@ -26,8 +26,13 @@
               </span>
                 <ul class="dropdown-menu" role="menu" style="min-width: 210px;max-height: 300px;overflow: auto;">
                     @foreach(Admin::menuLinks() as $link)
+                    @php($menuUrl = \Encore\Admin\MenuUrl::resolve($link['uri'] ?? ''))
                     <li>
-                        <a href="{{ admin_url($link['uri']) }}"><i class="fa {{ $link['icon'] }}"></i>{{ admin_trans($link['title']) }}</a>
+                        @if($menuUrl['href'] === null)
+                            <a aria-disabled="true"><i class="fa {{ $link['icon'] }}"></i>{{ admin_trans($link['title']) }}</a>
+                        @else
+                            <a href="{!! e($menuUrl['href'], true) !!}"><i class="fa {{ $link['icon'] }}"></i>{{ admin_trans($link['title']) }}</a>
+                        @endif
                     </li>
                     @endforeach
                 </ul>

@@ -1,5 +1,8 @@
 # Built-in menu tree text
 
+This guide records the original escaping change. The subsequent
+[URL-scheme policy](MENU_URL_SCHEMES.md) includes additional view upgrade steps.
+
 The built-in `MenuController` now escapes saved titles, icon class values and the
 resolved URI before adding them to its tree HTML. A title such as
 `<b>literal</b> &amp;` stays visible as that exact text. Quotes in an icon or URI
@@ -13,11 +16,11 @@ branches and tree controls continue to work. Custom `Tree::branch()` callbacks
 continue to return HTML; applications that provide one are responsible for
 escaping their own interpolated values. Stored menu values are not rewritten.
 
-URL acceptance and resolution still use Laravel's `url()->isValidUrl()` and the
-package's `admin_url()`. HTML escaping is not a URL scheme allowlist. The existing
-resolver can accept executable schemes, and the sidebar shares that URL policy.
-A shared scheme policy for tree and sidebar links remains separate work. These
-tests inspect URI text and attributes without following the supplied links.
+The original escaping change retained Laravel's URL acceptance rules; escaping
+alone does not restrict navigation schemes. The subsequent
+[menu URL policy](MENU_URL_SCHEMES.md) now supplies a shared allowlist for tree,
+sidebar and search links, with separate browser navigation checks. The literal
+text assertions below remain focused on text and attribute boundaries.
 
 ## Checks
 
@@ -114,10 +117,9 @@ The integration fixture bypasses CSRF and uses an authenticated test guard;
 the separate browser flow covers real cookies and CSRF with SQLite, official
 Laravel skeletons and Chromium. Other databases, browsers, custom controllers,
 custom branch callbacks, and arbitrary invalid/binary text are outside these
-checks. Menu deletion and URL-scheme policy are separate concerns; the
-[follow-up audit](../../docs/menu-followups-2026-10-24.md) records these concerns.
-The separate [NULL URI follow-up](MENU_NULL_URI.md) covers empty menu paths,
-sidebar/search rendering and URL helpers.
+checks. The [subtree-deletion](MENU_DELETION.md), [URL policy](MENU_URL_SCHEMES.md)
+and [NULL URI](MENU_NULL_URI.md) guides describe those subsequent changes and
+their own verification boundaries.
 
 ## 日本語
 
@@ -131,10 +133,9 @@ sidebar/search rendering and URL helpers.
 `MenuController::treeView()` をコピーした実装を確認し、管理画面を再読み込み
 してください。スキーマ・データ移行やアセット・ビューの再公開は不要です。
 
-URL 判定・解決の方針は変更しません。HTML エスケープは URL スキームの許可
-リストではなく、現状の判定は実行可能なスキームも受け入れます。サイドバーと
-管理ツリーに共通のスキーム方針は別途検討が必要です。検証では URI の文字列と
-属性を確認し、そのリンクには移動しません。
+この文字列エスケープ修正自体は URL スキームを制限しません。後続の
+[メニュー URL 方針](MENU_URL_SCHEMES.md)で、管理ツリー・サイドバー・検索に
+共通の許可リストとブラウザーでのリンク操作の検証を追加しています。
 
 実 HTTP・SQLite・DOM のテストは通常画面と PJAX 出力を検証します。別の
 実ブラウザーテストでは Cookie と CSRF を通して保存し、通常画面と PJAX 更新、

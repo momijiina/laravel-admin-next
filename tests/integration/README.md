@@ -140,6 +140,11 @@ The dated results below are historical snapshots, not the current suite totals.
 
 ## What this covers
 
+- Shared menu URL scheme rules, disabled but searchable rejected entries,
+  literal URI attributes, control-character spellings and preserved normal
+  links; [policy, view upgrades and navigation checks](MENU_URL_SCHEMES.md)
+  - 日本語: メニュー 3 箇所の URL 方針、拒否した項目の表示・検索とビュー更新
+
 - Menu subtree deletion, descendant model events and role-pivot cleanup,
   veto/exception rollback on the model connection, custom tree models and
   soft/force deletion; [contracts, UI behavior and transaction boundaries](MENU_DELETION.md)

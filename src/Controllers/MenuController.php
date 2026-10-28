@@ -6,6 +6,7 @@ use Encore\Admin\Form;
 use Encore\Admin\Layout\Column;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Layout\Row;
+use Encore\Admin\MenuUrl;
 use Encore\Admin\Tree;
 use Encore\Admin\Widgets\Box;
 use Illuminate\Routing\Controller;
@@ -82,12 +83,14 @@ class MenuController extends Controller
 
             if (!isset($branch['children'])) {
                 $uri = $branch['uri'] ?? '';
-                if (!url()->isValidUrl($uri)) {
-                    $uri = admin_url($uri);
-                }
+                $link = MenuUrl::resolve($uri);
 
-                $uri = e($uri);
-                $payload .= "&nbsp;&nbsp;&nbsp;<a href=\"$uri\" class=\"dd-nodrag\">$uri</a>";
+                if ($link['href'] === null) {
+                    $payload .= '&nbsp;&nbsp;&nbsp;<span class="dd-nodrag">'.e($uri).'</span>';
+                } else {
+                    $uri = e($link['href']);
+                    $payload .= "&nbsp;&nbsp;&nbsp;<a href=\"$uri\" class=\"dd-nodrag\">$uri</a>";
+                }
             }
 
             return $payload;

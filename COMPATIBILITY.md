@@ -413,6 +413,20 @@ asset/view republish, schema or data migration is needed. See the
 複数 Grid の DOM ID を変更するものではありません。他の Laravel アプリとの
 互換性はアプリごとに検証してください。
 
+## Menu URL schemes (2026-10-28)
+
+The tree, sidebar and menu search now share a menu-specific URL resolver.
+HTTP(S), mailto/tel/sms, fragments and relative links remain available; other
+explicit schemes render without navigation, including control-character
+spellings interpreted by browsers. Rejected entries remain visible/searchable
+and editable. Review FTP/custom-scheme entries, published menu/sidebar views
+and copied tree callbacks; see [the policy, migration and click regressions](tests/integration/MENU_URL_SCHEMES.md).
+The public `admin_url()` helper retains its existing behavior.
+
+日本語: 管理ツリー・サイドバー・検索でスキームの許可方針を共通化し、拒否した
+項目は確認・編集できる表示として残します。公開済みビュー、コピーした実装と
+既存の独自スキームを確認してください。汎用 URL ヘルパーの仕様は変更しません。
+
 ## Menu subtree deletion (2026-10-27)
 
 ModelTree now invokes each descendant's model deletion before deleting its
@@ -670,14 +684,14 @@ for the narrow default-assignment change, unchanged matching rules and upgrade
 cautions. 日本語: 別の既定スコープがあってもゼロの明示選択を保持します。
 既存の比較仕様と独自実装の注意事項は上記ガイドを確認してください。
 
-Updated 2026-10-27. This index describes the changes merged through
-[PR #131](https://github.com/momijiina/laravel-admin-next/pull/131), at
-[`077c67f`](https://github.com/momijiina/laravel-admin-next/commit/077c67f).
+Updated 2026-10-28. This index describes the changes merged through
+[PR #132](https://github.com/momijiina/laravel-admin-next/pull/132), at
+[`8fe9df3`](https://github.com/momijiina/laravel-admin-next/commit/8fe9df3).
 Use the linked guides for upgrade steps and each regression's precise boundary.
 Historical test totals below remain evidence for their own revisions, not
 current suite totals or validation of subsequent changes.
 
-### Recent merged changes: PRs #128–#131
+### Recent merged changes: PRs #128–#132
 
 - **Installer preservation (#128):** rerunning installation preserves existing
   administrator data and scaffold files; see [initialization and retry rules](tests/integration/INSTALL_COMMAND_PRESERVATION.md).
@@ -690,6 +704,9 @@ current suite totals or validation of subsequent changes.
   deprecation warnings; update [overridden menu partials](tests/integration/MENU_NULL_URI.md).
   Its pre-merge head `a3ace8c` completed all 63 GitHub checks successfully,
   verified on 2026-10-27. That result applies to that revision.
+- **Menu subtree deletion (#132):** descendant model events remove deep menu
+  records and role pivots, with same-connection rollback on veto/failure;
+  review [observer and soft-delete behavior](tests/integration/MENU_DELETION.md).
 
 日本語: 再インストール時の既存データ・ファイル保持、CSV のバックスラッシュ、
 メニュー文字列の表示と空 URI の警告を修正しました。適用範囲と更新手順は各ガイドを

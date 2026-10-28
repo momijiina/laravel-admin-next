@@ -47,7 +47,8 @@ The [fresh application smoke](../fresh-app/README.md) covers blank menu URIs
 through real cookies/CSRF and full/PJAX rendering with cached Laravel apps.
 These tests use SQLite. Other databases, application-specific overrides and
 other browsers need their own checks. URL-scheme acceptance and nested-menu
-deletion remain separate [follow-up work](../../docs/menu-followups-2026-10-24.md).
+deletion have their own [policy](MENU_URL_SCHEMES.md) and
+[subtree-deletion](MENU_DELETION.md) guides.
 
 ## 日本語
 

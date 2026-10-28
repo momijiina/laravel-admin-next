@@ -185,6 +185,82 @@ async function main() {
     `, emptyMenu.title);
     assert.equal(savedUri, null, 'Web middleware stores the empty URI as database NULL');
 
+    const markerUri = '//example.test/%0Awindow.menuSchemeExecuted=1;void(0)';
+    const blockedMenus = [
+      {title: 'Scheme plain ' + suffix, uri: 'javascript:' + markerUri},
+      {title: 'Scheme whitespace ' + suffix, uri: 'JaVa\tSc\nRi\rPt:' + markerUri},
+      {title: 'Scheme control ' + suffix, uri: '\u0001javascript:' + markerUri},
+    ];
+    const relativeMenu = {title: 'Scheme relative ' + suffix, uri: 'auth/roles?menu_relative=' + suffix};
+    const fragmentMenu = {title: 'Scheme fragment ' + suffix, uri: '#menu-fragment-' + suffix};
+    const httpMenu = {title: 'Scheme HTTP ' + suffix, uri: base + '/admin/auth/roles?menu_http=' + suffix};
+    for (const menu of [...blockedMenus, relativeMenu, fragmentMenu, httpMenu]) {
+      menu.id = await createMenu({...menu, icon: 'fa-bars'});
+    }
+    const storedBlockedUris = readDatabase(String.raw`
+      $model = config('admin.database.menu_model');
+      $ids = json_decode($argv[1], true, 512, JSON_THROW_ON_ERROR);
+      echo json_encode(array_map(fn ($id) => $model::findOrFail($id)->getRawOriginal('uri'), $ids), JSON_THROW_ON_ERROR);
+    `, JSON.stringify(blockedMenus.map(menu => menu.id)));
+    assert.deepEqual(storedBlockedUris, blockedMenus.map(menu => menu.uri), 'Unsupported schemes remain stored without rewriting their bytes');
+
+    async function findSearchMenu(menu) {
+      const input = page.locator('.sidebar-form .autocomplete');
+      await input.fill(menu.title);
+      await input.press('End'); // The shipped autocomplete filters on keyup.
+      const link = page.locator('.sidebar-form .dropdown-menu a').filter({hasText: menu.title});
+      assert.equal(await link.count(), 1, 'Autocomplete retains the menu label');
+      await link.waitFor({state: 'visible'});
+      return link;
+    }
+
+    async function checkInertMenuUris(load) {
+      const initialUrl = page.url();
+      const initialPages = context.pages().length;
+      const navigationRequests = [];
+      let popups = 0;
+      const recordRequest = request => {
+        if (request.isNavigationRequest() || request.headers()['x-pjax'] === 'true') navigationRequests.push(request.url());
+      };
+      const recordPopup = () => { popups++; };
+      context.on('request', recordRequest);
+      page.on('popup', recordPopup);
+      await page.evaluate(() => { window.menuSchemeExecuted = 0; });
+      try {
+        for (const menu of blockedMenus) {
+          for (const surface of ['tree', 'sidebar', 'search']) {
+            const node = surface === 'tree'
+              ? page.locator('.dd-item[data-id="' + menu.id + '"] > .dd-handle > .dd-nodrag:not(.pull-right)')
+              : surface === 'sidebar'
+                ? page.locator('.sidebar-menu > li > a').filter({hasText: menu.title})
+                : await findSearchMenu(menu);
+            const label = load + ' ' + surface + ' ' + menu.title;
+            assert.equal(await node.count(), 1, label);
+            // Deliver a real mouse click even when aria-disabled prevents Playwright's normal click.
+            // The generic tree locator also clicks the old unsafe anchor in a negative control.
+            await node.click({force: true});
+            await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+            assert.equal(await page.evaluate(() => window.menuSchemeExecuted), 0, label + ' cannot execute a stored scheme');
+            assert.equal(page.url(), initialUrl, label + ' cannot change the current URL');
+            assert.equal(popups, 0, label + ' cannot open a popup');
+            assert.equal(context.pages().length, initialPages, label + ' cannot open another page');
+            assert.deepEqual(navigationRequests, [], label + ' cannot request navigation or PJAX');
+            assert.equal(await node.getAttribute('href'), null, label + ' has no navigation href');
+            assert.equal(await node.getAttribute('target'), null, label + ' has no navigation target');
+            if (surface === 'tree') {
+              assert.equal(await node.evaluate(element => element.tagName), 'SPAN');
+              assert.equal(await node.textContent(), menu.uri.replace(/\r\n?/g, '\n'), 'Tree retains URI text with normal HTML newline parsing');
+            } else {
+              assert.equal(await node.getAttribute('aria-disabled'), 'true');
+            }
+          }
+        }
+      } finally {
+        context.off('request', recordRequest);
+        page.off('popup', recordPopup);
+      }
+    }
+
     async function checkLiteralMenus() {
       for (const menu of menus) {
         const title = page.locator('.dd-handle > strong').filter({hasText: menu.title});
@@ -208,7 +284,12 @@ async function main() {
     }
 
     await visit('/admin/auth/menu');
+    if (await page.locator('body').evaluate(body => body.classList.contains('sidebar-collapse'))) {
+      await page.locator('.sidebar-toggle').click();
+    }
+    await page.locator('.sidebar-form .autocomplete').waitFor({state: 'visible'});
     await checkLiteralMenus();
+    await checkInertMenuUris('Full page');
     for (const selector of ['.sidebar-menu > li > a', '.sidebar-form .dropdown-menu a']) {
       const rootLink = page.locator(selector).filter({hasText: emptyMenu.title});
       assert.equal(await rootLink.count(), 1, 'NULL URI menu appears in ' + selector);
@@ -231,7 +312,51 @@ async function main() {
     await page.waitForFunction(() => window.menuSmokePjaxEnded && !document.querySelector('.dd[data-menu-smoke-old-dom]'));
     await page.waitForLoadState('networkidle');
     await checkLiteralMenus();
+    await checkInertMenuUris('PJAX refresh');
     console.log('PASS literal menu values and NULL URI root links after full page and PJAX loads');
+    console.log('PASS stored executable and obfuscated schemes stay inert in tree, sidebar and search after full page and PJAX loads');
+
+    await markMenuRefresh();
+    const relativeUrl = base + '/admin/' + relativeMenu.uri;
+    const [relativeResponse] = await Promise.all([
+      page.waitForResponse(response => {
+        const url = new URL(response.url());
+        return url.pathname === '/admin/auth/roles' && url.searchParams.get('menu_relative') === suffix && response.request().headers()['x-pjax'] === 'true';
+      }),
+      page.locator('.dd-item[data-id="' + relativeMenu.id + '"] > .dd-handle > a.dd-nodrag').click(),
+    ]);
+    assert.equal(relativeResponse.status(), 200);
+    await page.waitForURL(relativeUrl);
+    await page.waitForFunction(() => window.menuSmokePjaxEnded && !document.querySelector('.dd[data-menu-smoke-old-dom]'));
+    await page.locator('tr').filter({hasText: roleName + ' updated'}).waitFor();
+    await page.waitForLoadState('networkidle');
+    assert.equal(await page.evaluate(() => window.menuSchemeExecuted), 0, 'Relative menu navigation preserves the document through PJAX');
+
+    const fragmentRequests = [];
+    const recordFragmentRequest = request => fragmentRequests.push(request.url());
+    const fragmentUrl = relativeUrl + fragmentMenu.uri;
+    context.on('request', recordFragmentRequest);
+    try {
+      const fragmentLink = await findSearchMenu(fragmentMenu);
+      await Promise.all([page.waitForURL(fragmentUrl), fragmentLink.click()]);
+      await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+      assert.deepEqual(fragmentRequests, [], 'Fragment menu navigation makes no HTTP or PJAX request');
+      assert.equal(await page.evaluate(() => window.menuSchemeExecuted), 0, 'Fragment navigation preserves the document');
+    } finally {
+      context.off('request', recordFragmentRequest);
+    }
+
+    const [httpPopup, httpResponse] = await Promise.all([
+      page.waitForEvent('popup'),
+      context.waitForEvent('response', response => response.url() === httpMenu.uri && response.request().isNavigationRequest()),
+      page.locator('.sidebar-menu > li > a').filter({hasText: httpMenu.title}).click(),
+    ]);
+    assert.equal(httpResponse.status(), 200, 'Absolute HTTP menu opens the real loopback server');
+    await httpPopup.waitForURL(httpMenu.uri);
+    await httpPopup.locator('tr').filter({hasText: roleName + ' updated'}).waitFor();
+    assert.equal(page.url(), fragmentUrl, 'Sidebar HTTP target preserves the original page');
+    await httpPopup.close();
+    console.log('PASS relative tree PJAX, same-document search fragment and sidebar HTTP popup navigation on loopback');
 
     const roleId = Number(new URL(editUrl).pathname.split('/').at(-2));
     assert.ok(Number.isInteger(roleId) && roleId > 0, 'Use the role created by this browser run');

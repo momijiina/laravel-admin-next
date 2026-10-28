@@ -60,6 +60,16 @@ applied. The browser then checks:
 - Empty menu URI submission stored as database `NULL`, with admin-root links
   in the management tree after full/PJAX loads and in the full-page sidebar and
   menu-search list.
+- Stored executable menu schemes, including mixed case, embedded TAB/LF/CR and
+  leading control characters, retain their database values and management URI
+  text. Real clicks cannot execute the harmless marker, navigate or open a popup
+  from the tree, sidebar or search. These checks run after a full load and a
+  verified PJAX tree replacement; the real autocomplete still finds disabled
+  entries by their labels.
+- Allowed menu links really navigate: a relative tree link loads the roles page
+  through PJAX, a search fragment changes the hash without a request, and an
+  absolute HTTP sidebar link opens the roles page in a new tab. All followed
+  HTTP URLs use the runner's loopback server.
 - Four-level menu-tree deletion through its trash button and confirmation dialog;
   all descendants and role links removed from the database after PJAX refresh,
   while an unrelated menu, its role link, and the role remain.
