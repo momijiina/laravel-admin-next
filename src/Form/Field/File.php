@@ -126,7 +126,10 @@ class File extends Field
     {
         $path = $this->upload($file);
 
-        $this->destroy();
+        // A missing original may have just been recreated at the same path.
+        if ($path !== $this->original) {
+            $this->destroy();
+        }
 
         return $path;
     }

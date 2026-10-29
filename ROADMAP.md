@@ -79,6 +79,8 @@ and application checks; do not silently remove or claim support for them.
       real SQLite/HTTP lifecycle regressions; see [behavior and limits](docs/operation-log-redaction.md)
 - [x] Preserve original main-upload files/records when replacement storage fails;
       see [non-atomic filesystem/database limits](tests/integration/FILE_UPLOAD_FAILURE.md)
+- [x] Keep successfully uploaded bytes when replacing a missing file at the same
+      path; review [cleanup overrides and recovery limits](tests/integration/FILE_UPLOAD_FAILURE.md#replacing-a-missing-original-at-the-same-path)
 - [x] Migrate optional image processing to Intervention Image `^3.11.9` with a
       bounded legacy adapter and GD-output regressions; review the breaking
       changes and unverified drivers/codecs in the [migration guide](IMAGE_MIGRATION.md)

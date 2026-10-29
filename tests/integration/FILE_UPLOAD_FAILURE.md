@@ -20,6 +20,47 @@ overlong filename; no filesystem permission changes or production files are used
 The HTTP fixture uses the real form and framework kernel, with test-mode CSRF
 bypass; it does not exercise browser JavaScript.
 
+## Replacing a missing original at the same path
+
+If a record still points to `uploads/report.txt` but that file is missing,
+uploading `report.txt` again now retains the new bytes. Previously the upload
+succeeded at that same path, then the old-file cleanup deleted the newly written
+file. The HTTP response reported success and the database retained a path with
+no file behind it.
+
+After a successful single-file upload, `File` skips original cleanup when the
+returned storage path is exactly the original path. Existing-file collisions
+still receive a new name, and a different original path is still cleaned up
+unless `retainable()` is set. Failed writes retain the existing failure guard.
+The image field already has its own protection for successfully stored paths.
+
+Review copies or overrides of `File::uploadAndDeleteOriginal()`. An overridden
+`destroy()` is no longer called in this same-path case; explicit deletion and
+cleanup of a different original path keep their behavior. No data migration,
+dependency change, or asset/view update is required. Previously deleted bytes
+are not recoverable from this change; affected files must be uploaded again.
+
+日本語: DB にパスが残っていて実ファイルだけがない場合、同名で再アップロード
+したファイルを直後の古いファイル削除処理が消していました。保存先と元のパスが
+同一の場合は削除を行わず、新しい内容を保持します。独自の保存・削除処理を確認して
+ください。過去に失われた内容の復元は含みませんが、再アップロードで保存できます。
+
+Verification on 2026-10-29, PHP 8.4.27 with Laravel 12.70.1 / PHPUnit 11.5.57
+and Laravel 13.38.0 / PHPUnit 12.5.40:
+
+- `FileUploadFailureTest` passes **14 tests / 83 assertions** on each framework.
+  New HTTP cases cover missing-file recovery on throwing/nonthrowing disks,
+  a configured filename callback, same-name collisions, retention and a different
+  replacement path, while keeping the previous failed-write regressions.
+- Preloading the original `File` class makes the four same-path cases report
+  **three failures** on each framework: the new bytes are absent despite HTTP
+  success. The `retainable()` control already passes on the original code.
+- The related `FileUploadFailureTest|GridInlineUploadTest|MultipleFileSortTest|UploadPreviewTextTest`
+  suite passes **101 tests / 2,836 assertions** in randomized order (seed 135)
+  on each framework. The historical BrowserKit/image runner also passes all
+  **125 tests** on both. These are local results, not a hosted CI run or a new
+  live-browser upload test.
+
 ## Boundaries
 
 This is a main-upload failure guard, not a database/filesystem transaction.

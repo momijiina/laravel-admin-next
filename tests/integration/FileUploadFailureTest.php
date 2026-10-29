@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use League\Flysystem\UnableToWriteFile;
 use Orchestra\Testbench\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class FileUploadFailureTest extends TestCase
 {
@@ -116,6 +117,93 @@ class FileUploadFailureTest extends TestCase
         $this->assertSame('uploads/new.txt', $record->fresh()->document);
         $this->assertSame('replacement bytes', Storage::disk('upload_test')->get('uploads/new.txt'));
         $this->assertFalse(Storage::disk('upload_test')->exists('old.txt'));
+    }
+
+    public static function missingOriginalReplacements(): iterable
+    {
+        yield 'original filename, nonthrowing disk' => [false, false, false];
+        yield 'original filename, throwing disk' => [true, false, false];
+        yield 'configured filename' => [false, true, false];
+        yield 'retainable control' => [false, false, true];
+    }
+
+    #[DataProvider('missingOriginalReplacements')]
+    public function test_missing_original_same_path_http_replacement_keeps_new_bytes(bool $throw, bool $named, bool $retainable): void
+    {
+        config(['filesystems.disks.upload_test.throw' => $throw]);
+        $disk = Storage::disk('upload_test');
+        $record = UploadFailureRecord::create(['document' => 'uploads/report.txt']);
+        $this->assertFalse($disk->exists($record->document));
+        $this->app['router']->post('same-path-upload-test/{id}', function ($id) use ($named, $retainable) {
+            $form = new Form(new UploadFailureRecord());
+            $field = $form->file('document')->retainable($retainable);
+            if ($named) {
+                $field->name(function ($file) {
+                    return 'report.'.$file->getClientOriginalExtension();
+                });
+            }
+            return $form->update($id);
+        })->middleware('web');
+
+        $this->post('/same-path-upload-test/'.$record->id, [
+            'document' => UploadedFile::fake()->createWithContent($named ? 'incoming.txt' : 'report.txt', 'replacement bytes'),
+        ], ['X-Requested-With' => 'XMLHttpRequest', 'Accept' => 'application/json'])
+            ->assertOk()->assertJson(['status' => true]);
+
+        $this->assertSame('uploads/report.txt', $record->fresh()->document);
+        $this->assertTrue($disk->exists('uploads/report.txt'));
+        $this->assertSame('replacement bytes', $disk->get('uploads/report.txt'));
+        $this->assertSame(['uploads/report.txt'], $disk->allFiles());
+    }
+
+    public static function retainableReplacements(): iterable
+    {
+        yield 'remove original' => [false];
+        yield 'retain original' => [true];
+    }
+
+    #[DataProvider('retainableReplacements')]
+    public function test_existing_same_name_http_replacement_keeps_collision_naming_and_retention(bool $retainable): void
+    {
+        $disk = Storage::disk('upload_test');
+        $disk->put('uploads/report.txt', 'original bytes');
+        $record = UploadFailureRecord::create(['document' => 'uploads/report.txt']);
+        $this->app['router']->post('collision-upload-test/{id}', function ($id) use ($retainable) {
+            $form = new Form(new UploadFailureRecord());
+            $form->file('document')->retainable($retainable);
+            return $form->update($id);
+        })->middleware('web');
+
+        $this->post('/collision-upload-test/'.$record->id, [
+            'document' => UploadedFile::fake()->createWithContent('report.txt', 'replacement bytes'),
+        ], ['X-Requested-With' => 'XMLHttpRequest', 'Accept' => 'application/json'])
+            ->assertOk()->assertJson(['status' => true]);
+
+        $path = $record->fresh()->document;
+        $this->assertStringStartsWith('uploads/', $path);
+        $this->assertNotSame('uploads/report.txt', $path);
+        $this->assertSame('replacement bytes', $disk->get($path));
+        $this->assertSame($retainable, $disk->exists('uploads/report.txt'));
+        if ($retainable) {
+            $this->assertSame('original bytes', $disk->get('uploads/report.txt'));
+        }
+        $this->assertCount($retainable ? 2 : 1, $disk->allFiles());
+    }
+
+    public function test_missing_original_different_path_http_replacement_keeps_new_bytes(): void
+    {
+        $disk = Storage::disk('upload_test');
+        $record = UploadFailureRecord::create(['document' => 'uploads/missing.txt']);
+        $this->assertFalse($disk->exists($record->document));
+
+        $this->post('/upload-test/'.$record->id, [
+            'document' => UploadedFile::fake()->createWithContent('new.txt', 'replacement bytes'),
+        ], ['X-Requested-With' => 'XMLHttpRequest', 'Accept' => 'application/json'])
+            ->assertOk()->assertJson(['status' => true]);
+
+        $this->assertSame('uploads/new.txt', $record->fresh()->document);
+        $this->assertSame('replacement bytes', $disk->get('uploads/new.txt'));
+        $this->assertSame(['uploads/new.txt'], $disk->allFiles());
     }
 
     public function test_failed_initial_http_upload_does_not_create_a_record(): void

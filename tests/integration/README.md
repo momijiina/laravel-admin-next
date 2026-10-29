@@ -359,7 +359,8 @@ The dated results below are historical snapshots, not the current suite totals.
 - Ready-wrapped HasMany default/tab reinitialization, consumer handlers, safe child
   identities, real Bootstrap tab behavior and HTTP/SQLite saves;
   [regression scope](HASMANY_MODES_REINITIALIZATION.md)
-- Main-file upload failure preservation and successful replacement
+- Main-file upload failure preservation and successful replacement, including
+  [recreating a missing original at the same stored path](FILE_UPLOAD_FAILURE.md#replacing-a-missing-original-at-the-same-path)
 - Saved upload captions, preview/download URLs and native zoom preserving literal
   filename characters across File/Image/Multiple variants;
   [plugin-boundary escaping and custom-template limits](UPLOAD_PREVIEW_TEXT.md)

@@ -1304,6 +1304,19 @@ for separate in-process historical and image-output coverage. Local results,
 configured CI matrices and hosted results for an exact commit are distinct
 forms of evidence; none substitutes for the others.
 
+## Replacement of missing files (2026-10-29)
+
+A single-file upload now keeps its new bytes when it recreates the exact original
+path of a missing file. Previously the subsequent cleanup deleted the new file
+while the request reported success. Existing-file collision naming and cleanup
+of a different original remain. Review copied `uploadAndDeleteOriginal()` and
+custom `destroy()` hooks; see [the replacement contract and verification](tests/integration/FILE_UPLOAD_FAILURE.md#replacing-a-missing-original-at-the-same-path).
+No schema, asset or view update is required.
+
+日本語: 実ファイルがない保存先へ同名で再アップロードした直後、新しい内容まで
+削除される問題を修正します。同一パスの場合は古いファイルの削除処理を呼びません。
+独自の保存・削除フックと検証範囲は上記ガイドを確認してください。
+
 ## Literal saved-upload previews (2026-10-23)
 
 Generated file/image preview captions and download URLs are escaped at the
